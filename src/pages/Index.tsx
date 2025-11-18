@@ -30,15 +30,10 @@ const Index = () => {
         <main style={{ minHeight: 'auto' }}>
           <HeroSection />
           <HowItWorksSection />
-          <div style={{ backgroundColor: 'red', padding: '50px', color: 'white', fontSize: '24px', minHeight: '200px' }}>
-            <h2>TESTING: This div should be visible after HowItWorksSection</h2>
-            <p>If you can see this red section, then there's no rendering issue with adding new divs</p>
-          </div>
-          {/* Now let's uncomment one section at a time */}
           <FeaturedCoachesSection />
-          {/* <BenefitsSection /> */}
-          {/* <TestimonialsSection /> */}
-          {/* <CTASection /> */}
+          <BenefitsSection />
+          <TestimonialsSection />
+          <CTASection />
         </main>
         <Footer />
         </div>
