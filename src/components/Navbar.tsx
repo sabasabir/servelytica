@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Users, LogIn, UserRound, BookOpen } from "lucide-react";
+import { Menu, X, Users, LogIn, UserRound, BookOpen, Brain } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -76,6 +76,14 @@ const Navbar = () => {
                 Blog
               </span>
             </Link>
+            {user && (
+              <Link to="/motion-analysis" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                <span className="flex items-center">
+                  <Brain className="h-4 w-4 mr-1" />
+                  Motion Analysis
+                </span>
+              </Link>
+            )}
             {role !== 'coach' && (
             <Link to="/how-it-works" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">How It Works</Link>
             )}
@@ -154,6 +162,14 @@ const Navbar = () => {
                 Blog
               </span>
             </Link>
+            {user && (
+              <Link to="/motion-analysis" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                <span className="flex items-center">
+                  <Brain className="h-4 w-4 mr-1" />
+                  Motion Analysis
+                </span>
+              </Link>
+            )}
             <Link to="/how-it-works" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">How It Works</Link>
             {role !== 'coach' && (
               <Link to="/pricing" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">Pricing</Link>

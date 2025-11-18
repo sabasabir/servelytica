@@ -23,6 +23,7 @@ import BlogPostPage from "./pages/BlogPostPage";
 import PlanSelectionPage from "./pages/PlanSelectionPage";
 import NotFound from "./pages/NotFound";
 import ChatPage from "./pages/ChatPage";
+import MotionAnalysisPage from "./pages/MotionAnalysisPage";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/blog/create" element={<BlogPage />} />
             <Route path="/blog/post/:id" element={<BlogPostPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/motion-analysis" element={<MotionAnalysisPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
