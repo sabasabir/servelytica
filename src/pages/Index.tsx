@@ -15,6 +15,7 @@ const Index = () => {
     const { user, userProfile, userRoles} = useAuth();
 
     console.log({user, userProfile, userRoles})
+    console.log('Index component rendering - all sections should be visible');
 
     const handleCompletedSurvey = async () => {
         const {error} = await supabase.from('user_roles').update({is_survey_completed: true}).eq('user_id', userProfile?.id).single();
@@ -26,13 +27,18 @@ const Index = () => {
     <>
         <div className={`${userRoles?.role === 'player' && userRoles?.is_survey_completed === false ? 'cursor-not-allowed' : ''}`}>
         <Navbar />
-        <main>
+        <main style={{ minHeight: 'auto' }}>
           <HeroSection />
           <HowItWorksSection />
+          <div style={{ backgroundColor: 'red', padding: '50px', color: 'white', fontSize: '24px', minHeight: '200px' }}>
+            <h2>TESTING: This div should be visible after HowItWorksSection</h2>
+            <p>If you can see this red section, then there's no rendering issue with adding new divs</p>
+          </div>
+          {/* Now let's uncomment one section at a time */}
           <FeaturedCoachesSection />
-          <BenefitsSection />
-          <TestimonialsSection />
-          <CTASection />
+          {/* <BenefitsSection /> */}
+          {/* <TestimonialsSection /> */}
+          {/* <CTASection /> */}
         </main>
         <Footer />
         </div>
