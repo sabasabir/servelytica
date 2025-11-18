@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Search, MessageSquare, TrendingUp, Users, Target, Award } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Upload, Search, MessageSquare, TrendingUp, Play, Users, Target, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const HowItWorksSection = () => {
@@ -53,24 +55,33 @@ const HowItWorksSection = () => {
           </TabsList>
           
           <TabsContent value="overview" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {steps.map((step, index) => (
-                <Card key={step.id} className="relative hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <step.icon className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <span className="text-3xl font-bold text-gray-200">{index + 1}</span>
-                    </div>
-                    <CardTitle className="text-lg mb-2">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 text-sm">{step.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <TooltipProvider>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {steps.map((step, index) => (
+                  <Tooltip key={step.id}>
+                    <TooltipTrigger asChild>
+                      <Card className="relative hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+                        <CardHeader>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                              <step.icon className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <span className="text-3xl font-bold text-gray-200">{index + 1}</span>
+                          </div>
+                          <CardTitle className="text-lg mb-2">{step.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-gray-600 text-sm">{step.description}</p>
+                        </CardContent>
+                      </Card>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>{step.details}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </TabsContent>
           
           <TabsContent value="detailed" className="mt-8">
@@ -85,6 +96,54 @@ const HowItWorksSection = () => {
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
                     <p className="text-gray-600 mb-3">{step.details}</p>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">Learn More</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{step.title}</DialogTitle>
+                          <DialogDescription className="pt-4">
+                            <div className="space-y-4">
+                              <p>{step.details}</p>
+                              <div className="bg-blue-50 p-4 rounded-lg">
+                                <h4 className="font-semibold mb-2">Pro Tips:</h4>
+                                <ul className="text-sm space-y-1 list-disc list-inside">
+                                  {step.id === "upload" && (
+                                    <>
+                                      <li>Ensure good lighting and stable camera position</li>
+                                      <li>Film from the side for best angle</li>
+                                      <li>Include both players in frame</li>
+                                    </>
+                                  )}
+                                  {step.id === "choose" && (
+                                    <>
+                                      <li>Check coach specializations</li>
+                                      <li>Read recent reviews</li>
+                                      <li>Consider your specific needs</li>
+                                    </>
+                                  )}
+                                  {step.id === "analysis" && (
+                                    <>
+                                      <li>Watch the full analysis video</li>
+                                      <li>Take notes on key points</li>
+                                      <li>Ask follow-up questions</li>
+                                    </>
+                                  )}
+                                  {step.id === "improve" && (
+                                    <>
+                                      <li>Practice drills consistently</li>
+                                      <li>Film progress videos</li>
+                                      <li>Track your improvements</li>
+                                    </>
+                                  )}
+                                </ul>
+                              </div>
+                            </div>
+                          </DialogDescription>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               ))}

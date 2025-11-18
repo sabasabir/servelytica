@@ -14,9 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
     const { user, userProfile, userRoles} = useAuth();
 
-    console.log({user, userProfile, userRoles})
-    console.log('Index component rendering - all sections should be visible');
-
     const handleCompletedSurvey = async () => {
         const {error} = await supabase.from('user_roles').update({is_survey_completed: true}).eq('user_id', userProfile?.id).single();
         if (error) {
@@ -27,7 +24,7 @@ const Index = () => {
     <>
         <div className={`${userRoles?.role === 'player' && userRoles?.is_survey_completed === false ? 'cursor-not-allowed' : ''}`}>
         <Navbar />
-        <main style={{ minHeight: 'auto' }}>
+        <main className="min-h-screen">
           <HeroSection />
           <HowItWorksSection />
           <FeaturedCoachesSection />
