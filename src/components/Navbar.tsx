@@ -77,12 +77,20 @@ const Navbar = () => {
               </span>
             </Link>
             {user && (
-              <Link to="/motion-analysis" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
-                <span className="flex items-center">
-                  <Brain className="h-4 w-4 mr-1" />
-                  Motion Analysis
-                </span>
-              </Link>
+              <>
+                <Link to="/motion-analysis" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                  <span className="flex items-center">
+                    <Brain className="h-4 w-4 mr-1" />
+                    Motion Analysis
+                  </span>
+                </Link>
+                <Link to="/analysis-space" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                  <span className="flex items-center">
+                    <Users className="h-4 w-4 mr-1" />
+                    Analysis Space
+                  </span>
+                </Link>
+              </>
             )}
             {role !== 'coach' && (
             <Link to="/how-it-works" className="px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">How It Works</Link>
@@ -163,12 +171,20 @@ const Navbar = () => {
               </span>
             </Link>
             {user && (
-              <Link to="/motion-analysis" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
-                <span className="flex items-center">
-                  <Brain className="h-4 w-4 mr-1" />
-                  Motion Analysis
-                </span>
-              </Link>
+              <>
+                <Link to="/motion-analysis" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                  <span className="flex items-center">
+                    <Brain className="h-4 w-4 mr-1" />
+                    Motion Analysis
+                  </span>
+                </Link>
+                <Link to="/analysis-space" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">
+                  <span className="flex items-center">
+                    <Users className="h-4 w-4 mr-1" />
+                    Analysis Space
+                  </span>
+                </Link>
+              </>
             )}
             <Link to="/how-it-works" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">How It Works</Link>
             {role !== 'coach' && (

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Users, Clock, CheckCircle, TrendingUp, Star } from "lucide-react";
+import { Users, Clock, CheckCircle, TrendingUp, Star, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,10 +14,12 @@ import { CompletedVideosList } from "@/components/coach/CompletedVideosList";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCoachProfile } from "@/hooks/useCoachProfile";
 import { CoachProfileService } from "@/services/coachProfileService";
+import { useNavigate } from "react-router-dom";
 
 const CoachDashboardPage = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [coachProfile, setCoachProfile] = useState(null);
+  const navigate = useNavigate();
 
     // console.log({coachProfile})
   const [coachData, setCoachData] = useState({
@@ -127,6 +129,37 @@ const CoachDashboardPage = () => {
       <Navbar />
       
       <div className="container mx-auto px-4 py-8">
+        {/* Quick Access Card for Private Analysis Space */}
+        <div className="mb-6">
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold mb-2 text-blue-900">Private Analysis Space</h2>
+                  <p className="text-gray-700 mb-4">Collaborate with your students through dedicated analysis sessions</p>
+                  <div className="flex gap-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4 text-blue-600" />
+                      <span>{students.length} active students</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-orange-600" />
+                      <span>{pendingVideos.length} pending requests</span>
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => navigate('/analysis-space')}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Open Analysis Space
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Coach Profile Header */}
         <div className="mb-8">
           <Card>
