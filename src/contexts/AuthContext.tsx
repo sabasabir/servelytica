@@ -1,0 +1,198 @@
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface AuthContextType {
+  user: User | null;
+  userProfile: User | null;
+  session: Session | null;
+  loading: boolean;
+  signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [userRoles, setUserRoles] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        // console.log(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if(user?.id) {
+        const fetchProfiles = async () => {
+            const {data, error} = await supabase.from('profiles').select("*").eq('user_id', user.id).single();
+            if (error) {
+                console.error('Error fetching profile:', error);
+            } else {
+                setUserProfile(data);
+            }
+        }
+        const fetchUserRoles = async () => {
+            const {data: userRolesData, error} = await supabase.from('user_roles').select("*").eq('user_id', user.id).single();
+            if (error) {
+                console.error('Error fetching profile:', error);
+            } else {
+                setUserRoles(userRolesData);
+            }
+        }
+        fetchProfiles();
+        fetchUserRoles();
+    }
+  }, [user?.id])
+
+  const signUp = async (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => {
+    try {
+      // For players, redirect to plan selection; for coaches, redirect to home
+      const redirectUrl = role === 'player' 
+        ? `${window.location.origin}/plan-selection`
+        : `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            username,
+            display_name: displayName,
+            role,
+            sport_id: sportId
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Signup failed",
+          description: "Please check your input and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Account created successfully",
+          description: role === 'player' 
+            ? "Please check your email to confirm your account, then select your plan."
+            : "Please check your email to confirm your account.",
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      toast({
+        title: "Signup failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
+      }
+
+      return { error };
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Logged out",
+          description: "You have been successfully logged out.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Logout failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const value = {
+    user,
+    userRoles,
+    session,
+    loading,
+    signUp,
+    signIn,
+    signOut,
+    userProfile,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
