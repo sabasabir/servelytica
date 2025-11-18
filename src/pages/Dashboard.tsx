@@ -15,7 +15,7 @@ import { ProfileService, VideoData } from "@/services/profileService";
 import VideoModal from "@/components/VideoModal";
 import { useAuth } from "@/contexts/AuthContext";
 import ReactPlayer from 'react-player'
-import videoThumbnail from '../../public/lovable-uploads/video_thumbnail.jpg';
+const videoThumbnail = '/lovable-uploads/video_thumbnail.jpg';
 import { VideoFeedbackDisplay } from "@/components/feedback/VideoFeedbackDisplay";
 
 const Dashboard = () => {

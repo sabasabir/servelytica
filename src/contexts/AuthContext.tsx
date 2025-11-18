@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 interface AuthContextType {
   user: User | null;
   userProfile: User | null;
+  userRoles: any | null;
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;

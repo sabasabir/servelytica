@@ -24,14 +24,16 @@ const Index = () => {
     }
   return (
     <>
-        <div className={`min-h-screen flex flex-col ${userRoles?.role === 'player' && userRoles?.is_survey_completed === false ? 'cursor-not-allowed  ' : ''}`}>
+        <div className={`${userRoles?.role === 'player' && userRoles?.is_survey_completed === false ? 'cursor-not-allowed' : ''}`}>
         <Navbar />
-        <HeroSection />
-        <HowItWorksSection />
-        <FeaturedCoachesSection />
-        <BenefitsSection />
-        <TestimonialsSection />
-        <CTASection />
+        <main>
+          <HeroSection />
+          <HowItWorksSection />
+          <FeaturedCoachesSection />
+          <BenefitsSection />
+          <TestimonialsSection />
+          <CTASection />
+        </main>
         <Footer />
         </div>
         {(userRoles?.role === 'player' && !userRoles?.is_survey_completed) && <SurvayModal userId={userProfile?.id} onComplete={handleCompletedSurvey} />}
