@@ -1,7 +1,12 @@
 # Servelytica - Sports Analytics Platform
 
 ## Overview
-Servelytica is a comprehensive sports analytics platform built with React, TypeScript, Vite, and Supabase. The platform provides video analysis, coaching services, and social connectivity for athletes and coaches.
+Servelytica is a comprehensive sports analytics platform built with React, TypeScript, Vite, and PostgreSQL (Neon). The platform provides video analysis, coaching services, and social connectivity for athletes and coaches.
+
+## ⚠️ Migration Status
+**Current State**: HYBRID - Database migrated to Neon PostgreSQL, but application still uses Supabase for Auth/Storage/Realtime
+
+The project is in the middle of migrating from Supabase to Neon PostgreSQL. See `MIGRATION_PLAN.md` for detailed migration strategy and next steps.
 
 ## Project Architecture
 
