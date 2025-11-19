@@ -6,6 +6,7 @@ export const appRoleEnum = pgEnum('app_role', ['admin', 'coach', 'player']);
 export const subscriptionTypeEnum = pgEnum('subscription_type', ['monthly', 'yearly', 'free']);
 export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'cancelled', 'expired', 'pending']);
 export const coachProficiencyEnum = pgEnum('coach_proficiency', ['beginner', 'intermediate', 'advanced', 'expert']);
+export const mediaTypeEnum = pgEnum('media_type', ['video', 'photo', 'audio', 'document', 'note']);
 
 // Core tables
 export const profiles = pgTable('profiles', {
@@ -217,6 +218,7 @@ export const motionAnalysisSessions = pgTable('motion_analysis_sessions', {
   title: text('title').notNull(),
   description: text('description'),
   sportType: text('sport_type').default('table-tennis'),
+  mediaType: mediaTypeEnum('media_type').default('video').notNull(),
   analysisStatus: text('analysis_status').default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),

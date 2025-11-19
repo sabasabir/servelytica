@@ -4,17 +4,19 @@ import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Upload, Activity, PlayCircle, FileVideo, Brain } from "lucide-react";
+import { Upload, Activity, PlayCircle, FileVideo, Brain, Plus } from "lucide-react";
 import MotionAnalysisUpload from "@/components/motion-analysis/MotionAnalysisUpload";
 import MotionAnalysisViewer from "@/components/motion-analysis/MotionAnalysisViewer";
 import MotionAnalysisResults from "@/components/motion-analysis/MotionAnalysisResults";
 import MotionAnalysisList from "@/components/motion-analysis/MotionAnalysisList";
+import MediaUploadModal from "@/components/motion-analysis/MediaUploadModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const MotionAnalysisPage = () => {
   const [activeTab, setActiveTab] = useState("upload");
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const [showMediaModal, setShowMediaModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -32,6 +34,12 @@ const MotionAnalysisPage = () => {
     setActiveTab("viewer");
   };
 
+  const handleMediaComplete = (data: any) => {
+    if (data?.id) {
+      handleAnalysisComplete(data.id);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -40,14 +48,28 @@ const MotionAnalysisPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <Brain className="h-8 w-8 text-tt-orange" />
-              <h1 className="text-3xl font-bold text-tt-blue">Motion Analysis</h1>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <Brain className="h-8 w-8 text-tt-orange" />
+                  <h1 className="text-3xl font-bold text-tt-blue">Motion Analysis</h1>
+                </div>
+                <p className="text-gray-600 max-w-3xl">
+                  Upload your table tennis videos for AI-powered motion analysis. Get detailed feedback on your technique,
+                  body position, timing, and areas for improvement.
+                </p>
+              </div>
+              {user && (
+                <Button
+                  onClick={() => setShowMediaModal(true)}
+                  className="bg-tt-orange hover:bg-orange-600 text-white"
+                  size="lg"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  Add Content
+                </Button>
+              )}
             </div>
-            <p className="text-gray-600 max-w-3xl">
-              Upload your table tennis videos for AI-powered motion analysis. Get detailed feedback on your technique,
-              body position, timing, and areas for improvement.
-            </p>
           </div>
 
           {/* Main Content */}
@@ -75,13 +97,34 @@ const MotionAnalysisPage = () => {
               <TabsContent value="upload" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Upload Video for Analysis</CardTitle>
+                    <CardTitle>Add Content for Analysis</CardTitle>
                     <CardDescription>
-                      Upload your table tennis video and our AI will analyze your technique and provide detailed feedback
+                      Record video, capture photos, create notes, record audio, or upload documents
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <MotionAnalysisUpload onUploadComplete={handleAnalysisComplete} />
+                    <div className="space-y-4">
+                      <Button
+                        onClick={() => setShowMediaModal(true)}
+                        className="w-full h-32 bg-gradient-to-r from-tt-orange to-orange-600 hover:from-orange-600 hover:to-tt-orange text-white text-lg"
+                      >
+                        <Plus className="mr-2 h-6 w-6" />
+                        Add Video, Photo, Note, Audio, or Document
+                      </Button>
+                      
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">
+                            Or upload from device
+                          </span>
+                        </div>
+                      </div>
+
+                      <MotionAnalysisUpload onUploadComplete={handleAnalysisComplete} />
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -163,6 +206,12 @@ const MotionAnalysisPage = () => {
           )}
         </div>
       </main>
+      
+      <MediaUploadModal 
+        open={showMediaModal} 
+        onOpenChange={setShowMediaModal}
+        onComplete={handleMediaComplete}
+      />
       
       <Footer />
     </div>
