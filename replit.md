@@ -14,11 +14,13 @@ Servelytica is a comprehensive sports analytics platform built with React, TypeS
 - **State Management**: React Context API, TanStack Query
 - **Forms**: React Hook Form with Zod validation
 
-### Backend
-- **Database**: Supabase (PostgreSQL)
+### Backend (Hybrid Approach)
+- **Database**: Neon PostgreSQL (via Replit integration) with Drizzle ORM
+- **Alternative Database**: Supabase PostgreSQL (legacy, can still be used)
 - **Authentication**: Supabase Auth
 - **Real-time**: Supabase Realtime
 - **Storage**: Supabase Storage (for video uploads)
+- **ORM**: Drizzle ORM for type-safe database queries
 
 ### Key Features
 1. **Video Analysis**: Upload and analyze sports performance videos
@@ -60,13 +62,43 @@ Servelytica is a comprehensive sports analytics platform built with React, TypeS
 ```
 
 ## Database Schema
-The application uses Supabase with migrations located in `supabase/migrations/`. Key tables include:
-- User profiles
-- Videos and video analysis
-- Coach profiles and specialties
-- Social connections and requests
-- Blog articles and categories
-- Membership and subscription data
+
+### Hybrid Database Architecture
+The application now supports a **hybrid database approach**:
+
+1. **Neon PostgreSQL (Primary - via Replit)**
+   - Located at: `server/db.ts` (Drizzle connection)
+   - Schema defined in: `shared/schema.ts` (Drizzle schema)
+   - Type-safe queries using Drizzle ORM
+   - Connected via `DATABASE_URL` environment variable
+   
+2. **Supabase (Secondary - for Auth/Storage/Realtime)**
+   - Auth, Storage, and Realtime features still use Supabase
+   - Legacy database queries can still use Supabase client
+   - Located in: `src/integrations/supabase/client.ts`
+
+### Database Tables (30+ tables)
+Key tables include:
+- **User Management**: profiles, user_roles, activity_log
+- **Video Analysis**: videos, video_feedback, motion_analysis_data, stroke_types
+- **Coaching**: coach_profiles, coach_specialties, coach_availability, coach_reviews
+- **Social**: connections, connection_requests, chats, chat_messages
+- **Blog/Community**: blog_articles, blog_categories, blog_tags, article_tags, comments
+- **Subscriptions**: memberships, subscription_plans, pricing_tiers
+- **Notifications**: notifications, notification_preferences
+- **Analytics**: analytics_events
+
+### Schema Management
+```bash
+# Push schema changes to Neon database
+npm run db:push
+
+# Generate migrations (if needed)
+npm run db:generate
+
+# Test database connections
+npx tsx server/test-db.ts
+```
 
 ## Development Setup
 
@@ -75,9 +107,17 @@ The application uses Supabase with migrations located in `supabase/migrations/`.
 - npm
 
 ### Environment Variables
-The Supabase connection is configured in `src/integrations/supabase/client.ts` with:
-- SUPABASE_URL: `https://pxzlivocnykjjikkjago.supabase.co`
-- SUPABASE_PUBLISHABLE_KEY: (Public anon key hardcoded)
+
+**Required (Auto-configured by Replit):**
+- `DATABASE_URL`: Neon PostgreSQL connection string (set automatically by Replit)
+- `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`: Postgres credentials (set automatically)
+
+**Optional (for Supabase features):**
+- `SUPABASE_URL`: Your Supabase project URL
+- `SUPABASE_ANON_KEY`: Supabase anonymous key (for client-side auth)
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key (for server-side operations)
+
+**Note**: The Supabase connection is currently configured in `src/integrations/supabase/client.ts` with hardcoded values for the existing Supabase project.
 
 ### Running Locally
 ```bash
@@ -104,6 +144,15 @@ The Vite dev server is configured to:
 - Use HMR with clientPort 443 for proper hot reload in Replit's proxy environment
 
 ## Recent Changes
+
+### 2025-11-19: Database Migration to Neon + Hybrid Approach
+- **Migrated to Neon PostgreSQL**: Set up Replit's PostgreSQL database with Neon serverless driver
+- **Drizzle ORM Integration**: Created comprehensive schema with 30+ tables matching Supabase migrations
+- **Hybrid Architecture**: Keeping Supabase for Auth/Storage/Realtime, using Neon for database operations
+- **Path Aliases**: Configured `@shared` alias for schema imports across the application
+- **Type Safety**: Full TypeScript support with Drizzle ORM for database queries
+- **Testing Utilities**: Added `server/test-db.ts` for verifying database connections
+- **Documentation**: Updated architecture docs to reflect hybrid approach
 
 ### 2025-11-18: Complete Fix Implementation
 - **Fixed Coach Images**: Replaced failing external URLs (randomuser.me) with local placeholder.svg images
