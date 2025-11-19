@@ -110,7 +110,7 @@ const Navbar = () => {
                 {role === 'player' && (
                   <Link to="/dashboard" className="ml-2">
                     <Button variant="outline" className="border-tt-orange text-tt-orange hover:bg-tt-orange hover:text-white">
-                      Dashboard
+                      My Videos
                     </Button>
                   </Link>
                 )}
@@ -200,7 +200,7 @@ const Navbar = () => {
                   </span>
                 </Link>
                 {role === 'player' && (
-                  <Link to="/dashboard" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">Dashboard</Link>
+                  <Link to="/dashboard" className="block px-3 py-2 text-tt-blue hover:text-tt-orange transition-colors">My Videos</Link>
                 )}
                 <Button onClick={handleLogout} className="w-full border-tt-blue text-tt-blue hover:bg-tt-blue hover:text-white mt-2">
                   Logout

@@ -420,9 +420,9 @@ const Dashboard = () => {
       <main className="flex-grow py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-tt-blue mb-2">Your Dashboard</h1>
+            <h1 className="text-3xl font-bold text-tt-blue mb-2">My Videos</h1>
             <p className="text-gray-600">
-              Manage your uploaded games and view coach analyses
+              View your uploaded game videos and coach feedback
             </p>
           </div>
           
