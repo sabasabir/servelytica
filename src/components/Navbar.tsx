@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Users, LogIn, UserRound, BookOpen, Brain } from "lucide-react";
+import { Menu, X, Users, BookOpen, Brain } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AppBar, Toolbar, IconButton, useScrollTrigger } from '@mui/material';
+import { AppBar, Toolbar, IconButton, useScrollTrigger, Box, Typography } from '@mui/material';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,72 +29,85 @@ const Navbar = () => {
     }
     
     await signOut();
-    
-    const currentPath = location.pathname;
-    let redirectPath = '/';
-    
-    if (currentPath.includes('table-tennis')) {
-      redirectPath = '/table-tennis';
-    } else if (currentPath.includes('pickleball')) {
-      redirectPath = '/pickleball';
-    } else if (currentPath.includes('badminton')) {
-      redirectPath = '/badminton';
-    } else if (currentPath.includes('tennis')) {
-      redirectPath = '/tennis';
-    } else if (currentPath.includes('squash')) {
-      redirectPath = '/squash';
-    }
-    
-    navigate(redirectPath);
+    navigate('/');
   };
+
+  const navItems = [
+    { to: "/", label: "Home" },
+    ...(role !== 'coach' ? [{ to: "/coaches", label: "Coaches" }] : []),
+    ...(role !== 'coach' ? [{ to: "/connect", label: "Connect", icon: Users }] : []),
+    { to: "/blog", label: "Blog", icon: BookOpen },
+    ...(user ? [
+      { to: "/motion-analysis", label: "Motion Analysis", icon: Brain },
+      { to: "/analysis-space", label: "Analysis Space", icon: Users }
+    ] : []),
+    ...(role !== 'coach' ? [
+      { to: "/how-it-works", label: "How It Works" },
+      { to: "/pricing", label: "Pricing" }
+    ] : []),
+  ];
 
   return (
     <AppBar 
       position="sticky" 
       sx={{ 
-        background: 'white',
-        boxShadow: trigger ? '0 2px 8px rgba(26, 54, 93, 0.08)' : '0 1px 2px rgba(26, 54, 93, 0.05)',
+        background: trigger 
+          ? 'rgba(255, 255, 255, 0.95)' 
+          : 'rgba(255, 255, 255, 1)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: trigger 
+          ? '0 4px 12px rgba(26, 54, 93, 0.1)' 
+          : '0 1px 3px rgba(26, 54, 93, 0.05)',
         transition: 'all 0.3s ease',
+        borderBottom: '1px solid rgba(26, 54, 93, 0.08)',
       }}
     >
-      <Toolbar className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center w-full h-16">
+      <Toolbar sx={{ maxWidth: '1280px', mx: 'auto', width: '100%', px: { xs: 2, md: 4 } }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', height: '64px' }}>
+          {/* Logo */}
           <motion.div 
-            className="flex items-center"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
+            style={{ display: 'flex', alignItems: 'center' }}
           >
-            <Link to="/" className="flex-shrink-0 flex items-center group">
-              <motion.span 
-                className="h-10 w-10 rounded-full bg-gradient-to-br from-tt-orange to-orange-500 flex items-center justify-center mr-2 shadow-lg"
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              <motion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: '12px',
+                  boxShadow: '0 4px 12px rgba(255, 126, 0, 0.3)',
+                }}
               >
-                <span className="text-white font-bold text-lg">S</span>
-              </motion.span>
-              <span className="text-2xl font-bold bg-gradient-to-r from-tt-blue to-tt-lightBlue bg-clip-text text-transparent">
+                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '20px' }}>S</Typography>
+              </motion.div>
+              <Typography 
+                sx={{ 
+                  fontSize: '24px', 
+                  fontWeight: 800,
+                  background: 'linear-gradient(135deg, #1a365d 0%, #ff7e00 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                }}
+              >
                 Servelytica
-              </span>
+              </Typography>
             </Link>
           </motion.div>
           
-          <div className="hidden md:flex items-center space-x-1">
-            {[
-              { to: "/", label: "Home" },
-              ...(role !== 'coach' ? [{ to: "/coaches", label: "Coaches" }] : []),
-              ...(role !== 'coach' ? [{ to: "/connect", label: "Connect", icon: Users }] : []),
-              { to: "/blog", label: "Blog", icon: BookOpen },
-              ...(user ? [
-                { to: "/motion-analysis", label: "Motion Analysis", icon: Brain },
-                { to: "/analysis-space", label: "Analysis Space", icon: Users }
-              ] : []),
-              ...(role !== 'coach' ? [
-                { to: "/how-it-works", label: "How It Works" },
-                { to: "/pricing", label: "Pricing" }
-              ] : []),
-            ].map((item, index) => (
+          {/* Desktop Menu */}
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+            {navItems.map((item, index) => (
               <motion.div
                 key={item.to}
                 initial={{ opacity: 0, y: -10 }}
@@ -102,226 +115,135 @@ const Navbar = () => {
                 transition={{ duration: 0.3, delay: index * 0.05 }}
               >
                 <Link 
-                  to={item.to} 
-                  className="px-4 py-2 text-tt-blue hover:text-tt-orange transition-all duration-300 font-medium rounded-lg hover:bg-orange-50 flex items-center gap-1"
+                  to={item.to}
+                  style={{ textDecoration: 'none' }}
                 >
-                  {item.icon && <item.icon className="h-4 w-4" />}
-                  {item.label}
+                  <Typography
+                    sx={{
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      color: location.pathname === item.to ? '#ff7e00' : '#475569',
+                      px: 2,
+                      py: 1,
+                      borderRadius: '8px',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        color: '#ff7e00',
+                        background: 'rgba(255, 126, 0, 0.08)',
+                      },
+                      fontFamily: '"Poppins", "Sora", sans-serif',
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
                 </Link>
               </motion.div>
             ))}
-            
+          </Box>
+
+          {/* Auth Buttons & Mobile Menu */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {user ? (
-              <motion.div 
-                className="flex items-center gap-2 ml-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <Link to="/profile">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button 
-                      variant="ghost" 
-                      className="text-tt-blue hover:text-tt-orange hover:bg-orange-50"
-                    >
-                      <UserRound className="h-4 w-4 mr-1" />
-                      Profile
-                    </Button>
-                  </motion.div>
-                </Link>
-                {role === 'player' && (
-                  <Link to="/dashboard">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button 
-                        className="bg-gradient-to-r from-tt-orange to-orange-500 text-white hover:shadow-lg transition-all duration-300"
-                      >
-                        My Videos
-                      </Button>
-                    </motion.div>
-                  </Link>
-                )}
-                {role === 'coach' && (
-                  <Link to="/coach-dashboard">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button 
-                        className="bg-gradient-to-r from-tt-orange to-orange-500 text-white hover:shadow-lg transition-all duration-300"
-                      >
-                        Dashboard
-                      </Button>
-                    </motion.div>
-                  </Link>
-                )}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <Button
+                  onClick={handleLogout}
+                  size="sm"
+                  variant="outline"
+                  sx={{ display: { xs: 'none', md: 'inline-flex' } }}
                 >
-                  <Button 
-                    onClick={handleLogout} 
-                    variant="outline" 
-                    className="border-2 border-tt-blue text-tt-blue hover:bg-tt-blue hover:text-white transition-all duration-300"
-                  >
-                    Logout
-                  </Button>
-                </motion.div>
+                  Logout
+                </Button>
               </motion.div>
             ) : (
-              <motion.div 
-                className="flex items-center gap-2 ml-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Link to="/auth">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+              <>
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ display: 'none' }}
+                  className="hidden md:block"
+                >
+                  <Link to="/auth">
+                    <Button size="sm" variant="outline">Login</Button>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  style={{ display: 'none' }}
+                  className="hidden md:block"
+                >
+                  <Link to="/auth">
                     <Button 
-                      variant="ghost" 
-                      className="text-tt-blue hover:text-tt-orange hover:bg-orange-50"
-                    >
-                      <LogIn className="h-4 w-4 mr-1" />
-                      Login
-                    </Button>
-                  </motion.div>
-                </Link>
-                <Link to="/auth">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button 
-                      className="bg-gradient-to-r from-tt-blue to-tt-lightBlue text-white hover:shadow-lg transition-all duration-300"
+                      size="sm"
+                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white"
                     >
                       Sign Up
                     </Button>
-                  </motion.div>
-                </Link>
-              </motion.div>
+                  </Link>
+                </motion.div>
+              </>
             )}
-          </div>
-          
-          <div className="flex md:hidden items-center">
+
+            {/* Mobile Menu Button */}
             <IconButton
               onClick={toggleMenu}
-              className="text-tt-blue hover:text-tt-orange"
-              sx={{ color: '#1a365d' }}
+              sx={{ display: { xs: 'flex', md: 'none' }, color: '#1a365d' }}
             >
-              <motion.div
-                animate={{ rotate: isMenuOpen ? 90 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </motion.div>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </IconButton>
-          </div>
-        </div>
+          </Box>
+        </Box>
       </Toolbar>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-100"
+            style={{
+              overflow: 'hidden',
+              background: 'rgba(255, 255, 255, 0.98)',
+              backdropFilter: 'blur(10px)',
+              borderTop: '1px solid rgba(26, 54, 93, 0.08)',
+            }}
           >
-            <div className="px-4 pt-2 pb-3 space-y-1">
-              <Link to="/" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">Home</Link>
-              {role !== 'coach' && (
-                <Link to="/coaches" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">Coaches</Link>
-              )}
-              {role !== 'coach' && (
-                <Link to="/connect" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                  <span className="flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
-                    Connect
-                  </span>
+            <Box sx={{ px: 3, py: 4, display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+              {navItems.map((item) => (
+                <Link key={item.to} to={item.to} style={{ textDecoration: 'none' }}>
+                  <Typography
+                    sx={{
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      color: '#475569',
+                      py: 1.5,
+                      borderRadius: '8px',
+                      fontFamily: '"Poppins", "Sora", sans-serif',
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
                 </Link>
-              )}
-              <Link to="/blog" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                <span className="flex items-center">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Blog
-                </span>
-              </Link>
+              ))}
               {user && (
-                <>
-                  <Link to="/motion-analysis" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                    <span className="flex items-center">
-                      <Brain className="h-4 w-4 mr-2" />
-                      Motion Analysis
-                    </span>
-                  </Link>
-                  <Link to="/analysis-space" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                    <span className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Analysis Space
-                    </span>
-                  </Link>
-                </>
+                <Button
+                  onClick={handleLogout}
+                  size="sm"
+                  className="mt-2 w-full"
+                >
+                  Logout
+                </Button>
               )}
-              {role !== 'coach' && (
-                <>
-                  <Link to="/how-it-works" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">How It Works</Link>
-                  <Link to="/pricing" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">Pricing</Link>
-                </>
-              )}
-              
-              {user ? (
-                <>
-                  <Link to="/profile" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                    <span className="flex items-center">
-                      <UserRound className="h-4 w-4 mr-2" />
-                      Profile
-                    </span>
-                  </Link>
-                  {role === 'player' && (
-                    <Link to="/dashboard" className="block px-3 py-3">
-                      <Button className="w-full bg-gradient-to-r from-tt-orange to-orange-500 text-white">
-                        My Videos
-                      </Button>
-                    </Link>
-                  )}
-                  {role === 'coach' && (
-                    <Link to="/coach-dashboard" className="block px-3 py-3">
-                      <Button className="w-full bg-gradient-to-r from-tt-orange to-orange-500 text-white">
-                        Dashboard
-                      </Button>
-                    </Link>
-                  )}
-                  <div className="px-3 py-3">
-                    <Button onClick={handleLogout} variant="outline" className="w-full border-2 border-tt-blue text-tt-blue hover:bg-tt-blue hover:text-white">
-                      Logout
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Link to="/auth" className="block px-3 py-3 text-tt-blue hover:text-tt-orange hover:bg-orange-50 rounded-lg transition-all">
-                    <span className="flex items-center">
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Login
-                    </span>
-                  </Link>
-                  <Link to="/auth" className="block px-3 py-3">
-                    <Button className="w-full bg-gradient-to-r from-tt-blue to-tt-lightBlue text-white">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
+            </Box>
           </motion.div>
         )}
       </AnimatePresence>
