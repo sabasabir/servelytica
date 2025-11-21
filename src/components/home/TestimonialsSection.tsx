@@ -59,6 +59,7 @@ const TestimonialsSection = () => {
                   letterSpacing: "2px",
                   mb: 2,
                   textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Testimonials
@@ -76,6 +77,7 @@ const TestimonialsSection = () => {
                   fontWeight: 800,
                   color: "#1a365d",
                   mb: 2,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 What Our Players Say
@@ -176,6 +178,7 @@ const TestimonialsSection = () => {
                           fontWeight: 700,
                           color: "#1a365d",
                           fontSize: "15px",
+                          fontFamily: '"Poppins", "Sora", sans-serif',
                         }}
                       >
                         {testimonial.author}

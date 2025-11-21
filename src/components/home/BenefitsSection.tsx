@@ -68,6 +68,7 @@ const BenefitsSection = () => {
                   letterSpacing: "2px",
                   mb: 2,
                   textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Key Benefits
@@ -84,6 +85,7 @@ const BenefitsSection = () => {
                   fontSize: { xs: "28px", md: "44px" },
                   fontWeight: 800,
                   mb: 2,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Why Choose Servelytica
@@ -146,6 +148,7 @@ const BenefitsSection = () => {
                       fontWeight: 700,
                       mb: 2,
                       fontSize: "18px",
+                      fontFamily: '"Poppins", "Sora", sans-serif',
                     }}
                   >
                     {benefit.title}

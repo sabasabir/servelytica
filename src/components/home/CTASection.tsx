@@ -58,6 +58,7 @@ const CTASection = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
+                    fontFamily: '"Poppins", "Sora", sans-serif',
                   }}
                 >
                   <Sparkles size={14} /> Limited Time Offer
@@ -72,6 +73,7 @@ const CTASection = () => {
                   color: "white",
                   mb: 3,
                   lineHeight: 1.2,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Ready to Transform Your Game?

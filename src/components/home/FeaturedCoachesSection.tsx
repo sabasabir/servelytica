@@ -59,6 +59,7 @@ const FeaturedCoachesSection = () => {
                   letterSpacing: "2px",
                   mb: 2,
                   textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Top Coaches
@@ -76,6 +77,7 @@ const FeaturedCoachesSection = () => {
                   fontWeight: 800,
                   color: "#1a365d",
                   mb: 2,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Meet Our Top Coaches
@@ -164,6 +166,7 @@ const FeaturedCoachesSection = () => {
                         color: "#1a365d",
                         mb: 1,
                         fontSize: "18px",
+                        fontFamily: '"Poppins", "Sora", sans-serif',
                       }}
                     >
                       {coach.name}

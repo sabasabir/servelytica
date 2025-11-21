@@ -56,6 +56,7 @@ const HeroSection = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 <Zap size={16} /> Professional Analysis Platform
@@ -75,6 +76,7 @@ const HeroSection = () => {
                   lineHeight: 1.1,
                   mb: 3,
                   color: "#ffffff",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Elevate Your Game With Professional Analysis

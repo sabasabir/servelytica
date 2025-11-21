@@ -59,6 +59,7 @@ const HowItWorksSection = () => {
                   letterSpacing: "2px",
                   mb: 2,
                   textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 How It Works
@@ -76,6 +77,7 @@ const HowItWorksSection = () => {
                   fontWeight: 800,
                   color: "#1a365d",
                   mb: 2,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
                 Simple Steps to Better Performance
@@ -152,6 +154,7 @@ const HowItWorksSection = () => {
                         color: "#1a365d",
                         mb: 2,
                         fontSize: "18px",
+                        fontFamily: '"Poppins", "Sora", sans-serif',
                       }}
                     >
                       {step.title}
