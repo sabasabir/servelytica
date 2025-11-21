@@ -23,10 +23,14 @@ const HeroSection = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "0.9fr 1.3fr" },
-            gap: { xs: 6, md: 10 },
-            alignItems: "center",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: { xs: 6, md: 8 },
+            alignItems: "stretch",
             rowGap: { xs: 8, md: 0 },
+            background: "rgba(255, 126, 0, 0.05)",
+            borderRadius: "32px",
+            p: { xs: 4, md: 6 },
+            border: "2px solid rgba(255, 126, 0, 0.2)",
           }}
         >
           {/* Left Content */}
@@ -34,6 +38,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -72,10 +77,10 @@ const HeroSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", sm: "40px", md: "52px" },
+                  fontSize: { xs: "28px", sm: "36px", md: "44px" },
                   fontWeight: 800,
-                  lineHeight: 1.1,
-                  mb: 4,
+                  lineHeight: 1.15,
+                  mb: 3,
                   color: "#ffffff",
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
@@ -92,11 +97,11 @@ const HeroSection = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  fontSize: { xs: "16px", md: "17px" },
+                  fontSize: { xs: "14px", md: "16px" },
                   color: "#e0e7ff",
-                  mb: 6,
-                  lineHeight: 1.8,
-                  maxWidth: "500px",
+                  mb: 5,
+                  lineHeight: 1.7,
+                  maxWidth: "100%",
                 }}
               >
                 Upload your matches and get personalized feedback from top coaches worldwide. Improve faster with AI-powered insights and expert guidance.
@@ -156,20 +161,20 @@ const HeroSection = () => {
               elevation={0}
               sx={{
                 position: "relative",
-                borderRadius: "32px",
+                borderRadius: "20px",
                 overflow: "hidden",
                 background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
-                border: "3px solid rgba(255, 126, 0, 0.3)",
+                border: "2px solid rgba(255, 126, 0, 0.3)",
                 backdropFilter: "blur(10px)",
-                aspectRatio: { xs: "4/3", md: "9/11" },
+                height: "100%",
+                minHeight: { xs: "300px", md: "400px" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: { xs: "320px", md: "580px" },
                 backgroundImage: "url(/hero-video.png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                boxShadow: "0 25px 80px rgba(255, 126, 0, 0.25), 0 10px 40px rgba(0, 0, 0, 0.2)",
+                boxShadow: "0 20px 60px rgba(255, 126, 0, 0.2)",
               }}
             >
               {/* Overlay */}
