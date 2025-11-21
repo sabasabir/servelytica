@@ -54,6 +54,7 @@ const AuthPage = () => {
   const [signupStep, setSignupStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,7 +139,7 @@ const AuthPage = () => {
                 </Typography>
               </Box>
 
-              <Tabs defaultValue="login" className="w-full">
+              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100 p-1 rounded-lg">
                   <TabsTrigger value="login">LOGIN</TabsTrigger>
                   <TabsTrigger value="signup">SIGN UP</TabsTrigger>
