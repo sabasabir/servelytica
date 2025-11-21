@@ -23,9 +23,10 @@ const HeroSection = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            gap: { xs: 4, md: 6 },
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1.2fr" },
+            gap: { xs: 6, md: 8 },
             alignItems: "center",
+            rowGap: { xs: 8, md: 0 },
           }}
         >
           {/* Left Content */}
@@ -71,10 +72,10 @@ const HeroSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", sm: "40px", md: "56px" },
+                  fontSize: { xs: "32px", sm: "40px", md: "48px" },
                   fontWeight: 800,
-                  lineHeight: 1.1,
-                  mb: 3,
+                  lineHeight: 1.15,
+                  mb: 4,
                   color: "#ffffff",
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
@@ -91,10 +92,11 @@ const HeroSection = () => {
               <Typography
                 variant="body1"
                 sx={{
-                  fontSize: { xs: "16px", md: "18px" },
+                  fontSize: { xs: "16px", md: "17px" },
                   color: "#e0e7ff",
-                  mb: 5,
-                  lineHeight: 1.7,
+                  mb: 6,
+                  lineHeight: 1.8,
+                  maxWidth: "500px",
                 }}
               >
                 Upload your matches and get personalized feedback from top coaches worldwide. Improve faster with AI-powered insights and expert guidance.
@@ -154,19 +156,20 @@ const HeroSection = () => {
               elevation={0}
               sx={{
                 position: "relative",
-                borderRadius: "24px",
+                borderRadius: "28px",
                 overflow: "hidden",
                 background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
                 border: "2px solid rgba(255, 126, 0, 0.25)",
                 backdropFilter: "blur(10px)",
-                aspectRatio: { xs: "1", md: "16/9" },
+                aspectRatio: { xs: "4/3", md: "1/1" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: "400px",
+                minHeight: { xs: "300px", md: "500px" },
                 backgroundImage: "url(/hero-video.png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
+                boxShadow: "0 20px 60px rgba(255, 126, 0, 0.2)",
               }}
             >
               {/* Overlay */}
