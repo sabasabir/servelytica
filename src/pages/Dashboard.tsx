@@ -35,8 +35,7 @@ const Dashboard = () => {
   const [feedbackDisplayOpen, setFeedbackDisplayOpen] = useState(false);
   const { toast } = useToast();
 
-//   console.log({selectedVideo})
-
+  // Load user videos on component mount
   useEffect(() => {
     const fetchVideos = async () => {
       try {
