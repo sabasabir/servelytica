@@ -70,7 +70,7 @@ const AuthPage = () => {
 
   // Redirect to dashboard when user is authenticated
   useEffect(() => {
-    if (user && !window.location.search.includes('access_token')) {
+    if (user) {
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
