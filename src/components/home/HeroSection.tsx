@@ -131,22 +131,24 @@ const HeroSection = () => {
                 </motion.div>
               </Link>
 
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  style={{
-                    border: "2px solid rgba(255, 126, 0, 0.6)",
-                    color: "white",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    padding: "14px 32px",
-                    background: "transparent",
-                  }}
-                >
-                  Learn More
-                </Button>
-              </motion.div>
+              <Link to="/how-it-works">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    style={{
+                      border: "2px solid rgba(255, 126, 0, 0.6)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                      padding: "14px 32px",
+                      background: "transparent",
+                    }}
+                  >
+                    Learn More
+                  </Button>
+                </motion.div>
+              </Link>
             </motion.div>
           </motion.div>
 

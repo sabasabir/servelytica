@@ -202,6 +202,7 @@ const SocialConnector = () => {
                 </Typography>
               </Box>
               <Button
+                onClick={() => navigate("/profile")}
                 sx={{
                   background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
                   color: "white",
@@ -211,6 +212,7 @@ const SocialConnector = () => {
                   px: 3,
                   py: 1.5,
                   borderRadius: "10px",
+                  cursor: "pointer",
                   "&:hover": {
                     background: "linear-gradient(135deg, #ff6b00 0%, #ff8800 100%)",
                     boxShadow: "0 8px 20px rgba(255, 126, 0, 0.4)",
