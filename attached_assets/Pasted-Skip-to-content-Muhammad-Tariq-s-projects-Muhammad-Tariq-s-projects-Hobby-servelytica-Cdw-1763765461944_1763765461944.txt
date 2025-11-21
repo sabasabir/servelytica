@@ -1,0 +1,114 @@
+Skip to content
+Muhammad Tariq's projects
+Muhammad Tariq's projects
+
+Hobby
+
+servelytica
+
+Cdw719PA3
+
+
+Find…
+F
+
+Deployment Details
+Build Failed
+Command "vite build" exited with 1
+
+Created
+muhammadtariqw33 Avatar
+muhammadtariqw33
+1m ago
+Status
+Error
+Latest
+Duration
+23s
+Just now
+Environment
+Production
+Domains
+servelytica-git-main-muhammad-tariqs-projects-12ff375f.vercel.app
+servelytica-itkx4i1zv-muhammad-tariqs-projects-12ff375f.vercel.app
+Source
+main
+00abde7
+Add authentication guards to all protected pages
+
+Deployment Settings
+3 Recommendations
+Build Logs
+23s
+53 lines
+Find in logs
+CtrlF
+03:50:12.992 
+28 |    const [videos, setVideos] = useState<VideoData[]>([]);
+03:50:12.992 
+29 |    const [loading, setLoading] = useState(true);
+03:50:12.992 
+   |          ^
+03:50:12.992 
+30 |    const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
+03:50:12.992 
+31 |    const [videoModalOpen, setVideoModalOpen] = useState(false);
+03:50:12.992 
+03:50:12.992 
+    at failureErrorWithLog (/vercel/path0/node_modules/esbuild/lib/main.js:1472:15)
+03:50:12.992 
+    at /vercel/path0/node_modules/esbuild/lib/main.js:755:50
+03:50:12.992 
+    at responseCallbacks.<computed> (/vercel/path0/node_modules/esbuild/lib/main.js:622:9)
+03:50:12.993 
+    at handleIncomingPacket (/vercel/path0/node_modules/esbuild/lib/main.js:677:12)
+03:50:12.993 
+    at Socket.readFromStdout (/vercel/path0/node_modules/esbuild/lib/main.js:600:7)
+03:50:12.993 
+    at Socket.emit (node:events:519:28)
+03:50:12.993 
+    at addChunk (node:internal/streams/readable:561:12)
+03:50:12.993 
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+03:50:12.993 
+    at Readable.push (node:internal/streams/readable:392:5)
+03:50:12.993 
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+03:50:13.021 
+Error: Command "vite build" exited with 1
+Deployment Summary
+Deployment Checks
+Assigning Custom Domains
+Runtime Logs
+
+View and debug runtime logs & errors
+
+Observability
+
+Monitor app health & performance
+
+Speed Insights
+
+Not Enabled
+Performance metrics from real users
+
+Web Analytics
+
+Not Enabled
+Analyze visitors & traffic in real-time
+
+Home
+Docs
+Guides
+Academy
+Help
+Contact
+Loading status…
+
+Select a display theme:
+
+system
+
+light
+
+dark
