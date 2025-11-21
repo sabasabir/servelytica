@@ -44,11 +44,8 @@ const CoachesPage = () => {
 
   // Update displayed coaches when filters change
   useEffect(() => {
-    // Only update if the filtered list actually changed
-    if (JSON.stringify(filteredCoaches) !== JSON.stringify(displayedCoaches.map(dc => coaches.find(c => c.id === dc.id)).filter(Boolean))) {
-      setDisplayedCoaches(filteredCoaches.slice(0, 9));
-    }
-  }, [searchQuery, activeTab]);
+    setDisplayedCoaches(filteredCoaches.slice(0, 9));
+  }, [searchQuery, activeTab, filteredCoaches]);
 
   const resetFilters = () => {
     setSearchQuery("");

@@ -57,9 +57,9 @@ const getSpecialties = (playStyle: string | null, bio: string | null): string[] 
 };
 
 export const CoachService = {
-  async getCoaches(): Promise<Coach[]> {
+  async getCoaches(limit: number = 15): Promise<Coach[]> {
     try {
-      // Get all coach profiles with their basic profile information
+      // Get coach profiles with limit for faster initial loading
       const { data: coachProfiles, error } = await supabase
         .from('coach_profiles')
         .select(`
@@ -87,7 +87,8 @@ export const CoachService = {
             total_reviews,
             response_time_hours
           )
-        `);
+        `)
+        .limit(limit);
 
       if (error) {
         console.error("Error fetching coaches:", error);
