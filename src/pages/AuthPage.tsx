@@ -78,8 +78,15 @@ const AuthPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn(loginEmail, loginPassword);
-    setLoading(false);
+    const { error } = await signIn(loginEmail, loginPassword);
+    if (!error) {
+      // Add a small delay to ensure auth state is fully updated
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 100);
+    } else {
+      setLoading(false);
+    }
   };
 
   const handleSignupStep1 = async (e: React.FormEvent) => {
