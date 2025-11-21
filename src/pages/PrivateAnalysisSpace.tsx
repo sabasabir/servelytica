@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,10 +30,14 @@ import { PrivateAnalysisService } from "@/services/privateAnalysisService";
 import { format } from "date-fns";
 
 const PrivateAnalysisSpace = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { role } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  if (!user && !authLoading) {
+    return <Navigate to="/auth" replace />;
+  }
   
   const [loading, setLoading] = useState(true);
   const [relationships, setRelationships] = useState<any[]>([]);

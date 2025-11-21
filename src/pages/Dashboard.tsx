@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowUpRight, Clock, Play, CheckCircle, AlertCircle, Upload, FileVideo, Loader2, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,7 +19,11 @@ const videoThumbnail = '/lovable-uploads/video_thumbnail.jpg';
 import { VideoFeedbackDisplay } from "@/components/feedback/VideoFeedbackDisplay";
 
 const Dashboard = () => {
-    const {user} = useAuth();
+    const {user, loading} = useAuth();
+    
+    if (!user && !loading) {
+      return <Navigate to="/auth" replace />;
+    }
   const [activeTab, setActiveTab] = useState("uploads");
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [loading, setLoading] = useState(true);

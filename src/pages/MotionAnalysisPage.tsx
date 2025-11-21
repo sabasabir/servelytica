@@ -12,13 +12,18 @@ import MotionAnalysisList from "@/components/motion-analysis/MotionAnalysisList"
 import MediaUploadModal from "@/components/motion-analysis/MediaUploadModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Navigate } from "react-router-dom";
 
 const MotionAnalysisPage = () => {
   const [activeTab, setActiveTab] = useState("upload");
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [showMediaModal, setShowMediaModal] = useState(false);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { toast } = useToast();
+  
+  if (!user && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const handleAnalysisComplete = (sessionId: string) => {
     setSelectedSession(sessionId);

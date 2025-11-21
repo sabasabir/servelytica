@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,11 @@ import { QuotaExceededDialog } from "@/components/profile/QuotaExceededDialog";
 const UploadPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading } = useAuth();
+  
+  if (!user && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({

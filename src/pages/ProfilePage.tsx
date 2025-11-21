@@ -22,6 +22,7 @@ import { AnalyzedVideosList } from "@/components/profile/AnalyzedVideosList";
 import { PendingVideosList } from "@/components/coach/PendingVideosList";
 import PlayerCoachFeedbacks from "@/components/coach/PlayerCoachFeedbacks";
 import CoachReviews from "@/components/coach/CoachReviews";
+import { Navigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [user, setUser] = useState<ProfileData | null>(null);
@@ -32,7 +33,11 @@ const ProfilePage = () => {
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { user: authUser } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
+  
+  if (!authUser && !authLoading) {
+    return <Navigate to="/auth" replace />;
+  }
   const { role, loading: roleLoading } = useUserRole();
 
   // Coach profile management

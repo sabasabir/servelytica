@@ -14,12 +14,17 @@ import { CompletedVideosList } from "@/components/coach/CompletedVideosList";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCoachProfile } from "@/hooks/useCoachProfile";
 import { CoachProfileService } from "@/services/coachProfileService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const CoachDashboardPage = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [coachProfile, setCoachProfile] = useState(null);
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  
+  if (!user && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
 
     // console.log({coachProfile})
   const [coachData, setCoachData] = useState({
