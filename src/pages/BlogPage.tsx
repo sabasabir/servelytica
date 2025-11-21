@@ -1,5 +1,7 @@
 
 import { useEffect, useState } from "react";
+import { Box, Container, Typography, CircularProgress } from "@mui/material";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ARTICLES, CATEGORIES, TRENDING_TOPICS, WHO_TO_FOLLOW } from "@/components/blog/BlogData";
@@ -16,20 +18,9 @@ const BlogPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [categories, setCategories] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // We'll use this to conditionally render the taskbar
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [loading, setLoading] = useState(true);
-  
-//   // Filter articles based on search query and category
-//   const filteredArticles = ARTICLES.filter(article => {
-//     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-//                           article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-//     const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
-    
-//     return matchesSearch && matchesCategory;
-//   });
 
-
-  
   useEffect(() => {
     fetchArticles();
     fetchCategories();
@@ -48,8 +39,6 @@ const BlogPage = () => {
 
       if (error) throw error;
 
-      console.log("fetched articles", data)
-      
       const formattedData = data.map(article => ({
         ...article,
         date: new Date(article.created_at).toLocaleDateString('en-US', {
@@ -61,7 +50,7 @@ const BlogPage = () => {
         author: article.author_name,
         category: article.category_name
       }));
-      
+
       setAllArticles(formattedData);
       setFilteredArticles(formattedData);
     } catch (error) {
@@ -71,8 +60,7 @@ const BlogPage = () => {
     }
   };
 
-
-    const fetchCategories = async () => {
+  const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
         .from('categories')
@@ -80,7 +68,7 @@ const BlogPage = () => {
         .order('name');
 
       if (error) throw error;
-      
+
       const categoryNames = data.map(cat => cat.name);
       setCategories(['All', ...categoryNames]);
     } catch (error) {
@@ -88,36 +76,83 @@ const BlogPage = () => {
     }
   };
 
-    const filterArticles = () => {
+  const filterArticles = () => {
     const filtered = allArticles.filter(article => {
-      const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            article.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.content.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
-      
+
       return matchesSearch && matchesCategory;
     });
-    
+
     setFilteredArticles(filtered);
   };
 
-
-  console.log({categories, CATEGORIES})
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <Navbar />
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <CircularProgress sx={{ color: "#ff7e00" }} />
+        </Box>
+        <Footer />
+      </Box>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
       <Navbar />
-      <div className="flex-grow bg-gray-50">
-        {/* Header section - Only show when logged in */}
-        {isLoggedIn && <BlogNavigation handleRefetch={()=>fetchArticles()} />}
-        
-        {/* Main content area with sidebar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left sidebar (categories) */}
-            <div className="lg:w-1/4">
-              <BlogCategories 
-                // categories={CATEGORIES}
+
+      <Box component="main" sx={{ flex: 1, py: { xs: 4, md: 8 } }}>
+        {/* Header */}
+        <Box sx={{ mb: 8, textAlign: "center" }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 700,
+                color: "#ff7e00",
+                letterSpacing: "2px",
+                mb: 2,
+                textTransform: "uppercase",
+                fontFamily: '"Poppins", "Sora", sans-serif',
+              }}
+            >
+              INSIGHTS & STORIES
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: { xs: "28px", md: "40px" },
+                fontWeight: 800,
+                color: "#1a365d",
+                mb: 2,
+                fontFamily: '"Poppins", "Sora", sans-serif',
+                textTransform: "uppercase",
+              }}
+            >
+              SPORTS COACHING BLOG
+            </Typography>
+            <Typography sx={{ fontSize: "16px", color: "#64748b", maxWidth: "600px", mx: "auto" }}>
+              Expert tips, training guides, and coaching insights from industry professionals
+            </Typography>
+          </motion.div>
+        </Box>
+
+        {/* Blog Navigation */}
+        {isLoggedIn && <BlogNavigation handleRefetch={() => fetchArticles()} />}
+
+        {/* Main Content */}
+        <Container maxWidth="lg">
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 2fr 1fr" }, gap: { xs: 2, md: 4 } }}>
+            {/* Left Sidebar */}
+            <Box sx={{ display: { xs: "none", lg: "block" } }}>
+              <BlogCategories
                 categories={categories}
                 selectedCategory={selectedCategory}
                 trendingTopics={TRENDING_TOPICS}
@@ -125,23 +160,24 @@ const BlogPage = () => {
                 onCategoryChange={setSelectedCategory}
                 onSearchChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
-            
-            {/* Center content (articles feed) */}
-            <div className="lg:w-2/4">
+            </Box>
+
+            {/* Center Content */}
+            <Box>
               <ArticlesList articles={filteredArticles} />
-            </div>
-            
-            {/* Right sidebar (who to follow, etc) */}
-            <div className="lg:w-1/4">
+            </Box>
+
+            {/* Right Sidebar */}
+            <Box sx={{ display: { xs: "none", lg: "block" } }}>
               <BlogSuggestions peopleToFollow={WHO_TO_FOLLOW} />
               <FeaturedEvents />
-            </div>
-          </div>
-        </div>
-      </div>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+
       <Footer />
-    </div>
+    </Box>
   );
 };
 

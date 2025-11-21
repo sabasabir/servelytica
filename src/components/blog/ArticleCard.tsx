@@ -1,9 +1,9 @@
 
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Heart, MessageCircle, Share2, User } from "lucide-react";
+import { Card as MuiCard, CardContent as MuiCardContent, Box, Typography, Chip, Button } from "@mui/material";
+import { Clock, Heart, MessageCircle, Share2 } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import ShareModal from "../ShareModal";
 
 interface Article {
@@ -23,10 +23,13 @@ interface ArticleCardProps {
   article: Article;
 }
 
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1516542108649-c52a66bda791?w=800&h=450&fit=crop";
+
 const ArticleCard = ({ article }: ArticleCardProps) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(article.likes || 0);
-    const [openShareOptions, setOpenShareOptions] = useState<{ open: boolean; id: number | null } | null>(null);
+  const [openShareOptions, setOpenShareOptions] = useState<{ open: boolean; id: number | null } | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,70 +38,218 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
     setLikeCount(liked ? likeCount - 1 : likeCount + 1);
   };
 
+  const imageUrl = article.image && !imageError ? article.image : DEFAULT_IMAGE;
+
   return (
     <>
-      {openShareOptions?.open && <ShareModal
+      {openShareOptions?.open && (
+        <ShareModal
           isOpen={openShareOptions.open}
           onClose={() => setOpenShareOptions(null)}
           blogPath={`/blog/post/${openShareOptions?.id}`}
-        />}
-    <Card className="overflow-hidden mb-6 hover:shadow-md transition-shadow duration-300 border-gray-200">
-      <div className="p-4 flex items-center gap-3 border-b">
-        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-          <User className="h-6 w-6 text-gray-500" />
-        </div>
-        <div>
-          <p className="font-medium text-sm">{article.author}</p>
-          <p className="text-xs text-gray-500">{article.date}</p>
-        </div>
-        <Badge className="ml-auto bg-tt-blue hover:bg-tt-blue/90">{article.category}</Badge>
-      </div>
-      
-      <Link to={`/blog/post/${article.id}`}>
-        <div className="aspect-video overflow-hidden">
-          <img 
-            src={article.image} 
-            alt={article.title} 
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-        
-        <CardContent className="pt-4">
-          <h3 className="text-xl font-semibold mb-2 hover:text-tt-orange transition-colors duration-200">
-            {article.title}
-          </h3>
-          <p className="text-gray-600 mb-4 line-clamp-3">
-            {article.excerpt}
-          </p>
-        </CardContent>
-      </Link>
-      
-      <CardFooter className="border-t pt-3 pb-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button 
-            className={`flex items-center gap-1 ${liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500 transition-colors`}
-            onClick={handleLike}
+        />
+      )}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.3 }}
+      >
+        <MuiCard
+          sx={{
+            borderRadius: "16px",
+            border: "2px solid rgba(255, 126, 0, 0.15)",
+            overflow: "hidden",
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 126, 0, 0.05) 100%)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+            mb: 3,
+            transition: "all 0.3s ease",
+            "&:hover": {
+              boxShadow: "0 16px 48px rgba(255, 126, 0, 0.25)",
+              borderColor: "rgba(255, 126, 0, 0.3)",
+              transform: "translateY(-4px)",
+            },
+          }}
+        >
+          {/* Author Header */}
+          <Box
+            sx={{
+              p: 2,
+              borderBottom: "1px solid rgba(255, 126, 0, 0.15)",
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+            }}
           >
-            <Heart className={`h-5 w-5 ${liked ? 'fill-red-500' : ''}`} />
-            <span className="text-sm">{likeCount}</span>
-          </button>
-          
-          <Link to={`/blog/post/${article.id}#comments`} className="flex items-center gap-1 text-gray-500 hover:text-tt-blue transition-colors">
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-sm">{article.comments || 0}</span>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontWeight: 700,
+                fontSize: "14px",
+              }}
+            >
+              {article.author.charAt(0).toUpperCase()}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontWeight: 700, fontSize: "13px", color: "#1a365d", textTransform: "capitalize" }}>
+                {article.author}
+              </Typography>
+              <Typography sx={{ fontSize: "12px", color: "#94a3b8" }}>{article.date}</Typography>
+            </Box>
+            <Chip
+              label={article.category}
+              size="small"
+              sx={{
+                background: "linear-gradient(135deg, #1a365d 0%, #2d5a8c 100%)",
+                color: "white",
+                fontWeight: 600,
+                fontSize: "11px",
+                textTransform: "uppercase",
+              }}
+            />
+          </Box>
+
+          {/* Article Image */}
+          <Link to={`/blog/post/${article.id}`}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                paddingBottom: "56.25%",
+                overflow: "hidden",
+                background: "#f0f0f0",
+              }}
+            >
+              <img
+                src={imageUrl}
+                alt={article.title}
+                onError={() => setImageError(true)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  transition: "transform 0.3s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              />
+            </Box>
+
+            {/* Content */}
+            <MuiCardContent sx={{ pt: 3, pb: 2 }}>
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  fontWeight: 800,
+                  color: "#1a365d",
+                  mb: 1.5,
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                  textTransform: "capitalize",
+                  transition: "color 0.3s ease",
+                  "&:hover": { color: "#ff7e00" },
+                }}
+              >
+                {article.title}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  color: "#64748b",
+                  mb: 2,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {article.excerpt}
+              </Typography>
+            </MuiCardContent>
           </Link>
-          
-          <button onClick={()=> setOpenShareOptions({ open: true, id: article.id })} className="flex items-center gap-1 text-gray-500 hover:text-tt-blue transition-colors">
-            <Share2 className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <div className="flex items-center text-xs text-gray-500">
-          <Clock className="mr-1 h-4 w-4" />
-          <span>{article.readTime}</span>
-        </div>
-      </CardFooter>
-    </Card>
+
+          {/* Footer Actions */}
+          <Box
+            sx={{
+              p: 2,
+              borderTop: "1px solid rgba(255, 126, 0, 0.15)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                onClick={handleLike}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  color: liked ? "#ff7e00" : "#94a3b8",
+                  transition: "color 0.3s ease",
+                  textTransform: "none",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  "&:hover": { color: "#ff7e00" },
+                }}
+              >
+                <Heart size={16} fill={liked ? "#ff7e00" : "none"} />
+                {likeCount}
+              </Button>
+
+              <Link to={`/blog/post/${article.id}#comments`} style={{ textDecoration: "none" }}>
+                <Button
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    color: "#94a3b8",
+                    transition: "color 0.3s ease",
+                    textTransform: "none",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    "&:hover": { color: "#ff7e00" },
+                  }}
+                >
+                  <MessageCircle size={16} />
+                  {article.comments || 0}
+                </Button>
+              </Link>
+
+              <Button
+                onClick={() => setOpenShareOptions({ open: true, id: article.id })}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  color: "#94a3b8",
+                  transition: "color 0.3s ease",
+                  textTransform: "none",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  "&:hover": { color: "#ff7e00" },
+                }}
+              >
+                <Share2 size={16} />
+              </Button>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#94a3b8", fontSize: "12px", fontWeight: 600 }}>
+              <Clock size={14} />
+              {article.readTime}
+            </Box>
+          </Box>
+        </MuiCard>
+      </motion.div>
     </>
   );
 };
