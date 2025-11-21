@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ? `${window.location.origin}/plan-selection`
         : `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -116,15 +116,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) {
         toast({
           title: "Signup failed",
-          description: "Please check your input and try again.",
+          description: error.message || "Please check your input and try again.",
           variant: "destructive",
         });
       } else {
+        // Check if email confirmation is required
+        const requiresConfirmation = data?.user?.user_metadata?.email_verified === false || 
+                                    data?.user?.identities?.[0]?.identity_data?.email_verified === false;
+        
         toast({
-          title: "Account created successfully",
-          description: role === 'player' 
-            ? "Please check your email to confirm your account, then select your plan."
-            : "Please check your email to confirm your account.",
+          title: "Account created successfully!",
+          description: requiresConfirmation 
+            ? "Check your email to confirm your account. Then login with your credentials."
+            : "You can now login with your email and password!",
         });
       }
 
@@ -133,7 +137,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Signup error:', error);
       toast({
         title: "Signup failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       return { error };
@@ -142,17 +146,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        toast({
-          title: "Login failed",
-          description: "Invalid email or password.",
-          variant: "destructive",
-        });
+        // Check if it's an email confirmation issue
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your email and click the confirmation link first, then try logging in again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login failed",
+            description: error.message || "Invalid email or password.",
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Welcome back!",
@@ -165,7 +178,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       return { error };
