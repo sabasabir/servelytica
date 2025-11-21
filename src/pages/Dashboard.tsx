@@ -327,7 +327,7 @@ const Dashboard = () => {
                 //   onLoadStart={() => setThumbnailLoading(true)}
                 onCanPlay={() => setThumbnailLoading(false)}
                 /> */}
-                <ReactPlayer src={selectedVideo?.video?.video_link} />
+                <ReactPlayer src={(selectedVideo as any)?.video?.video_link} />
                 </>
           )}
           <div className="absolute top-2 right-2">
@@ -534,11 +534,11 @@ const Dashboard = () => {
                     <CardHeader>
                       <CardTitle>Video Feedback</CardTitle> 
                       <CardDescription>
-                        Feedback for: {selectedVideo?.video?.title || selectedVideo.file_name}
+                        Feedback for: {(selectedVideo as any)?.video?.title || (selectedVideo as any).file_name}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <VideoFeedbackDisplay video={selectedVideo?.video} videoId={selectedVideo?.video?.id} />
+                      <VideoFeedbackDisplay video={(selectedVideo as any)?.video} videoId={(selectedVideo as any)?.video?.id} />
                       <div className="mt-4 flex justify-end">
                         <Button
                           variant="outline"
