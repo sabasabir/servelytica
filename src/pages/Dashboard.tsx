@@ -15,13 +15,28 @@ import { ProfileService, VideoData } from "@/services/profileService";
 import VideoModal from "@/components/VideoModal";
 import { useAuth } from "@/contexts/AuthContext";
 import ReactPlayer from 'react-player'
+import { Box, CircularProgress } from "@mui/material";
 const videoThumbnail = '/lovable-uploads/video_thumbnail.jpg';
 import { VideoFeedbackDisplay } from "@/components/feedback/VideoFeedbackDisplay";
 
 const Dashboard = () => {
     const {user, loading: authLoading} = useAuth();
     
-    if (!user && !authLoading) {
+    // Show loading while auth is initializing
+    if (authLoading) {
+      return (
+        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
+          <Navbar />
+          <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CircularProgress sx={{ color: "#ff7e00" }} />
+          </Box>
+          <Footer />
+        </Box>
+      );
+    }
+    
+    // Redirect to login if no authenticated user
+    if (!user) {
       return <Navigate to="/auth" replace />;
     }
   const [activeTab, setActiveTab] = useState("uploads");
