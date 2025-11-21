@@ -1,6 +1,8 @@
 
+
 import { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Box, Container, Typography, Card, CardContent, TextField, CircularProgress } from "@mui/material";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachSearch from "@/components/coaches/CoachSearch";
@@ -45,50 +47,86 @@ const CoachesPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
         <Navbar />
-        <main className="flex-grow py-12 px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex justify-center items-center h-64">
-              <p className="text-gray-600">Loading coaches...</p>
-            </div>
-          </div>
-        </main>
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <CircularProgress sx={{ color: "#ff7e00" }} />
+        </Box>
         <Footer />
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
       <Navbar />
       
-      <main className="flex-grow py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-tt-blue mb-2">Our Expert Coaches</h1>
-            <p className="text-gray-600">
-              Choose from our roster of professional table tennis coaches for personalized analysis
-            </p>
-          </div>
-          
-          <CoachSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          
-          <Tabs defaultValue="all" className="mb-8" onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="all">All Coaches</TabsTrigger>
-              <TabsTrigger value="elite">Elite Coaches</TabsTrigger>
-              <TabsTrigger value="professional">Professional</TabsTrigger>
-              <TabsTrigger value="certified">Certified</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
+      <Box component="main" sx={{ flex: 1, py: { xs: 8, md: 14 } }}>
+        <Container maxWidth="lg">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box sx={{ textAlign: "center", mb: { xs: 8, md: 10 } }}>
+              <Typography
+                sx={{
+                  color: "#ff7e00",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  letterSpacing: "2px",
+                  mb: 2,
+                  textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                }}
+              >
+                EXPERT GUIDANCE
+              </Typography>
+
+              <Typography
+                variant="h2"
+                sx={{
+                  fontSize: { xs: "28px", md: "48px" },
+                  fontWeight: 800,
+                  mb: 3,
+                  color: "#1a365d",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                }}
+              >
+                OUR EXPERT COACHES
+              </Typography>
+
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  color: "#64748b",
+                  maxWidth: "600px",
+                  mx: "auto",
+                }}
+              >
+                Choose from our roster of professional coaches for personalized analysis and guidance
+              </Typography>
+            </Box>
+          </motion.div>
+
+          {/* Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            style={{ marginBottom: "32px" }}
+          >
+            <CoachSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          </motion.div>
+
+          {/* Coaches Grid */}
           <CoachGrid coaches={filteredCoaches} resetFilters={resetFilters} />
-        </div>
-      </main>
-      
+        </Container>
+      </Box>
+
       <Footer />
-    </div>
+    </Box>
   );
 };
 

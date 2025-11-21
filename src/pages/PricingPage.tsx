@@ -8,6 +8,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Box, Container, Typography, Card, CardContent, Switch } from "@mui/material";
+import { motion } from "framer-motion";
 
 interface PricingPlan {
   id: string;
@@ -38,7 +40,6 @@ const PricingPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch pricing plans
         const { data: plansData, error: plansError } = await supabase
           .from('pricing')
           .select('*')
@@ -49,14 +50,9 @@ const PricingPage = () => {
           return;
         }
 
-        // console.log('Pricing plans fetched:', plansData);
         setPricingPlans(plansData || []);
 
-        // Fetch user's current subscription if logged in
         if (user) {
-        //   console.log('Fetching subscription for user:', user.id);
-          
-          // First try to get active subscription
           const { data: subscriptionData, error: subscriptionError } = await supabase
             .from('users_subscription')
             .select('pricing_plan_id, subscription_type, status')
@@ -67,16 +63,10 @@ const PricingPage = () => {
           if (subscriptionError) {
             console.error('Error fetching user subscription:', subscriptionError);
           } else if (subscriptionData) {
-            // console.log('User subscription found:', subscriptionData);
             setUserSubscription(subscriptionData);
           } else {
-            console.log('No active subscription found, checking for free plan');
-            
-            // If no active subscription, create a default free one
             const freePlan = plansData?.find(plan => plan.name === 'Free');
             if (freePlan) {
-              console.log('Creating free subscription for user');
-              
               const { data: newSubscription, error: createError } = await supabase
                 .from('users_subscription')
                 .insert({
@@ -91,10 +81,7 @@ const PricingPage = () => {
                 .select('pricing_plan_id, subscription_type, status')
                 .single();
 
-              if (createError) {
-                console.error('Error creating free subscription:', createError);
-              } else {
-                // console.log('Free subscription created:', newSubscription);
+              if (!createError) {
                 setUserSubscription(newSubscription);
               }
             }
@@ -123,224 +110,173 @@ const PricingPage = () => {
     if (!currentPlan) return plan.button_text;
     
     const currentPlanLevel = getPlanLevel(currentPlan.name);
-    const thisPlanLevel = getPlanLevel(plan.name);
+    const newPlanLevel = getPlanLevel(plan.name);
     
-    console.log('Button text logic:', {
-      currentPlan: currentPlan.name,
-      currentPlanLevel,
-      thisPlan: plan.name,
-      thisPlanLevel,
-      isCurrentPlan: plan.id === userSubscription.pricing_plan_id
-    });
-    
-    if (plan.id === userSubscription.pricing_plan_id) {
-      return "Current Plan";
-    } else if (thisPlanLevel > currentPlanLevel) {
-      return "Upgrade";
-    } else if (thisPlanLevel < currentPlanLevel) {
-      return "Downgrade";
-    } else {
-      return plan.button_text;
-    }
-  };
-
-  const isCurrentPlan = (planId: string): boolean => {
-    return user && userSubscription && planId === userSubscription.pricing_plan_id;
+    if (currentPlanLevel === newPlanLevel) return "CURRENT PLAN";
+    return plan.button_text;
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
       <Navbar />
       
-      {/* Pricing Header */}
-      <section className="bg-gradient-to-r from-tt-blue to-tt-lightBlue text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Membership Plan</h1>
-          <p className="text-xl max-w-2xl mx-auto">
-            Select the perfect plan to elevate your table tennis skills with professional analysis and coaching
-          </p>
-          
-          {/* Billing Toggle */}
-          <div className="mt-10 inline-flex items-center bg-white/10 p-1 rounded-full">
-            <button
-              onClick={() => setBillingPeriod("monthly")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                billingPeriod === "monthly" ? "bg-white text-tt-blue" : "text-white"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingPeriod("yearly")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                billingPeriod === "yearly" ? "bg-white text-tt-blue" : "text-white"
-              }`}
-            >
-              Yearly (20% off)
-            </button>
-          </div>
-        </div>
-      </section>
-      
-      {/* Pricing Cards */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tt-orange"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {pricingPlans.map((plan) => {
-                const currentPrice = billingPeriod === "monthly" ? plan.monthly_price : plan.yearly_price;
-                const isUserCurrentPlan = isCurrentPlan(plan.id);
-                const buttonText = getButtonText(plan);
-                const isUpgrade = buttonText === "Upgrade";
-                const isDowngrade = buttonText === "Downgrade";
-                
-                console.log('Rendering plan:', {
-                  planName: plan.name,
-                  planId: plan.id,
-                  isUserCurrentPlan,
-                  buttonText,
-                  userSubscription
-                });
-                
-                return (
-                  <div 
-                    key={plan.id} 
-                    className={`relative bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 hover:shadow-xl border ${
-                      isUserCurrentPlan ? "border-green-500 ring-2 ring-green-200" : 
-                      plan.recommended ? "border-tt-orange" : "border-gray-200"
-                    }`}
-                  >
-                    {isUserCurrentPlan && (
-                      <Badge className="absolute top-4 left-4 bg-green-500 text-white z-10">Your Plan</Badge>
-                    )}
-                    {plan.recommended && !isUserCurrentPlan && (
-                      <Badge className="absolute top-4 right-4 bg-tt-orange">Recommended</Badge>
-                    )}
-                    <div className="p-8">
-                      <h3 className={`text-2xl font-bold ${isUserCurrentPlan ? 'text-green-600' : 'text-tt-blue'}`}>
-                        {plan.name}
-                      </h3>
-                      <p className="text-gray-600 mt-2">{plan.description}</p>
-                      
-                      <div className="mt-6">
-                        <span className={`text-4xl font-bold ${isUserCurrentPlan ? 'text-green-600' : 'text-tt-blue'}`}>
-                          ${currentPrice}
-                        </span>
-                        <span className="text-gray-500 ml-2">
-                          {currentPrice > 0 ? `/ ${billingPeriod === "monthly" ? "month" : "month, billed yearly"}` : "forever"}
-                        </span>
-                      </div>
-                      
-                      <ul className="mt-8 space-y-4">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-start">
-                            <Check className={`h-5 w-5 flex-shrink-0 mr-2 ${isUserCurrentPlan ? 'text-green-500' : 'text-tt-orange'}`} />
-                            <span className="text-gray-700">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <div className="mt-8">
-                        {isUserCurrentPlan ? (
-                          <Button 
-                            disabled
-                            className="w-full bg-green-500 text-white opacity-70 cursor-not-allowed"
-                          >
-                            {buttonText}
-                          </Button>
-                        ) : (
-                          <Link to={user ? "/dashboard" : "/auth"}>
-                            <Button 
-                              variant={plan.button_variant as "default" | "outline"}
-                              className={`w-full ${
-                                isUpgrade 
-                                  ? "bg-green-600 hover:bg-green-700 text-white" 
-                                  : isDowngrade
-                                  ? "bg-gray-500 hover:bg-gray-600 text-white"
-                                  : plan.button_variant === "default" 
-                                  ? "bg-tt-orange hover:bg-orange-600 text-white" 
-                                  : "border-tt-orange text-tt-orange hover:bg-tt-orange hover:text-white"
-                              }`}
-                            >
-                              {buttonText}
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-      
-      {/* FAQ Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-tt-blue text-center mb-12">Frequently Asked Questions</h2>
-          
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-tt-blue mb-2">What's included in the game analysis?</h3>
-              <p className="text-gray-700">
-                Our coaches provide detailed feedback on your technique, strategy, and overall gameplay. They identify strengths and weaknesses, and provide specific drills and exercises to improve your skills.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-tt-blue mb-2">Can I change my subscription plan?</h3>
-              <p className="text-gray-700">
-                Yes, you can upgrade or downgrade your subscription at any time. Changes will take effect at the start of your next billing cycle.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-tt-blue mb-2">How quickly will I receive my analysis?</h3>
-              <p className="text-gray-700">
-                Turnaround times vary by plan - Free (24 hours), Advanced (12 hours), and Pro (6 hours). Our coaches work diligently to provide thorough analysis within these timeframes.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-tt-blue mb-2">What if I don't use all my monthly analyses?</h3>
-              <p className="text-gray-700">
-                Unfortunately, unused analyses don't roll over to the next month. We encourage you to make the most of your subscription by regularly uploading your games.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* CTA Section */}
-      <section className="bg-tt-blue text-white py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to improve your table tennis game?</h2>
-          <p className="text-xl mb-8">
-            Join players worldwide who are taking their skills to the next level with professional analysis and coaching.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/upload">
-              <Button className="bg-tt-orange hover:bg-orange-600 text-white">
-                Upload Your Game
-              </Button>
-            </Link>
-            <Link to="/connect">
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-tt-blue">
-                Connect With Players
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-      
+      <Box component="main" sx={{ flex: 1, py: { xs: 8, md: 14 } }}>
+        <Container maxWidth="lg">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box sx={{ textAlign: "center", mb: { xs: 8, md: 10 } }}>
+              <Typography
+                sx={{
+                  color: "#ff7e00",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  letterSpacing: "2px",
+                  mb: 2,
+                  textTransform: "uppercase",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                }}
+              >
+                SIMPLE PRICING
+              </Typography>
+              
+              <Typography
+                variant="h2"
+                sx={{
+                  fontSize: { xs: "28px", md: "48px" },
+                  fontWeight: 800,
+                  mb: 3,
+                  color: "#1a365d",
+                  fontFamily: '"Poppins", "Sora", sans-serif',
+                }}
+              >
+                CHOOSE YOUR PLAN
+              </Typography>
+
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  color: "#64748b",
+                  maxWidth: "600px",
+                  mx: "auto",
+                  mb: 6,
+                }}
+              >
+                Start with our free plan and upgrade anytime as your needs grow
+              </Typography>
+
+              {/* Billing Toggle */}
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
+                <Typography sx={{ fontWeight: billingPeriod === "monthly" ? 700 : 500, color: billingPeriod === "monthly" ? "#1a365d" : "#64748b" }}>
+                  MONTHLY
+                </Typography>
+                <Switch 
+                  checked={billingPeriod === "yearly"}
+                  onChange={(e) => setBillingPeriod(e.target.checked ? "yearly" : "monthly")}
+                  sx={{ 
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: '#ff7e00' },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { background: '#ff7e00' },
+                  }}
+                />
+                <Typography sx={{ fontWeight: billingPeriod === "yearly" ? 700 : 500, color: billingPeriod === "yearly" ? "#1a365d" : "#64748b" }}>
+                  YEARLY
+                </Typography>
+                {billingPeriod === "yearly" && (
+                  <Badge className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white">
+                    SAVE 20%
+                  </Badge>
+                )}
+              </Box>
+            </Box>
+          </motion.div>
+
+          {/* Pricing Cards */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gap: 4,
+              mb: 8,
+            }}
+          >
+            {pricingPlans.map((plan, index) => (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card
+                  sx={{
+                    height: "100%",
+                    border: plan.recommended ? "2px solid #ff7e00" : "1px solid #e2e8f0",
+                    borderRadius: "16px",
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: plan.recommended 
+                        ? "0 20px 40px rgba(255, 126, 0, 0.15)"
+                        : "0 10px 30px rgba(0, 0, 0, 0.1)",
+                    },
+                  }}
+                >
+                  {plan.recommended && (
+                    <Box sx={{ background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)", py: 1, textAlign: "center" }}>
+                      <Typography sx={{ color: "white", fontWeight: 700, fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase" }}>
+                        MOST POPULAR
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography sx={{ fontSize: "20px", fontWeight: 800, mb: 1, color: "#1a365d", fontFamily: '"Poppins", "Sora", sans-serif' }}>
+                      {plan.name.toUpperCase()}
+                    </Typography>
+                    
+                    <Typography sx={{ color: "#64748b", mb: 4 }}>{plan.description}</Typography>
+
+                    {/* Price */}
+                    <Box sx={{ mb: 4 }}>
+                      <Typography sx={{ fontSize: "42px", fontWeight: 800, color: plan.recommended ? "#ff7e00" : "#1a365d" }}>
+                        ${billingPeriod === "monthly" ? plan.monthly_price : Math.floor(plan.yearly_price / 12)}
+                      </Typography>
+                      <Typography sx={{ color: "#64748b", fontSize: "14px" }}>
+                        {billingPeriod === "monthly" ? "per month" : "per month (billed yearly)"}
+                      </Typography>
+                    </Box>
+
+                    {/* Button */}
+                    <Link to="/auth">
+                      <Button className={plan.recommended ? "w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white" : "w-full"}>
+                        {getButtonText(plan)}
+                      </Button>
+                    </Link>
+
+                    {/* Features */}
+                    <Box sx={{ mt: 6, display: "flex", flexDirection: "column", gap: 2 }}>
+                      {plan.features.map((feature, idx) => (
+                        <Box key={idx} sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
+                          <Check size={20} style={{ color: "#ff7e00", flexShrink: 0, marginTop: "2px" }} />
+                          <Typography sx={{ color: "#64748b", fontSize: "14px" }}>{feature}</Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
       <Footer />
-    </div>
+    </Box>
   );
 };
 
