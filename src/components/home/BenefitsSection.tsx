@@ -114,14 +114,17 @@ const BenefitsSection = () => {
                   sx={{
                     height: "100%",
                     p: 4,
-                    background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
-                    border: "2px solid rgba(255, 126, 0, 0.15)",
+                    background: "linear-gradient(135deg, rgba(26, 54, 93, 0.6) 0%, rgba(26, 54, 93, 0.3) 100%)",
+                    border: "2px solid rgba(255, 126, 0, 0.25)",
                     borderRadius: "16px",
                     transition: "all 0.3s ease",
                     cursor: "pointer",
+                    backdropFilter: "blur(10px)",
                     "&:hover": {
-                      border: "2px solid rgba(255, 126, 0, 0.4)",
-                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.15)",
+                      border: "2px solid rgba(255, 126, 0, 0.5)",
+                      boxShadow: "0 20px 60px rgba(255, 126, 0, 0.3)",
+                      transform: "translateY(-8px)",
+                      background: "linear-gradient(135deg, rgba(26, 54, 93, 0.8) 0%, rgba(26, 54, 93, 0.5) 100%)",
                     },
                   }}
                 >
@@ -130,13 +133,14 @@ const BenefitsSection = () => {
                       mb: 3,
                       display: "inline-flex",
                       p: 2,
-                      background: "rgba(255, 126, 0, 0.2)",
+                      background: "linear-gradient(135deg, rgba(255, 126, 0, 0.3) 0%, rgba(255, 126, 0, 0.15) 100%)",
                       borderRadius: "12px",
                       color: "#ff7e00",
                       width: "56px",
                       height: "56px",
                       alignItems: "center",
                       justifyContent: "center",
+                      boxShadow: "0 8px 16px rgba(255, 126, 0, 0.2)",
                     }}
                   >
                     {benefit.icon}
@@ -145,10 +149,13 @@ const BenefitsSection = () => {
                   <Typography
                     variant="h6"
                     sx={{
-                      fontWeight: 700,
+                      fontWeight: 800,
                       mb: 2,
                       fontSize: "18px",
                       fontFamily: '"Poppins", "Sora", sans-serif',
+                      color: "white",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
                     }}
                   >
                     {benefit.title}
@@ -156,9 +163,10 @@ const BenefitsSection = () => {
 
                   <Typography
                     sx={{
-                      color: "rgba(255, 255, 255, 0.85)",
+                      color: "rgba(255, 255, 255, 0.9)",
                       fontSize: "14px",
-                      lineHeight: 1.6,
+                      lineHeight: 1.7,
+                      fontWeight: 500,
                     }}
                   >
                     {benefit.description}
