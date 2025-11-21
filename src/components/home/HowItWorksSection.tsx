@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Box, Container, Typography, Grid, Card, CardContent } from "@mui/material";
-import { Upload, Play, MessageSquare, TrendingUp } from "lucide-react";
+import { Upload, MessageSquare, Play, TrendingUp } from "lucide-react";
 
 const HowItWorksSection = () => {
   const steps = [
@@ -48,7 +48,6 @@ const HowItWorksSection = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   };
@@ -86,7 +85,7 @@ const HowItWorksSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", md: "48px" },
+                  fontSize: { xs: "28px", md: "44px" },
                   fontWeight: 700,
                   color: "#1a365d",
                   mb: 3,
@@ -158,14 +157,13 @@ const HowItWorksSection = () => {
                         </Typography>
                         <Box
                           sx={{
-                            display: "inline-block",
+                            display: "inline-flex",
                             p: 2,
                             background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
                             borderRadius: "12px",
                             color: "#ff7e00",
                             width: "56px",
                             height: "56px",
-                            display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                           }}
@@ -180,7 +178,7 @@ const HowItWorksSection = () => {
                           fontWeight: 700,
                           color: "#1a365d",
                           mb: 2,
-                          fontSize: "20px",
+                          fontSize: "18px",
                         }}
                       >
                         {step.title}

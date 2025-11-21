@@ -80,7 +80,7 @@ const CTASection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", md: "52px" },
+                  fontSize: { xs: "28px", md: "48px" },
                   fontWeight: 700,
                   color: "white",
                   mb: 3,
@@ -92,7 +92,7 @@ const CTASection = () => {
 
               <Typography
                 sx={{
-                  fontSize: "18px",
+                  fontSize: { xs: "16px", md: "18px" },
                   color: "rgba(255, 255, 255, 0.8)",
                   mb: 6,
                   maxWidth: "600px",
@@ -104,31 +104,26 @@ const CTASection = () => {
               </Typography>
 
               <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link to="/upload">
+                <Link to="/upload">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Button
                       size="lg"
-                      sx={{
-                        background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                        color: "white",
+                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] hover:shadow-lg"
+                      style={{
                         fontSize: "16px",
                         fontWeight: 600,
                         padding: "14px 36px",
-                        textTransform: "none",
+                        color: "white",
                         boxShadow: "0 8px 24px rgba(255, 126, 0, 0.3)",
-                        "&:hover": {
-                          boxShadow: "0 12px 32px rgba(255, 126, 0, 0.5)",
-                          transform: "translateY(-2px)",
-                        },
                       }}
                     >
                       Start Free Trial <ArrowRight size={18} style={{ marginLeft: "8px" }} />
                     </Button>
-                  </Link>
-                </motion.div>
+                  </motion.div>
+                </Link>
 
                 <motion.div
                   whileHover={{ scale: 1.05 }}

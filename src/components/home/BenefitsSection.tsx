@@ -53,7 +53,6 @@ const BenefitsSection = () => {
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut",
       },
     },
   };
@@ -94,7 +93,7 @@ const BenefitsSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", md: "48px" },
+                  fontSize: { xs: "28px", md: "44px" },
                   fontWeight: 700,
                   mb: 3,
                 }}
@@ -132,11 +131,15 @@ const BenefitsSection = () => {
                     <Box
                       sx={{
                         mb: 3,
-                        display: "inline-block",
+                        display: "inline-flex",
                         p: 2,
                         background: "rgba(255, 126, 0, 0.2)",
                         borderRadius: "12px",
                         color: "#ff7e00",
+                        width: "56px",
+                        height: "56px",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
                       {benefit.icon}
@@ -147,7 +150,7 @@ const BenefitsSection = () => {
                       sx={{
                         fontWeight: 700,
                         mb: 2,
-                        fontSize: "20px",
+                        fontSize: "18px",
                       }}
                     >
                       {benefit.title}
