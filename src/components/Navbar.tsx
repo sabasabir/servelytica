@@ -91,7 +91,7 @@ const Navbar = () => {
               </motion.div>
               <Typography 
                 sx={{ 
-                  fontSize: '24px', 
+                  fontSize: { xs: '18px', md: '24px' },
                   fontWeight: 800,
                   background: 'linear-gradient(135deg, #1a365d 0%, #ff7e00 100%)',
                   backgroundClip: 'text',
@@ -106,7 +106,7 @@ const Navbar = () => {
           </motion.div>
           
           {/* Desktop Menu */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, overflow: 'auto' }}>
             {navItems.map((item, index) => (
               <motion.div
                 key={item.to}
@@ -120,14 +120,15 @@ const Navbar = () => {
                 >
                   <Typography
                     sx={{
-                      fontSize: '15px',
+                      fontSize: { md: '13px', lg: '15px' },
                       fontWeight: 600,
                       color: location.pathname === item.to ? '#ff7e00' : '#475569',
-                      px: 2,
+                      px: { md: 1.5, lg: 2 },
                       py: 1,
                       borderRadius: '8px',
                       transition: 'all 0.3s ease',
                       cursor: 'pointer',
+                      whiteSpace: 'nowrap',
                       '&:hover': {
                         color: '#ff7e00',
                         background: 'rgba(255, 126, 0, 0.08)',
@@ -143,13 +144,13 @@ const Navbar = () => {
           </Box>
 
           {/* Auth Buttons & Mobile Menu */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             {user ? (
               <motion.div
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
-                className="hidden md:block"
+                className="hidden lg:block"
               >
                 <Button
                   onClick={handleLogout}
@@ -165,7 +166,7 @@ const Navbar = () => {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="hidden md:block"
+                  className="hidden lg:block"
                 >
                   <Link to="/auth">
                     <Button size="sm" className="border-2 border-[#ff7e00] text-[#ff7e00] hover:bg-[#ff7e00] hover:text-white transition-all">LOGIN</Button>
@@ -175,7 +176,7 @@ const Navbar = () => {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
-                  className="hidden md:block"
+                  className="hidden lg:block"
                 >
                   <Link to="/auth">
                     <Button 
@@ -192,7 +193,7 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <IconButton
               onClick={toggleMenu}
-              sx={{ display: { xs: 'flex', md: 'none' }, color: '#1a365d' }}
+              sx={{ display: { xs: 'flex', lg: 'none' }, color: '#1a365d' }}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </IconButton>
