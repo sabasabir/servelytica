@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,7 +37,8 @@ interface PricingPlan {
 }
 
 const AuthPage = () => {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, userRoles } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [sports, setSports] = useState<Sport[]>([]);
@@ -68,13 +69,17 @@ const AuthPage = () => {
   }, []);
 
   if (user && !window.location.search.includes('access_token')) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn(loginEmail, loginPassword);
+    const { error } = await signIn(loginEmail, loginPassword);
+    if (!error) {
+      // Redirect to dashboard after successful login
+      setTimeout(() => navigate('/dashboard'), 500);
+    }
     setLoading(false);
   };
 
