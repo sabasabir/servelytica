@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect } from "react";
 import { Box, Container, Typography, Card, CardContent, TextField, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
@@ -44,7 +43,7 @@ const CoachesPage = () => {
   });
 
   // Update displayed coaches when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setDisplayedCoaches(filteredCoaches.slice(0, 9));
   }, [filteredCoaches]);
 
