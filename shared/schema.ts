@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, boolean, integer, decimal, jsonb, pgEnum, check, unique, varchar, real } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 
 // Enums
 export const appRoleEnum = pgEnum('app_role', ['admin', 'coach', 'player']);
@@ -572,4 +572,115 @@ export const categories = pgTable('categories', {
   description: text('description'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+// Testimonials and Feedback tables
+export const testimonials = pgTable('testimonials', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull(),
+  coachId: uuid('coach_id'),
+  content: text('content').notNull(),
+  rating: integer('rating'),
+  videoId: uuid('video_id'),
+  isFeatured: boolean('is_featured').default(false),
+  isApproved: boolean('is_approved').default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  ratingCheck: check('rating_check', sql`rating >= 1 AND rating <= 5`),
+}));
+
+// User Matching tables
+export const userMatches = pgTable('user_matches', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull(),
+  matchedUserId: uuid('matched_user_id').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  radiusKm: integer('radius_km').notNull(),
+  matchScore: integer('match_score'),
+  status: text('status').default('active').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueUserMatch: unique().on(table.userId, table.matchedUserId),
+}));
+
+export const userMatchPreferences = pgTable('user_match_preferences', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().unique(),
+  radiusKm: integer('radius_km').default(50),
+  skillLevel: text('skill_level').array(),
+  playStyle: text('play_style').array(),
+  availabilityDays: text('availability_days').array(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Booking and Scheduling tables
+export const bookings = pgTable('bookings', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull(),
+  coachId: uuid('coach_id').notNull(),
+  bookingDate: timestamp('booking_date', { withTimezone: true }).notNull(),
+  durationMinutes: integer('duration_minutes').default(60),
+  status: text('status').default('pending').notNull(),
+  bookingType: text('booking_type').default('lesson').notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const coachAvailability = pgTable('coach_availability', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  coachId: uuid('coach_id').notNull(),
+  dayOfWeek: integer('day_of_week').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  isAvailable: boolean('is_available').default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  dayOfWeekCheck: check('day_of_week_check', sql`day_of_week >= 0 AND day_of_week <= 6`),
+}));
+
+// Coach Videos table
+export const coachVideos = pgTable('coach_videos', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  coachId: uuid('coach_id').notNull(),
+  videoUrl: text('video_url').notNull(),
+  filePath: text('file_path').notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  videoType: text('video_type').default('demo').notNull(),
+  durationSeconds: integer('duration_seconds'),
+  isFeatured: boolean('is_featured').default(false),
+  viewCount: integer('view_count').default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Live Streaming tables
+export const liveSessions = pgTable('live_sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  coachId: uuid('coach_id').notNull(),
+  studentId: uuid('student_id').notNull(),
+  sessionType: text('session_type').default('live_coaching').notNull(),
+  roomId: text('room_id').notNull().unique(),
+  streamKey: text('stream_key'),
+  playbackUrl: text('playback_url'),
+  status: text('status').default('scheduled').notNull(),
+  scheduledStart: timestamp('scheduled_start', { withTimezone: true }).notNull(),
+  actualStart: timestamp('actual_start', { withTimezone: true }),
+  actualEnd: timestamp('actual_end', { withTimezone: true }),
+  durationMinutes: integer('duration_minutes'),
+  recordingUrl: text('recording_url'),
+  sessionNotes: text('session_notes'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const liveSessionParticipants = pgTable('live_session_participants', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sessionId: uuid('session_id').notNull(),
+  userId: uuid('user_id').notNull(),
+  role: text('role').default('viewer').notNull(),
+  joinedAt: timestamp('joined_at', { withTimezone: true }),
+  leftAt: timestamp('left_at', { withTimezone: true }),
+  totalWatchTimeSeconds: integer('total_watch_time_seconds').default(0),
 });

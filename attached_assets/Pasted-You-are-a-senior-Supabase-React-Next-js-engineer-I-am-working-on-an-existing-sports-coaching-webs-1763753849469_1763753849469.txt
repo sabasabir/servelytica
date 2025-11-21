@@ -1,0 +1,143 @@
+You are a senior Supabase + React/Next.js engineer.
+I am working on an existing sports coaching website built using Supabase as the backend and Next.js/React on the frontend.
+Your job is to review the codebase, identify the issues, and implement the required fixes and new features.
+Use best practices for Supabase Auth, Database, Storage, RLS, and Realtime.
+Here are the exact tasks to perform:
+
+1️⃣ Fix Redirect Issue
+
+Users are not returning to the same page after clicking internal links
+
+Implement:
+
+Next.js router.push() fix
+
+Correct page state preservation
+
+Persist redirect targets using Supabase Auth redirectTo
+
+Fix any client-side navigation bugs
+
+2️⃣ Update Profile Section
+
+Replace analyzed videos with feedback/testimonials
+
+Pull testimonials from Supabase table (create one if not available)
+
+Display testimonials in clean UI (cards, list, carousel)
+
+3️⃣ Implement Q&A-Based User Matching System
+
+Add matching logic:
+
+Match users within selected radius
+
+Auto-unmatch after 24 hours
+
+Add Supabase table matches with fields:
+
+user_id
+
+matched_user_id
+
+expires_at
+
+radius
+
+Use cron-like behavior with Supabase Scheduled Functions to auto-unmatch after 1 day
+
+4️⃣ Add Date Selection Feature
+
+Predefined date options (e.g., today, tomorrow, weekend)
+
+Store selected date in Supabase table related to bookings
+
+Add frontend component for date selection
+
+Validate date before submitting
+
+5️⃣ Build a Blog/Social Section
+
+Anyone (players, coaches, users) can post
+
+Create tables:
+
+posts (id, author_id, content, image_url, created_at)
+
+post_comments
+
+post_likes
+
+Implement:
+
+Create Post
+
+Edit/Delete Post (author only)
+
+List feed
+
+Like, comment, etc.
+
+6️⃣ Add Coach Profiles
+
+Show coach details + videos
+
+Upload videos using Supabase Storage
+
+Add fields in table coaches:
+
+name, bio, experience, video_url, profile_image
+
+7️⃣ Allow Players to Upload Practice Clips
+
+Upload from UI → Save to Supabase Storage
+
+Link to user table via user_id
+
+Display uploaded clips under their profile or blog page
+
+8️⃣ Integrate Live Streaming / Live Coaching
+
+Use one of the following:
+
+Livepeer
+
+Agora
+
+Dolby.io
+
+The system should:
+
+Create room
+
+Generate token
+
+Embed player + streamer view
+
+Store session details in Supabase
+
+General Requirements
+
+Use Supabase JS client with RLS policies
+
+Ensure auth-protected pages & secure APIs
+
+Optimize queries
+
+Clean up unused code
+
+Provide improvements if required
+
+Final Output Required
+
+Fixed code
+
+Updated database schema
+
+Working UI components
+
+API functions
+
+Supabase functions
+
+Deployment-ready code
