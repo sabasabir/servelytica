@@ -168,7 +168,7 @@ const Navbar = () => {
                   className="hidden md:block"
                 >
                   <Link to="/auth">
-                    <Button size="sm" variant="outline">LOGIN</Button>
+                    <Button size="sm" className="border-2 border-[#ff7e00] text-[#ff7e00] hover:bg-[#ff7e00] hover:text-white transition-all">LOGIN</Button>
                   </Link>
                 </motion.div>
                 <motion.div
