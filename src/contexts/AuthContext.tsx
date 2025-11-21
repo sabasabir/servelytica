@@ -2,11 +2,15 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type UserRole = Database['public']['Tables']['user_roles']['Row'];
 
 interface AuthContextType {
   user: User | null;
-  userProfile: any | null;
-  userRoles: any | null;
+  userProfile: Profile | null;
+  userRoles: UserRole | null;
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;
@@ -30,8 +34,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<any | null>(null);
-  const [userRoles, setUserRoles] = useState<any | null>(null);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
