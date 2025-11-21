@@ -1,130 +1,209 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Search, MessageSquare, TrendingUp, Users, Target, Award } from "lucide-react";
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Box, Container, Typography, Grid, Card, CardContent } from "@mui/material";
+import { Upload, Play, MessageSquare, TrendingUp } from "lucide-react";
 
 const HowItWorksSection = () => {
   const steps = [
     {
-      id: "upload",
-      icon: Upload,
-      title: "Upload Your Game",
-      description: "Record your match and upload the video",
-      details: "Simply record your table tennis match using any camera or smartphone. Upload the video in MP4, MOV, or AVI format (up to 500MB). We accept matches from any level - whether you're a beginner or advanced player."
+      icon: <Upload size={32} />,
+      title: "Upload Your Video",
+      description: "Record and upload your game footage in seconds",
+      number: "01",
     },
     {
-      id: "choose",
-      icon: Search,
-      title: "Choose a Coach",
-      description: "Select from our expert coaches",
-      details: "Browse through our roster of certified coaches, each with their specialization areas. Filter by expertise, rating, or price. Read reviews from other players to find the perfect match for your playing style and goals."
+      icon: <MessageSquare size={32} />,
+      title: "Get Expert Feedback",
+      description: "Connect with professional coaches for analysis",
+      number: "02",
     },
     {
-      id: "analysis",
-      icon: MessageSquare,
-      title: "Get Analysis",
-      description: "Receive detailed feedback on your game",
-      details: "Within 24-48 hours, receive a comprehensive video analysis. Your coach will provide timestamp-specific feedback, slow-motion breakdowns, technique corrections, and personalized drills to improve your weak points."
+      icon: <Play size={32} />,
+      title: "Review Analysis",
+      description: "Watch frame-by-frame breakdown with insights",
+      number: "03",
     },
     {
-      id: "improve",
-      icon: TrendingUp,
-      title: "Improve Your Skills",
-      description: "Practice with personalized drills",
-      details: "Follow the customized training plan created by your coach. Track your progress over time, upload follow-up videos for continuous improvement, and watch your game evolve with professional guidance."
-    }
+      icon: <TrendingUp size={32} />,
+      title: "Track Progress",
+      description: "Monitor your improvement over time",
+      number: "04",
+    },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <section className="py-16 px-4 md:px-8 lg:px-16 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">How It Works</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Get professional coaching in four simple steps
-          </p>
-        </div>
+    <Box
+      component="section"
+      sx={{
+        py: { xs: 8, md: 12 },
+        background: "linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%)",
+      }}
+    >
+      <Container maxWidth="lg">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={containerVariants}
+        >
+          <Box sx={{ textAlign: "center", mb: 8 }}>
+            <motion.div variants={itemVariants}>
+              <Typography
+                sx={{
+                  color: "#ff7e00",
+                  fontWeight: 600,
+                  fontSize: "14px",
+                  letterSpacing: "1px",
+                  mb: 2,
+                }}
+              >
+                HOW IT WORKS
+              </Typography>
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontSize: { xs: "32px", md: "48px" },
+                  fontWeight: 700,
+                  color: "#1a365d",
+                  mb: 3,
+                }}
+              >
+                Simple Steps to Better Performance
+              </Typography>
+            </motion.div>
+          </Box>
 
-        <Tabs defaultValue="overview" className="mb-12">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="detailed">Detailed Process</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {steps.map((step, index) => (
-                <Card key={step.id} className="relative hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <step.icon className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <span className="text-3xl font-bold text-gray-200">{index + 1}</span>
-                    </div>
-                    <CardTitle className="text-lg mb-2">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 text-sm">{step.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="detailed" className="mt-8">
-            <div className="space-y-8">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex gap-6 items-start">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
-                    <p className="text-gray-600 mb-3">{step.details}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+          <Grid container spacing={4}>
+            {steps.map((step, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card
+                    sx={{
+                      height: "100%",
+                      background: "white",
+                      border: "2px solid transparent",
+                      borderRadius: "16px",
+                      transition: "all 0.3s ease",
+                      position: "relative",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      "&:hover": {
+                        borderColor: "#ff7e00",
+                        boxShadow: "0 20px 40px rgba(255, 126, 0, 0.15)",
+                      },
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: "4px",
+                        background: "linear-gradient(90deg, #ff7e00 0%, #ff9500 100%)",
+                        transform: "scaleX(0)",
+                        transformOrigin: "left",
+                        transition: "transform 0.3s ease",
+                      },
+                      "&:hover::before": {
+                        transform: "scaleX(1)",
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ p: 4 }}>
+                      <Box
+                        sx={{
+                          position: "relative",
+                          mb: 3,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            fontSize: "48px",
+                            fontWeight: 700,
+                            color: "rgba(255, 126, 0, 0.1)",
+                            zIndex: 1,
+                          }}
+                        >
+                          {step.number}
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "inline-block",
+                            p: 2,
+                            background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
+                            borderRadius: "12px",
+                            color: "#ff7e00",
+                            width: "56px",
+                            height: "56px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {step.icon}
+                        </Box>
+                      </Box>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Expert Coaches</h3>
-              <p className="text-gray-600">Professional players and certified coaches</p>
-            </CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Target className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Personalized Feedback</h3>
-              <p className="text-gray-600">Tailored advice for your playing style</p>
-            </CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Award className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Proven Results</h3>
-              <p className="text-gray-600">Join hundreds of improving players</p>
-            </CardContent>
-          </Card>
-        </div>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          color: "#1a365d",
+                          mb: 2,
+                          fontSize: "20px",
+                        }}
+                      >
+                        {step.title}
+                      </Typography>
 
-        <div className="text-center">
-          <Link to="/upload">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
-              Get Started Now
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
+                      <Typography
+                        sx={{
+                          color: "rgba(26, 54, 93, 0.7)",
+                          fontSize: "14px",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {step.description}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </motion.div>
+      </Container>
+    </Box>
   );
 };
 
