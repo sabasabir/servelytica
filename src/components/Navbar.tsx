@@ -100,7 +100,7 @@ const Navbar = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Servelytica
+                SERVELYTICA
               </Typography>
             </Link>
           </motion.div>
@@ -149,12 +149,13 @@ const Navbar = () => {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
+                style={{ display: 'none' }}
+                className="hidden md:block"
               >
                 <Button
                   onClick={handleLogout}
                   size="sm"
                   variant="outline"
-                  sx={{ display: { xs: 'none', md: 'inline-flex' } }}
                 >
                   Logout
                 </Button>

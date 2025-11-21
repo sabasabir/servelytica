@@ -54,9 +54,9 @@ const Footer = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ py: { xs: 10, md: 14 } }}>
-        <Grid container spacing={{ xs: 6, md: 8 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(4, 1fr)" }, gap: { xs: 6, md: 8 } }}>
           {/* Brand Section */}
-          <Grid item xs={12} md={3}>
+          <Box sx={{ gridColumn: { xs: "span 1", md: "span 1" } }}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +86,7 @@ const Footer = () => {
                     fontFamily: '"Poppins", "Sora", sans-serif',
                   }}
                 >
-                  Servelytica
+                  SERVELYTICA
                 </Typography>
               </Link>
 
