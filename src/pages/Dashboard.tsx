@@ -54,28 +54,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        // const userVideos = await ProfileService.getUserVideos();
-        // setVideos(userVideos);
         const { data, error } = await supabase
         .from('video_feedback')
-        // .select(`
-        //   id,
-        //   feedback_text,
-        //   rating,
-        //   created_at,
-        //   coach_id,
-        //   `)
         .select(`
             *, 
             video: video_coaches_id (*)
             `)
-            // videos: video_coaches_id (*),
-            // video: video_coaches_id (*, player: player_id (*)) //! nested bro
-            // profiles:player_id (*)
           .eq('player_id', user?.id)
           .order('created_at', { ascending: false });
-        //   console.log({user, data})  
-          setVideos(data || []);
+          setVideos((data as any) || []);
       } catch (error) {
         console.error('Error fetching videos:', error);
       } finally {
@@ -90,11 +77,11 @@ const Dashboard = () => {
   const uploadedGames = videos;
   
   // Filter videos for coach analysis (only analyzed videos)
-  const coachAnalyses = videos.filter(video => video?.video?.status === "completed");
+  const coachAnalyses = videos.filter((video: any) => video?.video?.status === "completed");
 
-  const getVideoUrl = async (video: VideoData): Promise<string | null> => {
+  const getVideoUrl = async (video: any): Promise<string | null> => {
     try {
-      if (!video.file_path) {
+      if (!video?.video?.file_path) {
         console.error('No file path for video:', video.id);
         return null;
       }
@@ -102,7 +89,7 @@ const Dashboard = () => {
       // Create a signed URL for private bucket access
       const { data, error } = await supabase.storage
         .from('videos')
-        .createSignedUrl(video.file_path, 3600); // 1 hour expiry
+        .createSignedUrl(video.video.file_path, 3600); // 1 hour expiry
 
       if (error) {
         console.error('Error creating signed URL:', error);
@@ -120,12 +107,12 @@ const Dashboard = () => {
     window.open(link, '_blank');
   }
 
-    const openFeedbackDisplay = (video: VideoData) => {
+    const openFeedbackDisplay = (video: any) => {
       setSelectedVideo(video);
       setFeedbackDisplayOpen(true);
     };
 
-  const openVideoModal = async (video: VideoData) => {
+  const openVideoModal = async (video: any) => {
     // console.log({video})
       setSelectedVideo(video);
     // setVideoUrlLoading(true);
@@ -182,7 +169,7 @@ const Dashboard = () => {
     }
   };
 
-  const VideoCard = ({ video }: { video: VideoData }) => {
+  const VideoCard = ({ video }: { video: any }) => {
     const [videoError, setVideoError] = useState(false);
     const [thumbnailLoading, setThumbnailLoading] = useState(false);
     const [signedUrl, setSignedUrl] = useState<string | null>(null);
