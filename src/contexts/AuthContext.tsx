@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
-  userProfile: User | null;
+  userProfile: any | null;
   userRoles: any | null;
   session: Session | null;
   loading: boolean;
@@ -30,8 +30,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [userRoles, setUserRoles] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
+  const [userRoles, setUserRoles] = useState<any | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
