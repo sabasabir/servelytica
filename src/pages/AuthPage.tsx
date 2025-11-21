@@ -78,15 +78,8 @@ const AuthPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(loginEmail, loginPassword);
-    if (!error) {
-      // Add a small delay to ensure auth state is fully updated
-      setTimeout(() => {
-        navigate('/dashboard', { replace: true });
-      }, 100);
-    } else {
-      setLoading(false);
-    }
+    await signIn(loginEmail, loginPassword);
+    // Don't redirect here - let the useEffect handle it once auth state updates
   };
 
   const handleSignupStep1 = async (e: React.FormEvent) => {
