@@ -78,13 +78,14 @@ const AuthPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(loginEmail, loginPassword);
+    const { error, user: loggedInUser } = await signIn(loginEmail, loginPassword);
     if (error) {
-      // If there's an error, reset loading state immediately
+      // If there's an error, reset loading state
       setLoading(false);
+    } else if (loggedInUser) {
+      // Redirect to dashboard on successful login
+      navigate('/dashboard', { replace: true });
     }
-    // If no error, loading stays true while auth listener updates user state
-    // The useEffect watching user will trigger redirect once auth state updates
   };
 
   const handleSignupStep1 = async (e: React.FormEvent) => {

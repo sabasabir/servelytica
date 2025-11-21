@@ -14,7 +14,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; user?: User | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -166,14 +166,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             variant: "destructive",
           });
         }
+        return { error };
       } else {
+        // Update state immediately on successful login
+        setUser(data.user);
+        setSession(data.session);
         toast({
           title: "Welcome back!",
           description: "You have successfully logged in.",
         });
+        return { error: null, user: data.user };
       }
-
-      return { error };
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
