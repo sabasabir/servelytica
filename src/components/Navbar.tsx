@@ -149,7 +149,6 @@ const Navbar = () => {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
-                style={{ display: 'none' }}
                 className="hidden md:block"
               >
                 <Button
@@ -166,18 +165,16 @@ const Navbar = () => {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
-                  style={{ display: 'none' }}
                   className="hidden md:block"
                 >
                   <Link to="/auth">
-                    <Button size="sm" variant="outline">Login</Button>
+                    <Button size="sm" variant="outline">LOGIN</Button>
                   </Link>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
-                  style={{ display: 'none' }}
                   className="hidden md:block"
                 >
                   <Link to="/auth">
@@ -185,7 +182,7 @@ const Navbar = () => {
                       size="sm"
                       className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white"
                     >
-                      Sign Up
+                      SIGN UP
                     </Button>
                   </Link>
                 </motion.div>
