@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { User } from "lucide-react";
+import { Box, Container, Typography, Button, CircularProgress } from "@mui/material";
+import { motion } from "framer-motion";
+import { User, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { Link } from "react-router-dom";
+import Footer from "@/components/Footer";
+import { useToast } from "@/hooks/use-toast";
 import { MembershipType, canConnectWithPlayers } from "@/utils/membershipUtils";
 import SearchAndFilters from "@/components/social/SearchAndFilters";
 import MembershipBanner from "@/components/social/MembershipBanner";
@@ -18,11 +18,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import MyRequestsLists from "@/components/social/MyRequestsLists";
 import ConnectRequestModal from "@/components/social/ConnectRequestModal";
 
-// Mock user membership - In a real app, this would come from your auth context
-const userMembership: MembershipType = "Free"; // Set to "Free", "Advanced", or "Pro" for testing
+const userMembership: MembershipType = "Free";
 
 const SocialConnector = () => {
-  const {user, userProfile} = useAuth();
+  const { user, userProfile } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContactForm, setShowContactForm] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
@@ -32,26 +31,16 @@ const SocialConnector = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-//   console.log({user})
-
-  // Fetch players with "player" role from Supabase
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
         setLoading(true);
 
         const connectedUserIds = [];
-        // First get all user IDs with player role
         const { data: connections, error: connectionsError } = await supabase
-            .from('connections')
-            .select('user1_id: user1_id (user_id), user2_id: user2_id (user_id)')
-            .or(`user1_id.eq.${userProfile?.id},user2_id.eq.${userProfile?.id}`);
-
-            // console.log({connections})
-        if (connectionsError) {
-          console.error('Error fetching connections:', connectionsError);
-          return;
-        }
+          .from('connections')
+          .select('user1_id: user1_id (user_id), user2_id: user2_id (user_id)')
+          .or(`user1_id.eq.${userProfile?.id},user2_id.eq.${userProfile?.id}`);
 
         if (connectionsError) {
           console.error('Error fetching connections:', connectionsError);
@@ -59,27 +48,25 @@ const SocialConnector = () => {
         }
 
         const { data: requestsAll, error: requestsError } = await supabase
-            .from('connection_requests')
-            .select("*")
-            .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`);
-            // .select('user1_id: user1_id (user_id), user2_id: user2_id (user_id)')
- 
-            // console.log({requestsAll})
+          .from('connection_requests')
+          .select("*")
+          .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`);
 
-            if (requestsError) {
-              console.error('Error fetching connection requests:', requestsError);
-              return;
-            }  
+        if (requestsError) {
+          console.error('Error fetching connection requests:', requestsError);
+          return;
+        }
 
         const connectIds: string[] = (connections || []).map(conn => {
-            if (conn.user1_id?.user_id === user?.id) return conn.user2_id?.user_id;
-            if (conn.user2_id?.user_id === user?.id) return conn.user1_id?.user_id;
-            return null;
+          if (conn.user1_id?.user_id === user?.id) return conn.user2_id?.user_id;
+          if (conn.user2_id?.user_id === user?.id) return conn.user1_id?.user_id;
+          return null;
         }).filter(Boolean);
+
         const requestIds: string[] = (requestsAll || []).map(req => {
-            if (req.sender_id === user?.id) return req.receiver_id;
-            if (req.receiver_id === user?.id) return req.sender_id;
-            return null;
+          if (req.sender_id === user?.id) return req.receiver_id;
+          if (req.receiver_id === user?.id) return req.sender_id;
+          return null;
         }).filter(Boolean);
 
         connectedUserIds.push(...connectIds, ...requestIds);
@@ -99,22 +86,10 @@ const SocialConnector = () => {
           return;
         }
 
-        // console.log({ playerRoles }); 
-    const playerUserIds = playerRoles
-        ?.map(role => role?.user_id)
-        ?.filter(
-            id =>
-                id !== user?.id &&
-                !connectedUserIds.includes(id)
-        );
+        const playerUserIds = playerRoles
+          ?.map(role => role?.user_id)
+          ?.filter(id => id !== user?.id && !connectedUserIds.includes(id));
 
-
-    //    const playerUserIds = playerRoles
-    //     ?.filter(role => role?.user_id !== user?.id)
-    //     ?.map(role => role?.user_id); 
-    //     console.log({playerUserIds})
-
-        // Then get profiles for those users
         const { data, error } = await supabase
           .from('profiles')
           .select(`
@@ -129,23 +104,18 @@ const SocialConnector = () => {
           `)
           .in('user_id', playerUserIds);
 
-        //   console.log({data})
-
         if (error) {
           console.error('Error fetching players:', error);
           return;
         }
 
-        // console.log({data})
-
-        // Transform data to Player format
-        const transformedPlayers: Player[] = (data || []).map((profile, index) => ({
+        const transformedPlayers: Player[] = (data || []).map((profile) => ({
           id: profile?.user_id,
           name: profile.display_name || 'Player',
           level: profile.playing_experience || 'Beginner',
           location: profile.location || 'Location not specified',
           distance: "Unknown distance",
-          rating: Math.floor(Math.random() * 1000) + 1200, // Random rating for now
+          rating: Math.floor(Math.random() * 1000) + 1200,
           playStyle: profile.preferred_play_style || 'All-round',
           image: profile.avatar_url || "/placeholder.svg"
         }));
@@ -161,25 +131,21 @@ const SocialConnector = () => {
     if (user?.id && userProfile?.id) {
       fetchPlayers();
     }
-  }, [ user?.id, userProfile?.id]);
+  }, [user?.id, userProfile?.id]);
 
-  const filteredPlayers = players.filter(player => 
+  const filteredPlayers = players.filter(player =>
     player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     player.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     player.level.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleContactRequest = (player: Player) => {
-    // Check if user has required membership
     if (canConnectWithPlayers(userMembership)) {
       setSelectedPlayer(player);
       setShowContactForm(true);
     } else {
-        setSelectedPlayer(player);
-        setShowContactRequestDialog(true);
-        // setShowContactForm(true);
-        // Show upgrade dialog for free users
-    //   setShowUpgradeDialog(true);
+      setSelectedPlayer(player);
+      setShowContactRequestDialog(true);
     }
   };
 
@@ -193,70 +159,140 @@ const SocialConnector = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
       <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-tt-blue">Connect with Players</h1>
-            <p className="text-muted-foreground mt-2">Find table tennis players near you to practice with</p>
-          </div>
-          <Button className="bg-tt-orange text-white hover:bg-orange-600">
-            <User className="mr-2 h-4 w-4" /> Create Your Profile
-          </Button>
-        </div>
 
-        <MyRequestsLists />
+      <Box component="main" sx={{ flex: 1, py: { xs: 6, md: 10 } }}>
+        <Container maxWidth="lg">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 8 }}>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#ff7e00",
+                    letterSpacing: "2px",
+                    mb: 2,
+                    textTransform: "uppercase",
+                    fontFamily: '"Poppins", "Sora", sans-serif',
+                  }}
+                >
+                  COMMUNITY
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: { xs: "28px", md: "40px" },
+                    fontWeight: 800,
+                    color: "#1a365d",
+                    mb: 2,
+                    fontFamily: '"Poppins", "Sora", sans-serif',
+                    textTransform: "uppercase",
+                  }}
+                >
+                  CONNECT WITH PLAYERS
+                </Typography>
+                <Typography sx={{ fontSize: "16px", color: "#64748b", maxWidth: "600px" }}>
+                  Find table tennis players near you to practice with and build your network
+                </Typography>
+              </Box>
+              <Button
+                sx={{
+                  background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                  color: "white",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  textTransform: "uppercase",
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: "10px",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #ff6b00 0%, #ff8800 100%)",
+                    boxShadow: "0 8px 20px rgba(255, 126, 0, 0.4)",
+                  },
+                }}
+              >
+                <User size={16} sx={{ mr: 1 }} /> CREATE YOUR PROFILE
+              </Button>
+            </Box>
+          </motion.div>
 
-        {userMembership === "Free" && <MembershipBanner />}
+          {/* My Requests Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3 }}
+          >
+            <MyRequestsLists />
+          </motion.div>
 
-        <div className="flex flex-col space-y-6">
-          {/* Search and filter section */}
-          <SearchAndFilters 
-            searchTerm={searchTerm} 
-            onSearchChange={setSearchTerm} 
-          />
+          {/* Membership Banner */}
+          {userMembership === "Free" && <MembershipBanner />}
 
-          {/* Players list */}
-          {loading ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Loading players...</p>
-            </div>
-          ) : (
-            <PlayersList 
-              players={filteredPlayers} 
-              userMembership={userMembership} 
-              onContactRequest={handleContactRequest} 
-            />
-          )}
+          {/* Main Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3 }}
+          >
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {/* Search Section */}
+              <SearchAndFilters
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
 
-          {/* Contact form modal */}
+              {/* Players List */}
+              {loading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 10 }}>
+                  <CircularProgress sx={{ color: "#ff7e00" }} />
+                </Box>
+              ) : (
+                <PlayersList
+                  players={filteredPlayers}
+                  userMembership={userMembership}
+                  onContactRequest={handleContactRequest}
+                />
+              )}
+            </Box>
+          </motion.div>
+
+          {/* Contact Form Modal */}
           {showContactForm && selectedPlayer && (
-            <ContactForm 
-              player={selectedPlayer} 
-              onClose={() => setShowContactForm(false)} 
+            <ContactForm
+              player={selectedPlayer}
+              onClose={() => setShowContactForm(false)}
               onSubmit={handleSendMessage}
             />
           )}
 
+          {/* Contact Request Dialog */}
           {showContactRequestDialog && selectedPlayer && (
-            <ConnectRequestModal 
-              player={selectedPlayer} 
-              onClose={() => setShowContactRequestDialog(false)} 
+            <ConnectRequestModal
+              player={selectedPlayer}
+              onClose={() => setShowContactRequestDialog(false)}
               onSubmit={handleSendMessage}
             />
           )}
 
-          {/* Upgrade membership dialog */}
-          <UpgradeDialog 
-            isOpen={showUpgradeDialog} 
-            onOpenChange={setShowUpgradeDialog} 
+          {/* Upgrade Dialog */}
+          <UpgradeDialog
+            isOpen={showUpgradeDialog}
+            onOpenChange={setShowUpgradeDialog}
             selectedPlayer={selectedPlayer}
           />
-        </div>
-      </div>
-    </div>
+        </Container>
+      </Box>
+
+      <Footer />
+    </Box>
   );
 };
 
