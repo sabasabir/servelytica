@@ -154,7 +154,7 @@ const Navbar = () => {
                 <Button
                   onClick={handleLogout}
                   size="sm"
-                  variant="outline"
+                  className="bg-red-600 hover:bg-red-700 text-white border-0"
                 >
                   Logout
                 </Button>
@@ -236,7 +236,7 @@ const Navbar = () => {
                 <Button
                   onClick={handleLogout}
                   size="sm"
-                  className="mt-2 w-full"
+                  className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white border-0"
                 >
                   Logout
                 </Button>

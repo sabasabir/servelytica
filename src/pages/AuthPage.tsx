@@ -280,7 +280,7 @@ const AuthPage = () => {
                         </div>
                       )}
 
-                      <Button onClick={() => setSignupStep(1)} variant="outline" className="w-full mb-2">
+                      <Button onClick={() => setSignupStep(1)} className="w-full mb-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-0">
                         BACK
                       </Button>
                       <Button 
