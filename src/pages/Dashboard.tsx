@@ -19,9 +19,9 @@ const videoThumbnail = '/lovable-uploads/video_thumbnail.jpg';
 import { VideoFeedbackDisplay } from "@/components/feedback/VideoFeedbackDisplay";
 
 const Dashboard = () => {
-    const {user, loading} = useAuth();
+    const {user, loading: authLoading} = useAuth();
     
-    if (!user && !loading) {
+    if (!user && !authLoading) {
       return <Navigate to="/auth" replace />;
     }
   const [activeTab, setActiveTab] = useState("uploads");
