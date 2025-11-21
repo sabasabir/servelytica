@@ -79,7 +79,7 @@ const HeroSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Elevate Your Game With Professional Analysis
+                ELEVATE YOUR GAME WITH PROFESSIONAL ANALYSIS
               </Typography>
             </motion.div>
 

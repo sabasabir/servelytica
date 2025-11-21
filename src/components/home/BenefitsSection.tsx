@@ -71,7 +71,7 @@ const BenefitsSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Key Benefits
+                KEY BENEFITS
               </Typography>
             </motion.div>
             <motion.div
@@ -88,7 +88,7 @@ const BenefitsSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Why Choose Servelytica
+                WHY CHOOSE SERVELYTICA
               </Typography>
             </motion.div>
           </Box>

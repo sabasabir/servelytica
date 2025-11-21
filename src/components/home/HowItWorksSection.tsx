@@ -62,7 +62,7 @@ const HowItWorksSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                How It Works
+                HOW IT WORKS
               </Typography>
             </motion.div>
             <motion.div
@@ -80,7 +80,7 @@ const HowItWorksSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Simple Steps to Better Performance
+                SIMPLE STEPS TO BETTER PERFORMANCE
               </Typography>
             </motion.div>
           </Box>

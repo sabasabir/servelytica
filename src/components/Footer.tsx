@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Grid, Paper } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const Footer = () => {
@@ -15,7 +15,7 @@ const Footer = () => {
 
   const footerSections = [
     {
-      title: "Quick Links",
+      title: "QUICK LINKS",
       links: [
         { label: "Home", href: "/" },
         { label: "Coaches", href: "/coaches" },
@@ -24,7 +24,7 @@ const Footer = () => {
       ],
     },
     {
-      title: "Support",
+      title: "SUPPORT",
       links: [
         { label: "FAQ", href: "#" },
         { label: "Contact Us", href: "#" },
@@ -33,7 +33,7 @@ const Footer = () => {
       ],
     },
     {
-      title: "Resources",
+      title: "RESOURCES",
       links: [
         { label: "Blog", href: "/blog" },
         { label: "Community", href: "#" },
@@ -129,11 +129,11 @@ const Footer = () => {
                 ))}
               </Box>
             </motion.div>
-          </Grid>
+          </Box>
 
           {/* Footer Sections */}
           {footerSections.map((section, sectionIndex) => (
-            <Grid item xs={12} sm={6} md={3} key={sectionIndex}>
+            <Box sx={{ gridColumn: { xs: "span 1", md: "span 1" } }} key={sectionIndex}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -177,9 +177,9 @@ const Footer = () => {
                   ))}
                 </Box>
               </motion.div>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {/* Divider */}
         <Box
@@ -198,7 +198,7 @@ const Footer = () => {
         >
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 3 }}>
             <Typography sx={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.6)" }}>
-              © {currentYear} Servelytica. All rights reserved.
+              © {currentYear} SERVELYTICA. All rights reserved.
             </Typography>
 
             <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>

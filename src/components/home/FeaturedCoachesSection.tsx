@@ -80,7 +80,7 @@ const FeaturedCoachesSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Meet Our Top Coaches
+                MEET OUR TOP COACHES
               </Typography>
             </motion.div>
             <motion.div

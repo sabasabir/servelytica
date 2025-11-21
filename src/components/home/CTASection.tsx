@@ -76,7 +76,7 @@ const CTASection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                Ready to Transform Your Game?
+                READY TO TRANSFORM YOUR GAME?
               </Typography>
 
               <Typography

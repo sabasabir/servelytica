@@ -80,7 +80,7 @@ const TestimonialsSection = () => {
                   fontFamily: '"Poppins", "Sora", sans-serif',
                 }}
               >
-                What Our Players Say
+                WHAT OUR PLAYERS SAY
               </Typography>
             </motion.div>
             <motion.div
