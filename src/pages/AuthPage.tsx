@@ -68,18 +68,17 @@ const AuthPage = () => {
     fetchData();
   }, []);
 
-  if (user && !window.location.search.includes('access_token')) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // Redirect to dashboard when user is authenticated
+  useEffect(() => {
+    if (user && !window.location.search.includes('access_token')) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(loginEmail, loginPassword);
-    if (!error) {
-      // Redirect to dashboard after successful login
-      setTimeout(() => navigate('/dashboard'), 500);
-    }
+    await signIn(loginEmail, loginPassword);
     setLoading(false);
   };
 
