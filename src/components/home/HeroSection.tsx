@@ -23,8 +23,8 @@ const HeroSection = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1.2fr" },
-            gap: { xs: 6, md: 8 },
+            gridTemplateColumns: { xs: "1fr", md: "0.9fr 1.3fr" },
+            gap: { xs: 6, md: 10 },
             alignItems: "center",
             rowGap: { xs: 8, md: 0 },
           }}
@@ -72,9 +72,9 @@ const HeroSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontSize: { xs: "32px", sm: "40px", md: "48px" },
+                  fontSize: { xs: "32px", sm: "40px", md: "52px" },
                   fontWeight: 800,
-                  lineHeight: 1.15,
+                  lineHeight: 1.1,
                   mb: 4,
                   color: "#ffffff",
                   fontFamily: '"Poppins", "Sora", sans-serif',
@@ -156,20 +156,20 @@ const HeroSection = () => {
               elevation={0}
               sx={{
                 position: "relative",
-                borderRadius: "28px",
+                borderRadius: "32px",
                 overflow: "hidden",
                 background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
-                border: "2px solid rgba(255, 126, 0, 0.25)",
+                border: "3px solid rgba(255, 126, 0, 0.3)",
                 backdropFilter: "blur(10px)",
-                aspectRatio: { xs: "4/3", md: "1/1" },
+                aspectRatio: { xs: "4/3", md: "9/11" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: { xs: "300px", md: "500px" },
+                minHeight: { xs: "320px", md: "580px" },
                 backgroundImage: "url(/hero-video.png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                boxShadow: "0 20px 60px rgba(255, 126, 0, 0.2)",
+                boxShadow: "0 25px 80px rgba(255, 126, 0, 0.25), 0 10px 40px rgba(0, 0, 0, 0.2)",
               }}
             >
               {/* Overlay */}
