@@ -15,6 +15,7 @@ const CoachesPage = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayedCoaches, setDisplayedCoaches] = useState<Coach[]>([]);
 
   useEffect(() => {
     const fetchCoaches = async () => {
@@ -22,6 +23,8 @@ const CoachesPage = () => {
       try {
         const fetchedCoaches = await CoachService.getCoaches();
         setCoaches(fetchedCoaches);
+        // Display first 9 coaches initially for faster loading
+        setDisplayedCoaches(fetchedCoaches.slice(0, 9));
       } catch (error) {
         console.error("Error fetching coaches:", error);
       } finally {
@@ -39,6 +42,11 @@ const CoachesPage = () => {
     if (activeTab === "all") return matchesSearch;
     return matchesSearch && coach.category === activeTab;
   });
+
+  // Update displayed coaches when filters change
+  React.useEffect(() => {
+    setDisplayedCoaches(filteredCoaches.slice(0, 9));
+  }, [filteredCoaches]);
 
   const resetFilters = () => {
     setSearchQuery("");
@@ -121,7 +129,7 @@ const CoachesPage = () => {
           </motion.div>
 
           {/* Coaches Grid */}
-          <CoachGrid coaches={filteredCoaches} resetFilters={resetFilters} />
+          <CoachGrid coaches={displayedCoaches} resetFilters={resetFilters} />
         </Container>
       </Box>
 
