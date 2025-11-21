@@ -159,24 +159,51 @@ const HeroSection = () => {
                 background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
                 border: "2px solid rgba(255, 126, 0, 0.25)",
                 backdropFilter: "blur(10px)",
-                aspectRatio: { xs: "1", md: "1" },
+                aspectRatio: { xs: "1", md: "16/9" },
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: "300px",
+                minHeight: "400px",
+                backgroundImage: "url(/hero-video.png)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
             >
-              <Typography
+              {/* Overlay */}
+              <Box
                 sx={{
-                  fontSize: { xs: "20px", md: "28px" },
-                  color: "rgba(255, 126, 0, 0.6)",
-                  fontWeight: 600,
-                  textAlign: "center",
-                  px: 3,
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(135deg, rgba(26, 54, 93, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                🎥 Your Analysis Journey Starts Here
-              </Typography>
+                <Box
+                  sx={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    background: "rgba(255, 126, 0, 0.9)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 8px 32px rgba(255, 126, 0, 0.4)",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: "28px solid white",
+                      borderTop: "18px solid transparent",
+                      borderBottom: "18px solid transparent",
+                      marginLeft: "4px",
+                    }}
+                  />
+                </Box>
+              </Box>
             </Paper>
           </motion.div>
         </Box>
