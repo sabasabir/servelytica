@@ -1,94 +1,81 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Grid, Card, CardContent } from "@mui/material";
+import { Box, Container, Typography, Card, CardContent, Grid2 } from "@mui/material";
 import { Upload, MessageSquare, Play, TrendingUp } from "lucide-react";
 
 const HowItWorksSection = () => {
   const steps = [
     {
-      icon: <Upload size={32} />,
+      icon: <Upload size={28} />,
       title: "Upload Your Video",
       description: "Record and upload your game footage in seconds",
       number: "01",
     },
     {
-      icon: <MessageSquare size={32} />,
+      icon: <MessageSquare size={28} />,
       title: "Get Expert Feedback",
       description: "Connect with professional coaches for analysis",
       number: "02",
     },
     {
-      icon: <Play size={32} />,
+      icon: <Play size={28} />,
       title: "Review Analysis",
       description: "Watch frame-by-frame breakdown with insights",
       number: "03",
     },
     {
-      icon: <TrendingUp size={32} />,
+      icon: <TrendingUp size={28} />,
       title: "Track Progress",
       description: "Monitor your improvement over time",
       number: "04",
     },
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-      },
-    },
-  };
-
   return (
     <Box
       component="section"
       sx={{
-        py: { xs: 8, md: 12 },
-        background: "linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%)",
+        py: { xs: 10, md: 16 },
+        background: "linear-gradient(135deg, #f8fafc 0%, #eff2f7 100%)",
       }}
     >
       <Container maxWidth="lg">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          variants={containerVariants}
+          transition={{ duration: 0.6 }}
         >
-          <Box sx={{ textAlign: "center", mb: 8 }}>
-            <motion.div variants={itemVariants}>
+          <Box sx={{ textAlign: "center", mb: { xs: 8, md: 10 } }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
               <Typography
                 sx={{
                   color: "#ff7e00",
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: "14px",
-                  letterSpacing: "1px",
+                  letterSpacing: "2px",
                   mb: 2,
+                  textTransform: "uppercase",
                 }}
               >
-                HOW IT WORKS
+                How It Works
               </Typography>
             </motion.div>
-            <motion.div variants={itemVariants}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               <Typography
                 variant="h2"
                 sx={{
                   fontSize: { xs: "28px", md: "44px" },
-                  fontWeight: 700,
+                  fontWeight: 800,
                   color: "#1a365d",
-                  mb: 3,
+                  mb: 2,
                 }}
               >
                 Simple Steps to Better Performance
@@ -96,61 +83,41 @@ const HowItWorksSection = () => {
             </motion.div>
           </Box>
 
-          <Grid container spacing={4}>
+          <Grid2 container spacing={{ xs: 3, md: 4 }}>
             {steps.map((step, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid2 xs={12} sm={6} md={3} key={index}>
                 <motion.div
-                  variants={itemVariants}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
-                  transition={{ duration: 0.3 }}
                 >
                   <Card
                     sx={{
                       height: "100%",
                       background: "white",
-                      border: "2px solid transparent",
+                      border: "2px solid #f0f4f8",
                       borderRadius: "16px",
                       transition: "all 0.3s ease",
-                      position: "relative",
-                      overflow: "hidden",
                       cursor: "pointer",
                       "&:hover": {
                         borderColor: "#ff7e00",
-                        boxShadow: "0 20px 40px rgba(255, 126, 0, 0.15)",
-                      },
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: "4px",
-                        background: "linear-gradient(90deg, #ff7e00 0%, #ff9500 100%)",
-                        transform: "scaleX(0)",
-                        transformOrigin: "left",
-                        transition: "transform 0.3s ease",
-                      },
-                      "&:hover::before": {
-                        transform: "scaleX(1)",
+                        boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
+                        transform: "translateY(-4px)",
                       },
                     }}
                   >
                     <CardContent sx={{ p: 4 }}>
-                      <Box
-                        sx={{
-                          position: "relative",
-                          mb: 3,
-                        }}
-                      >
+                      <Box sx={{ position: "relative", mb: 3 }}>
                         <Typography
                           sx={{
                             position: "absolute",
-                            top: 0,
+                            top: -8,
                             right: 0,
-                            fontSize: "48px",
-                            fontWeight: 700,
-                            color: "rgba(255, 126, 0, 0.1)",
-                            zIndex: 1,
+                            fontSize: "42px",
+                            fontWeight: 800,
+                            color: "rgba(255, 126, 0, 0.08)",
                           }}
                         >
                           {step.number}
@@ -159,7 +126,7 @@ const HowItWorksSection = () => {
                           sx={{
                             display: "inline-flex",
                             p: 2,
-                            background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
+                            background: "linear-gradient(135deg, rgba(255, 126, 0, 0.12) 0%, rgba(255, 126, 0, 0.06) 100%)",
                             borderRadius: "12px",
                             color: "#ff7e00",
                             width: "56px",
@@ -186,7 +153,7 @@ const HowItWorksSection = () => {
 
                       <Typography
                         sx={{
-                          color: "rgba(26, 54, 93, 0.7)",
+                          color: "#64748b",
                           fontSize: "14px",
                           lineHeight: 1.6,
                         }}
@@ -196,9 +163,9 @@ const HowItWorksSection = () => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </Grid>
+              </Grid2>
             ))}
-          </Grid>
+          </Grid2>
         </motion.div>
       </Container>
     </Box>

@@ -2,45 +2,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Paper } from "@mui/material";
+import { Box, Container, Typography, Paper, Grid2 } from "@mui/material";
 
 const HeroSection = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  const imageVariants = {
-    hidden: { opacity: 0, scale: 0.8, rotate: -10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotate: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeInOut",
-      },
-    },
-  };
-
   return (
     <Box
       component="section"
@@ -49,32 +13,25 @@ const HeroSection = () => {
         color: "white",
         position: "relative",
         overflow: "hidden",
-        py: { xs: 8, md: 12 },
-        minHeight: "90vh",
+        py: { xs: 10, md: 16 },
+        minHeight: { xs: "auto", md: "80vh" },
         display: "flex",
         alignItems: "center",
       }}
     >
       <Container maxWidth="lg" sx={{ width: "100%" }}>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: 6,
-              alignItems: "center",
-            }}
-          >
-            {/* Left Content */}
-            <motion.div variants={itemVariants}>
+        <Grid2 container spacing={{ xs: 4, md: 6 }} alignItems="center">
+          {/* Left Content */}
+          <Grid2 xs={12} md={6}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
                 style={{
                   display: "inline-block",
                   padding: "12px 24px",
@@ -99,32 +56,37 @@ const HeroSection = () => {
                 </Typography>
               </motion.div>
 
-              <motion.div variants={itemVariants}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
                 <Typography
                   variant="h2"
                   sx={{
-                    fontSize: { xs: "32px", sm: "40px", md: "52px" },
-                    fontWeight: 700,
-                    lineHeight: 1.2,
+                    fontSize: { xs: "32px", sm: "40px", md: "56px" },
+                    fontWeight: 800,
+                    lineHeight: 1.1,
                     mb: 3,
-                    background: "linear-gradient(135deg, #fff 0%, #ff7e00 100%)",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    color: "#ffffff",
                   }}
                 >
                   Elevate Your Game With Professional Analysis
                 </Typography>
               </motion.div>
 
-              <motion.div variants={itemVariants}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 <Typography
                   variant="body1"
                   sx={{
                     fontSize: { xs: "16px", md: "18px" },
-                    color: "rgba(255, 255, 255, 0.8)",
-                    mb: 4,
-                    lineHeight: 1.6,
+                    color: "#e0e7ff",
+                    mb: 5,
+                    lineHeight: 1.7,
                   }}
                 >
                   Upload your matches and get personalized feedback from top coaches worldwide. Improve faster with AI-powered insights and expert guidance.
@@ -132,43 +94,39 @@ const HeroSection = () => {
               </motion.div>
 
               <motion.div
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
                 style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
               >
                 <Link to="/upload">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] hover:shadow-lg"
+                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white hover:shadow-2xl"
                       style={{
                         fontSize: "16px",
-                        fontWeight: 600,
-                        padding: "12px 32px",
-                        color: "white",
-                        boxShadow: "0 8px 24px rgba(255, 126, 0, 0.3)",
+                        fontWeight: 700,
+                        padding: "14px 32px",
+                        boxShadow: "0 8px 24px rgba(255, 126, 0, 0.4)",
                       }}
                     >
-                      Upload Your Game <ArrowRight size={18} style={{ marginLeft: "8px" }} />
+                      Upload Your Game <ArrowRight size={20} style={{ marginLeft: "8px" }} />
                     </Button>
                   </motion.div>
                 </Link>
 
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     size="lg"
                     variant="outline"
                     style={{
-                      border: "2px solid rgba(255, 126, 0, 0.5)",
+                      border: "2px solid rgba(255, 126, 0, 0.6)",
                       color: "white",
                       fontSize: "16px",
                       fontWeight: 600,
-                      padding: "12px 32px",
+                      padding: "14px 32px",
+                      background: "transparent",
                     }}
                   >
                     Learn More
@@ -176,23 +134,26 @@ const HeroSection = () => {
                 </motion.div>
               </motion.div>
             </motion.div>
+          </Grid2>
 
-            {/* Right Image */}
+          {/* Right Image */}
+          <Grid2 xs={12} md={6}>
             <motion.div
-              variants={imageVariants}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
               whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.3 }}
             >
               <Paper
                 elevation={0}
                 sx={{
                   position: "relative",
-                  borderRadius: "20px",
+                  borderRadius: "24px",
                   overflow: "hidden",
-                  background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
-                  border: "2px solid rgba(255, 126, 0, 0.2)",
+                  background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
+                  border: "2px solid rgba(255, 126, 0, 0.25)",
                   backdropFilter: "blur(10px)",
-                  aspectRatio: "1",
+                  aspectRatio: { xs: "1", md: "1" },
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -201,19 +162,19 @@ const HeroSection = () => {
               >
                 <Typography
                   sx={{
-                    fontSize: { xs: "18px", md: "24px" },
-                    color: "rgba(255, 126, 0, 0.5)",
+                    fontSize: { xs: "20px", md: "28px" },
+                    color: "rgba(255, 126, 0, 0.6)",
                     fontWeight: 600,
                     textAlign: "center",
-                    px: 2,
+                    px: 3,
                   }}
                 >
                   🎥 Your Analysis Journey Starts Here
                 </Typography>
               </Paper>
             </motion.div>
-          </Box>
-        </motion.div>
+          </Grid2>
+        </Grid2>
       </Container>
     </Box>
   );

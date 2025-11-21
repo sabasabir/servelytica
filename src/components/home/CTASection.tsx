@@ -9,15 +9,15 @@ const CTASection = () => {
     <Box
       component="section"
       sx={{
-        py: { xs: 8, md: 12 },
-        background: "linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%)",
+        py: { xs: 10, md: 16 },
+        background: "linear-gradient(135deg, #f8fafc 0%, #eff2f7 100%)",
         position: "relative",
         overflow: "hidden",
       }}
     >
       <Container maxWidth="lg">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
@@ -26,26 +26,13 @@ const CTASection = () => {
             sx={{
               textAlign: "center",
               background: "linear-gradient(135deg, #1a365d 0%, #0d1b2a 50%, #1a365d 100%)",
-              borderRadius: "24px",
-              p: { xs: 6, md: 10 },
+              borderRadius: "28px",
+              p: { xs: 6, md: 12 },
               border: "2px solid rgba(255, 126, 0, 0.2)",
               position: "relative",
               overflow: "hidden",
             }}
           >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: "-50%",
-                width: "200%",
-                height: "100%",
-                background: "radial-gradient(circle at 20% 50%, rgba(255, 126, 0, 0.1) 0%, transparent 50%)",
-                animation: "float 15s ease-in-out infinite",
-                pointerEvents: "none",
-              }}
-            />
-
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
@@ -81,7 +68,7 @@ const CTASection = () => {
                 variant="h2"
                 sx={{
                   fontSize: { xs: "28px", md: "48px" },
-                  fontWeight: 700,
+                  fontWeight: 800,
                   color: "white",
                   mb: 3,
                   lineHeight: 1.2,
@@ -93,14 +80,14 @@ const CTASection = () => {
               <Typography
                 sx={{
                   fontSize: { xs: "16px", md: "18px" },
-                  color: "rgba(255, 255, 255, 0.8)",
+                  color: "#e0e7ff",
                   mb: 6,
-                  maxWidth: "600px",
+                  maxWidth: "700px",
                   mx: "auto",
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
                 }}
               >
-                Join thousands of players already improving their skills with professional analysis and expert coaching.
+                Join thousands of players already improving their skills with professional analysis and expert coaching. Start your journey today!
               </Typography>
 
               <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
@@ -111,16 +98,15 @@ const CTASection = () => {
                   >
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] hover:shadow-lg"
+                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white"
                       style={{
                         fontSize: "16px",
-                        fontWeight: 600,
-                        padding: "14px 36px",
-                        color: "white",
-                        boxShadow: "0 8px 24px rgba(255, 126, 0, 0.3)",
+                        fontWeight: 700,
+                        padding: "16px 36px",
+                        boxShadow: "0 8px 24px rgba(255, 126, 0, 0.4)",
                       }}
                     >
-                      Start Free Trial <ArrowRight size={18} style={{ marginLeft: "8px" }} />
+                      Start Free Trial <ArrowRight size={20} style={{ marginLeft: "8px" }} />
                     </Button>
                   </motion.div>
                 </Link>
@@ -133,10 +119,10 @@ const CTASection = () => {
                     size="large"
                     variant="outlined"
                     sx={{
-                      border: "2px solid rgba(255, 126, 0, 0.5)",
+                      border: "2px solid rgba(255, 126, 0, 0.6)",
                       color: "white",
                       fontSize: "16px",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       padding: "14px 36px",
                       textTransform: "none",
                       "&:hover": {
