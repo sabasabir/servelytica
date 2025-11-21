@@ -422,16 +422,16 @@ const Dashboard = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-grow py-12 px-4">
+      <main className="flex-grow py-6 md:py-12 px-3 md:px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-tt-blue mb-2">My Videos</h1>
-            <p className="text-gray-600">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-tt-blue mb-2">My Videos</h1>
+            <p className="text-gray-600 text-sm md:text-base">
               View your uploaded game videos and coach feedback
             </p>
           </div>
           
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <Tabs defaultValue="uploads" className="w-full" onValueChange={setActiveTab}>
               <TabsList>
                 <TabsTrigger value="uploads">Uploaded Games</TabsTrigger>
@@ -440,10 +440,10 @@ const Dashboard = () => {
               
               <div className="mt-8">
                 <TabsContent value="uploads" className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-tt-blue">Your Uploaded Games</h2>
-                    <Link to="/upload">
-                      <Button className="bg-tt-orange text-white hover:bg-orange-600">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <h2 className="text-lg md:text-xl font-semibold text-tt-blue">Your Uploaded Games</h2>
+                    <Link to="/upload" className="w-full md:w-auto">
+                      <Button className="bg-tt-orange text-white hover:bg-orange-600 w-full md:w-auto h-10 md:h-9">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload New Game
                       </Button>
@@ -480,8 +480,8 @@ const Dashboard = () => {
                 </TabsContent>
                 
                 <TabsContent value="analyses" className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-tt-blue">Your Coach Analyses</h2>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <h2 className="text-lg md:text-xl font-semibold text-tt-blue">Your Coach Analyses</h2>
                   </div>
                   
                   {isLoading ? (

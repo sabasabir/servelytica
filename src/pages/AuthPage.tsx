@@ -126,16 +126,16 @@ const AuthPage = () => {
             <Paper
               sx={{
                 background: "white",
-                borderRadius: "24px",
+                borderRadius: { xs: "16px", md: "24px" },
                 border: "2px solid rgba(255, 126, 0, 0.2)",
-                p: { xs: 4, md: 6 },
+                p: { xs: 3, sm: 4, md: 6 },
                 boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
               }}
             >
               <Box sx={{ mb: 4, textAlign: "center" }}>
                 <Typography
                   sx={{
-                    fontSize: "28px",
+                    fontSize: { xs: "20px", sm: "24px", md: "28px" },
                     fontWeight: 800,
                     color: "#1a365d",
                     mb: 1,
@@ -144,7 +144,7 @@ const AuthPage = () => {
                 >
                   WELCOME TO SERVELYTICA
                 </Typography>
-                <Typography sx={{ color: "#64748b", fontSize: "14px" }}>
+                <Typography sx={{ color: "#64748b", fontSize: { xs: "12px", md: "14px" } }}>
                   Professional sports coaching platform
                 </Typography>
               </Box>
@@ -198,7 +198,7 @@ const AuthPage = () => {
                           required
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="font-semibold text-sm">Username</Label>
                           <Input
@@ -207,6 +207,7 @@ const AuthPage = () => {
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="username"
                             required
+                            className="h-11 md:h-10"
                           />
                         </div>
                         <div className="space-y-2">
@@ -217,10 +218,11 @@ const AuthPage = () => {
                             onChange={(e) => setDisplayName(e.target.value)}
                             placeholder="Your Name"
                             required
+                            className="h-11 md:h-10"
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="font-semibold text-sm">Password</Label>
                           <Input
@@ -229,6 +231,7 @@ const AuthPage = () => {
                             onChange={(e) => setSignupPassword(e.target.value)}
                             placeholder="••••••••"
                             required
+                            className="h-11 md:h-10"
                           />
                         </div>
                         <div className="space-y-2">
@@ -239,6 +242,7 @@ const AuthPage = () => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="••••••••"
                             required
+                            className="h-11 md:h-10"
                           />
                         </div>
                       </div>
