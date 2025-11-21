@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Paper, Grid2 } from "@mui/material";
+import { Box, Container, Typography, Paper } from "@mui/material";
 import { Star } from "lucide-react";
 
 const TestimonialsSection = () => {
@@ -99,96 +99,101 @@ const TestimonialsSection = () => {
             </motion.div>
           </Box>
 
-          <Grid2 container spacing={{ xs: 3, md: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gap: { xs: 3, md: 4 },
+            }}
+          >
             {testimonials.map((testimonial, index) => (
-              <Grid2 xs={12} md={4} key={testimonial.id}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
+              <motion.div
+                key={testimonial.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    height: "100%",
+                    p: 4,
+                    background: "white",
+                    border: "2px solid #f0f4f8",
+                    borderRadius: "16px",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      border: "2px solid #ff7e00",
+                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.1)",
+                    },
+                  }}
                 >
-                  <Paper
-                    elevation={0}
+                  {/* Star Rating */}
+                  <Box sx={{ mb: 4, display: "flex", gap: 0.5 }}>
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} size={16} fill="#ff7e00" color="#ff7e00" />
+                    ))}
+                  </Box>
+
+                  {/* Testimonial Text */}
+                  <Typography
                     sx={{
-                      height: "100%",
-                      p: 4,
-                      background: "white",
-                      border: "2px solid #f0f4f8",
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer",
-                      "&:hover": {
-                        border: "2px solid #ff7e00",
-                        boxShadow: "0 16px 32px rgba(255, 126, 0, 0.1)",
-                      },
+                      fontSize: "15px",
+                      color: "#475569",
+                      mb: 4,
+                      lineHeight: 1.7,
+                      fontStyle: "italic",
                     }}
                   >
-                    {/* Star Rating */}
-                    <Box sx={{ mb: 4, display: "flex", gap: 0.5 }}>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} size={16} fill="#ff7e00" color="#ff7e00" />
-                      ))}
-                    </Box>
+                    "{testimonial.text}"
+                  </Typography>
 
-                    {/* Testimonial Text */}
-                    <Typography
+                  {/* Author */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+                    <Box
                       sx={{
-                        fontSize: "15px",
-                        color: "#475569",
-                        mb: 4,
-                        lineHeight: 1.7,
-                        fontStyle: "italic",
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: 700,
+                        fontSize: "16px",
+                        flexShrink: 0,
                       }}
                     >
-                      "{testimonial.text}"
-                    </Typography>
-
-                    {/* Author */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                      <Box
+                      {testimonial.initials}
+                    </Box>
+                    <Box>
+                      <Typography
                         sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: "50%",
-                          background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "white",
                           fontWeight: 700,
-                          fontSize: "16px",
-                          flexShrink: 0,
+                          color: "#1a365d",
+                          fontSize: "15px",
                         }}
                       >
-                        {testimonial.initials}
-                      </Box>
-                      <Box>
-                        <Typography
-                          sx={{
-                            fontWeight: 700,
-                            color: "#1a365d",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {testimonial.author}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: "13px",
-                            color: "#94a3b8",
-                          }}
-                        >
-                          {testimonial.role}
-                        </Typography>
-                      </Box>
+                        {testimonial.author}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "13px",
+                          color: "#94a3b8",
+                        }}
+                      >
+                        {testimonial.role}
+                      </Typography>
                     </Box>
-                  </Paper>
-                </motion.div>
-              </Grid2>
+                  </Box>
+                </Paper>
+              </motion.div>
             ))}
-          </Grid2>
+          </Box>
         </motion.div>
       </Container>
     </Box>

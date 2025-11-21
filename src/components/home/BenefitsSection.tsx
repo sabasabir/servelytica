@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Paper, Grid2 } from "@mui/material";
+import { Box, Container, Typography, Paper } from "@mui/material";
 import { CheckCircle2, Zap, Users, BarChart3, Clock, Shield } from "lucide-react";
 
 const BenefitsSection = () => {
@@ -91,74 +91,79 @@ const BenefitsSection = () => {
             </motion.div>
           </Box>
 
-          <Grid2 container spacing={{ xs: 3, md: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(3, 1fr)" },
+              gap: { xs: 3, md: 4 },
+            }}
+          >
             {benefits.map((benefit, index) => (
-              <Grid2 xs={12} sm={6} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.08 }}
-                  whileHover={{ y: -8 }}
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
+                whileHover={{ y: -8 }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    height: "100%",
+                    p: 4,
+                    background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
+                    border: "2px solid rgba(255, 126, 0, 0.15)",
+                    borderRadius: "16px",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      border: "2px solid rgba(255, 126, 0, 0.4)",
+                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.15)",
+                    },
+                  }}
                 >
-                  <Paper
-                    elevation={0}
+                  <Box
                     sx={{
-                      height: "100%",
-                      p: 4,
-                      background: "linear-gradient(135deg, rgba(255, 126, 0, 0.1) 0%, rgba(255, 126, 0, 0.05) 100%)",
-                      border: "2px solid rgba(255, 126, 0, 0.15)",
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer",
-                      "&:hover": {
-                        border: "2px solid rgba(255, 126, 0, 0.4)",
-                        boxShadow: "0 16px 32px rgba(255, 126, 0, 0.15)",
-                      },
+                      mb: 3,
+                      display: "inline-flex",
+                      p: 2,
+                      background: "rgba(255, 126, 0, 0.2)",
+                      borderRadius: "12px",
+                      color: "#ff7e00",
+                      width: "56px",
+                      height: "56px",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <Box
-                      sx={{
-                        mb: 3,
-                        display: "inline-flex",
-                        p: 2,
-                        background: "rgba(255, 126, 0, 0.2)",
-                        borderRadius: "12px",
-                        color: "#ff7e00",
-                        width: "56px",
-                        height: "56px",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {benefit.icon}
-                    </Box>
+                    {benefit.icon}
+                  </Box>
 
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        mb: 2,
-                        fontSize: "18px",
-                      }}
-                    >
-                      {benefit.title}
-                    </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 700,
+                      mb: 2,
+                      fontSize: "18px",
+                    }}
+                  >
+                    {benefit.title}
+                  </Typography>
 
-                    <Typography
-                      sx={{
-                        color: "rgba(255, 255, 255, 0.85)",
-                        fontSize: "14px",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {benefit.description}
-                    </Typography>
-                  </Paper>
-                </motion.div>
-              </Grid2>
+                  <Typography
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "14px",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {benefit.description}
+                  </Typography>
+                </Paper>
+              </motion.div>
             ))}
-          </Grid2>
+          </Box>
         </motion.div>
       </Container>
     </Box>

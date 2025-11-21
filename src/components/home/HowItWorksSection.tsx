@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Card, CardContent, Grid2 } from "@mui/material";
+import { Box, Container, Typography, Card, CardContent } from "@mui/material";
 import { Upload, MessageSquare, Play, TrendingUp } from "lucide-react";
 
 const HowItWorksSection = () => {
@@ -83,89 +83,94 @@ const HowItWorksSection = () => {
             </motion.div>
           </Box>
 
-          <Grid2 container spacing={{ xs: 3, md: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(4, 1fr)" },
+              gap: { xs: 3, md: 4 },
+            }}
+          >
             {steps.map((step, index) => (
-              <Grid2 xs={12} sm={6} md={3} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+              >
+                <Card
+                  sx={{
+                    height: "100%",
+                    background: "white",
+                    border: "2px solid #f0f4f8",
+                    borderRadius: "16px",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "#ff7e00",
+                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
+                      transform: "translateY(-4px)",
+                    },
+                  }}
                 >
-                  <Card
-                    sx={{
-                      height: "100%",
-                      background: "white",
-                      border: "2px solid #f0f4f8",
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer",
-                      "&:hover": {
-                        borderColor: "#ff7e00",
-                        boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
-                        transform: "translateY(-4px)",
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ p: 4 }}>
-                      <Box sx={{ position: "relative", mb: 3 }}>
-                        <Typography
-                          sx={{
-                            position: "absolute",
-                            top: -8,
-                            right: 0,
-                            fontSize: "42px",
-                            fontWeight: 800,
-                            color: "rgba(255, 126, 0, 0.08)",
-                          }}
-                        >
-                          {step.number}
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "inline-flex",
-                            p: 2,
-                            background: "linear-gradient(135deg, rgba(255, 126, 0, 0.12) 0%, rgba(255, 126, 0, 0.06) 100%)",
-                            borderRadius: "12px",
-                            color: "#ff7e00",
-                            width: "56px",
-                            height: "56px",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {step.icon}
-                        </Box>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ position: "relative", mb: 3 }}>
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          top: -8,
+                          right: 0,
+                          fontSize: "42px",
+                          fontWeight: 800,
+                          color: "rgba(255, 126, 0, 0.08)",
+                        }}
+                      >
+                        {step.number}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          p: 2,
+                          background: "linear-gradient(135deg, rgba(255, 126, 0, 0.12) 0%, rgba(255, 126, 0, 0.06) 100%)",
+                          borderRadius: "12px",
+                          color: "#ff7e00",
+                          width: "56px",
+                          height: "56px",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {step.icon}
                       </Box>
+                    </Box>
 
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 700,
-                          color: "#1a365d",
-                          mb: 2,
-                          fontSize: "18px",
-                        }}
-                      >
-                        {step.title}
-                      </Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: "#1a365d",
+                        mb: 2,
+                        fontSize: "18px",
+                      }}
+                    >
+                      {step.title}
+                    </Typography>
 
-                      <Typography
-                        sx={{
-                          color: "#64748b",
-                          fontSize: "14px",
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        {step.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid2>
+                    <Typography
+                      sx={{
+                        color: "#64748b",
+                        fontSize: "14px",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {step.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </Grid2>
+          </Box>
         </motion.div>
       </Container>
     </Box>

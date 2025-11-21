@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Paper, Grid2 } from "@mui/material";
+import { Box, Container, Typography, Paper } from "@mui/material";
 
 const HeroSection = () => {
   return (
@@ -20,161 +20,164 @@ const HeroSection = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ width: "100%" }}>
-        <Grid2 container spacing={{ xs: 4, md: 6 }} alignItems="center">
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: { xs: 4, md: 6 },
+            alignItems: "center",
+          }}
+        >
           {/* Left Content */}
-          <Grid2 xs={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              style={{
+                display: "inline-block",
+                padding: "12px 24px",
+                background: "rgba(255, 126, 0, 0.15)",
+                border: "1px solid rgba(255, 126, 0, 0.3)",
+                borderRadius: "50px",
+                marginBottom: "24px",
+                backdropFilter: "blur(10px)",
+              }}
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                style={{
-                  display: "inline-block",
-                  padding: "12px 24px",
-                  background: "rgba(255, 126, 0, 0.15)",
-                  border: "1px solid rgba(255, 126, 0, 0.3)",
-                  borderRadius: "50px",
-                  marginBottom: "24px",
-                  backdropFilter: "blur(10px)",
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#ff7e00",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
                 }}
               >
-                <Typography
-                  sx={{
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    color: "#ff7e00",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <Zap size={16} /> Professional Analysis Platform
-                </Typography>
-              </motion.div>
+                <Zap size={16} /> Professional Analysis Platform
+              </Typography>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Typography
+                variant="h2"
+                sx={{
+                  fontSize: { xs: "32px", sm: "40px", md: "56px" },
+                  fontWeight: 800,
+                  lineHeight: 1.1,
+                  mb: 3,
+                  color: "#ffffff",
+                }}
               >
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontSize: { xs: "32px", sm: "40px", md: "56px" },
-                    fontWeight: 800,
-                    lineHeight: 1.1,
-                    mb: 3,
-                    color: "#ffffff",
-                  }}
-                >
-                  Elevate Your Game With Professional Analysis
-                </Typography>
-              </motion.div>
+                Elevate Your Game With Professional Analysis
+              </Typography>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: { xs: "16px", md: "18px" },
+                  color: "#e0e7ff",
+                  mb: 5,
+                  lineHeight: 1.7,
+                }}
               >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontSize: { xs: "16px", md: "18px" },
-                    color: "#e0e7ff",
-                    mb: 5,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  Upload your matches and get personalized feedback from top coaches worldwide. Improve faster with AI-powered insights and expert guidance.
-                </Typography>
-              </motion.div>
+                Upload your matches and get personalized feedback from top coaches worldwide. Improve faster with AI-powered insights and expert guidance.
+              </Typography>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
-              >
-                <Link to="/upload">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      size="lg"
-                      className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white hover:shadow-2xl"
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: 700,
-                        padding: "14px 32px",
-                        boxShadow: "0 8px 24px rgba(255, 126, 0, 0.4)",
-                      }}
-                    >
-                      Upload Your Game <ArrowRight size={20} style={{ marginLeft: "8px" }} />
-                    </Button>
-                  </motion.div>
-                </Link>
-
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
+            >
+              <Link to="/upload">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     size="lg"
-                    variant="outline"
+                    className="bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white hover:shadow-2xl"
                     style={{
-                      border: "2px solid rgba(255, 126, 0, 0.6)",
-                      color: "white",
                       fontSize: "16px",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       padding: "14px 32px",
-                      background: "transparent",
+                      boxShadow: "0 8px 24px rgba(255, 126, 0, 0.4)",
                     }}
                   >
-                    Learn More
+                    Upload Your Game <ArrowRight size={20} style={{ marginLeft: "8px" }} />
                   </Button>
                 </motion.div>
-              </motion.div>
-            </motion.div>
-          </Grid2>
+              </Link>
 
-          {/* Right Image */}
-          <Grid2 xs={12} md={6}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <Paper
-                elevation={0}
-                sx={{
-                  position: "relative",
-                  borderRadius: "24px",
-                  overflow: "hidden",
-                  background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
-                  border: "2px solid rgba(255, 126, 0, 0.25)",
-                  backdropFilter: "blur(10px)",
-                  aspectRatio: { xs: "1", md: "1" },
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: "300px",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: { xs: "20px", md: "28px" },
-                    color: "rgba(255, 126, 0, 0.6)",
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  style={{
+                    border: "2px solid rgba(255, 126, 0, 0.6)",
+                    color: "white",
+                    fontSize: "16px",
                     fontWeight: 600,
-                    textAlign: "center",
-                    px: 3,
+                    padding: "14px 32px",
+                    background: "transparent",
                   }}
                 >
-                  🎥 Your Analysis Journey Starts Here
-                </Typography>
-              </Paper>
+                  Learn More
+                </Button>
+              </motion.div>
             </motion.div>
-          </Grid2>
-        </Grid2>
+          </motion.div>
+
+          {/* Right Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                position: "relative",
+                borderRadius: "24px",
+                overflow: "hidden",
+                background: "linear-gradient(135deg, rgba(255, 126, 0, 0.15) 0%, rgba(255, 126, 0, 0.08) 100%)",
+                border: "2px solid rgba(255, 126, 0, 0.25)",
+                backdropFilter: "blur(10px)",
+                aspectRatio: { xs: "1", md: "1" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "300px",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "20px", md: "28px" },
+                  color: "rgba(255, 126, 0, 0.6)",
+                  fontWeight: 600,
+                  textAlign: "center",
+                  px: 3,
+                }}
+              >
+                🎥 Your Analysis Journey Starts Here
+              </Typography>
+            </Paper>
+          </motion.div>
+        </Box>
       </Container>
     </Box>
   );

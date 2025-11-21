@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Card, CardContent, Avatar, Grid2 } from "@mui/material";
+import { Box, Container, Typography, Card, CardContent, Avatar } from "@mui/material";
 import { Star } from "lucide-react";
 
 const FeaturedCoachesSection = () => {
@@ -99,117 +99,122 @@ const FeaturedCoachesSection = () => {
             </motion.div>
           </Box>
 
-          <Grid2 container spacing={{ xs: 3, md: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gap: { xs: 3, md: 4 },
+            }}
+          >
             {coaches.map((coach, index) => (
-              <Grid2 xs={12} md={4} key={coach.id}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
+              <motion.div
+                key={coach.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+              >
+                <Card
+                  sx={{
+                    height: "100%",
+                    background: "white",
+                    border: "2px solid #f0f4f8",
+                    borderRadius: "16px",
+                    overflow: "hidden",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "#ff7e00",
+                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
+                    },
+                  }}
                 >
-                  <Card
+                  {/* Coach Avatar Section */}
+                  <Box
                     sx={{
-                      height: "100%",
-                      background: "white",
-                      border: "2px solid #f0f4f8",
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer",
-                      "&:hover": {
-                        borderColor: "#ff7e00",
-                        boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
-                      },
+                      height: "180px",
+                      background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
                     }}
                   >
-                    {/* Coach Avatar Section */}
-                    <Box
+                    <Avatar
                       sx={{
-                        height: "180px",
-                        background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        position: "relative",
+                        width: 100,
+                        height: 100,
+                        fontSize: "40px",
+                        fontWeight: 700,
+                        background: "rgba(255, 255, 255, 0.25)",
+                        color: "white",
+                        border: "3px solid white",
                       }}
                     >
-                      <Avatar
-                        sx={{
-                          width: 100,
-                          height: 100,
-                          fontSize: "40px",
-                          fontWeight: 700,
-                          background: "rgba(255, 255, 255, 0.25)",
-                          color: "white",
-                          border: "3px solid white",
-                        }}
-                      >
-                        {coach.image}
-                      </Avatar>
-                    </Box>
+                      {coach.image}
+                    </Avatar>
+                  </Box>
 
-                    <CardContent sx={{ p: 4 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        color: "#1a365d",
+                        mb: 1,
+                        fontSize: "18px",
+                      }}
+                    >
+                      {coach.name}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#ff7e00",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        mb: 3,
+                      }}
+                    >
+                      {coach.role}
+                    </Typography>
+
+                    {/* Rating */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={14}
+                            fill={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
+                            color={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
+                          />
+                        ))}
+                      </Box>
                       <Typography
-                        variant="h6"
                         sx={{
                           fontWeight: 700,
                           color: "#1a365d",
-                          mb: 1,
-                          fontSize: "18px",
+                          fontSize: "13px",
                         }}
                       >
-                        {coach.name}
+                        {coach.rating}
                       </Typography>
-
                       <Typography
                         sx={{
-                          color: "#ff7e00",
+                          color: "#94a3b8",
                           fontSize: "13px",
-                          fontWeight: 600,
-                          mb: 3,
                         }}
                       >
-                        {coach.role}
+                        ({coach.reviews})
                       </Typography>
-
-                      {/* Rating */}
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Box sx={{ display: "flex", gap: 0.5 }}>
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              fill={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
-                              color={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
-                            />
-                          ))}
-                        </Box>
-                        <Typography
-                          sx={{
-                            fontWeight: 700,
-                            color: "#1a365d",
-                            fontSize: "13px",
-                          }}
-                        >
-                          {coach.rating}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            color: "#94a3b8",
-                            fontSize: "13px",
-                          }}
-                        >
-                          ({coach.reviews})
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Grid2>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </Grid2>
+          </Box>
         </motion.div>
       </Container>
     </Box>
