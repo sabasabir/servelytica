@@ -26,7 +26,7 @@ const Dashboard = () => {
     }
   const [activeTab, setActiveTab] = useState("uploads");
   const [videos, setVideos] = useState<VideoData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
@@ -65,7 +65,7 @@ const Dashboard = () => {
       } catch (error) {
         console.error('Error fetching videos:', error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -449,7 +449,7 @@ const Dashboard = () => {
                     </Link>
                   </div>
                   
-                  {loading ? (
+                  {isLoading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tt-blue mx-auto"></div>
                       <p className="mt-2 text-gray-600">Loading your videos...</p>
@@ -483,7 +483,7 @@ const Dashboard = () => {
                     <h2 className="text-xl font-semibold text-tt-blue">Your Coach Analyses</h2>
                   </div>
                   
-                  {loading ? (
+                  {isLoading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tt-blue mx-auto"></div>
                       <p className="mt-2 text-gray-600">Loading your analyses...</p>

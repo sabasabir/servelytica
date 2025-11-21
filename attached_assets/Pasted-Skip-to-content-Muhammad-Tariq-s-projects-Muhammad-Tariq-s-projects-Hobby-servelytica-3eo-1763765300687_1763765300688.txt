@@ -1,0 +1,117 @@
+Skip to content
+Muhammad Tariq's projects
+Muhammad Tariq's projects
+
+Hobby
+
+servelytica
+
+3eo7owqY9
+
+
+Find…
+F
+
+Deployment Details
+Build Failed
+Command "vite build" exited with 1
+
+Created
+muhammadtariqw33 Avatar
+muhammadtariqw33
+46s ago
+Status
+Error
+Latest
+Duration
+21s
+Just now
+Environment
+Production
+Domains
+servelytica-git-main-muhammad-tariqs-projects-12ff375f.vercel.app
+servelytica-ek2img9lp-muhammad-tariqs-projects-12ff375f.vercel.app
+Source
+main
+00abde7
+Add authentication guards to all protected pages
+
+Deployment Settings
+3 Recommendations
+Build Logs
+22s
+53 lines
+Find in logs
+CtrlF
+03:47:46.021 
+03:47:46.021 
+To address issues that do not require attention, run:
+03:47:46.021 
+  npm audit fix
+03:47:46.021 
+03:47:46.022 
+To address all issues (including breaking changes), run:
+03:47:46.022 
+  npm audit fix --force
+03:47:46.022 
+03:47:46.022 
+Run `npm audit` for details.
+03:47:47.187 
+vite v5.4.21 building for production...
+03:47:47.320 
+transforming...
+03:47:48.961 
+✓ 15 modules transformed.
+03:47:48.967 
+x Build failed in 1.76s
+03:47:48.968 
+error during build:
+03:47:48.968 
+[vite:esbuild] Transform failed with 1 error:
+03:47:48.968 
+/vercel/path0/src/pages/Dashboard.tsx:29:8: ERROR: The symbol "loading" has already been declared
+03:47:48.969 
+file: /vercel/path0/src/pages/Dashboard.tsx:29:8
+03:47:48.969 
+03:47:48.969 
+The symbol "loading" has already been declared
+03:47:48.969 
+27 |    const [activeTab, setActiveTab] = useState("uploads");
+03:47:48.969 
+28 |    const [videos, setVideos] = useState<VideoData[]>([]);
+Deployment Summary
+Deployment Checks
+Assigning Custom Domains
+Runtime Logs
+
+View and debug runtime logs & errors
+
+Observability
+
+Monitor app health & performance
+
+Speed Insights
+
+Not Enabled
+Performance metrics from real users
+
+Web Analytics
+
+Not Enabled
+Analyze visitors & traffic in real-time
+
+Home
+Docs
+Guides
+Academy
+Help
+Contact
+All systems normal.
+
+Select a display theme:
+
+system
+
+light
+
+dark
