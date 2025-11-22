@@ -198,6 +198,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           variant: "destructive",
         });
       } else {
+        // Clear user state immediately
+        setUser(null);
+        setSession(null);
+        setUserProfile(null);
+        setUserRoles(null);
         toast({
           title: "Logged out",
           description: "You have been successfully logged out.",

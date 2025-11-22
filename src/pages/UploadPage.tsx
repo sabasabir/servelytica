@@ -15,10 +15,6 @@ const UploadPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading } = useAuth();
-  
-  if (!user && !loading) {
-    return <Navigate to="/auth" replace />;
-  }
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
@@ -33,6 +29,10 @@ const UploadPage = () => {
     analysesLimit: number;
     nextResetDate: Date | null;
   } | null>(null);
+  
+  if (!user && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
