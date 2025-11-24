@@ -138,8 +138,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               updated_at: new Date().toISOString()
             });
 
-          if (profileError && !profileError.message.includes('duplicate')) {
+          if (profileError && !profileError.message?.includes('duplicate')) {
             console.error('Profile creation error:', profileError);
+            throw new Error(`Profile creation failed: ${profileError.message}`);
           }
 
           // Create user role record
@@ -151,8 +152,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               created_at: new Date().toISOString()
             });
 
-          if (roleError && !roleError.message.includes('duplicate')) {
+          if (roleError && !roleError.message?.includes('duplicate')) {
             console.error('Role creation error:', roleError);
+            throw new Error(`Role creation failed: ${roleError.message}`);
           }
 
           // Try to create free subscription if it exists
@@ -163,7 +165,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .single();
 
           if (freePlan) {
-            await supabase
+            const { error: subError } = await supabase
               .from('users_subscription')
               .insert({
                 user_id: data.user.id,
@@ -174,9 +176,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 price_paid: 0,
                 auto_renew: false
               });
+            
+            if (subError && !subError.message?.includes('duplicate')) {
+              console.error('Subscription creation error:', subError);
+            }
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Error creating user profile/role:', err);
+          throw err;
         }
       }
 
