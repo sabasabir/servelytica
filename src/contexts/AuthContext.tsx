@@ -122,20 +122,78 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           description: error.message || "Please check your input and try again.",
           variant: "destructive",
         });
-      } else {
-        // Check if email confirmation is required
-        const requiresConfirmation = data?.user?.user_metadata?.email_verified === false || 
-                                    data?.user?.identities?.[0]?.identity_data?.email_verified === false;
-        
-        toast({
-          title: "Account created successfully!",
-          description: requiresConfirmation 
-            ? "Check your email to confirm your account. Then login with your credentials."
-            : "You can now login with your email and password!",
-        });
+        return { error };
       }
 
-      return { error };
+      // Manually create profile after successful signup
+      if (data?.user?.id) {
+        try {
+          // Create profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: data.user.id,
+              username: finalUsername,
+              display_name: displayName || finalUsername,
+              sport_id: sportId || null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+
+          if (profileError && !profileError.message.includes('duplicate')) {
+            console.error('Profile creation error:', profileError);
+          }
+
+          // Create user role record
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: data.user.id,
+              role: role || 'player',
+              created_at: new Date().toISOString()
+            });
+
+          if (roleError && !roleError.message.includes('duplicate')) {
+            console.error('Role creation error:', roleError);
+          }
+
+          // Try to create free subscription if it exists
+          const { data: freePlan } = await supabase
+            .from('pricing')
+            .select('id')
+            .eq('name', 'Free')
+            .single();
+
+          if (freePlan) {
+            await supabase
+              .from('users_subscription')
+              .insert({
+                user_id: data.user.id,
+                pricing_plan_id: freePlan.id,
+                subscription_type: 'free',
+                status: 'active',
+                start_date: new Date().toISOString(),
+                price_paid: 0,
+                auto_renew: false
+              });
+          }
+        } catch (err) {
+          console.error('Error creating user profile/role:', err);
+        }
+      }
+
+      // Check if email confirmation is required
+      const requiresConfirmation = data?.user?.user_metadata?.email_verified === false || 
+                                  data?.user?.identities?.[0]?.identity_data?.email_verified === false;
+      
+      toast({
+        title: "Account created successfully!",
+        description: requiresConfirmation 
+          ? "Check your email to confirm your account. Then login with your credentials."
+          : "You can now login with your email and password!",
+      });
+
+      return { error: null };
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({
