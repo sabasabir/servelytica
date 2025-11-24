@@ -16,6 +16,7 @@ import { PasswordInput } from '@/components/PasswordInput';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SurvayModal from '@/components/SurvayModal';
+import SignupSurvey, { SignupSurveyData } from '@/components/SignupSurvey';
 import { Box, Container, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -57,6 +58,7 @@ const AuthPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [surveyData, setSurveyData] = useState<Partial<SignupSurveyData>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -187,7 +189,7 @@ const AuthPage = () => {
                 {/* Signup Form */}
                 <TabsContent value="signup">
                   {signupStep === 1 ? (
-                    <form onSubmit={handleSignupStep1} className="space-y-4">
+                    <form onSubmit={handleSignupStep1} className="space-y-4 max-h-96 overflow-y-auto">
                       <div className="space-y-2">
                         <Label className="font-semibold text-sm">Email</Label>
                         <Input
@@ -283,20 +285,47 @@ const AuthPage = () => {
                       </Button>
                       <Button 
                         onClick={async () => {
+                          if (role === 'player') {
+                            setSignupStep(3);
+                          } else {
+                            // Coaches skip survey and go directly to account creation
+                            setLoading(true);
+                            const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, '');
+                            if (!error) {
+                              navigate('/dashboard', { replace: true });
+                            }
+                            setLoading(false);
+                          }
+                        }}
+                        className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10"
+                        disabled={loading || (role === 'player' && !selectedSport)}
+                      >
+                        {role === 'player' ? 'NEXT - ANSWER QUESTIONS' : 'CREATE ACCOUNT'}
+                      </Button>
+                    </div>
+                  ) : signupStep === 3 ? (
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
+                      <SignupSurvey data={surveyData} onChange={setSurveyData} />
+                      
+                      <Button onClick={() => setSignupStep(2)} className="w-full mb-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-0">
+                        BACK
+                      </Button>
+                      <Button 
+                        onClick={async () => {
                           setLoading(true);
-                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, role === 'coach' ? '' : selectedSport);
+                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, role === 'coach' ? '' : selectedSport, role === 'player' ? surveyData : undefined);
                           if (!error) {
                             navigate('/dashboard', { replace: true });
                           }
                           setLoading(false);
                         }}
                         className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10"
-                        disabled={loading || (role === 'player' && !selectedSport)}
+                        disabled={loading}
                       >
                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                       </Button>
                     </div>
-                  )}
+                  ) : null}
                 </TabsContent>
               </Tabs>
             </Paper>

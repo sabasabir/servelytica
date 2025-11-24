@@ -13,7 +13,7 @@ interface AuthContextType {
   userRoles: UserRole | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string, surveyData?: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any; user?: User | null }>;
   signInWithGoogle: () => Promise<{ error: any; user?: User | null }>;
   signOut: () => Promise<void>;
@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user?.id])
 
-  const signUp = async (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => {
+  const signUp = async (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string, surveyData?: any) => {
     try {
       // Redirect to dashboard after signup
       const redirectUrl = `${window.location.origin}/dashboard`;
@@ -128,6 +128,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Just wait a moment to let the trigger execute
       if (data?.user?.id) {
         await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Save survey data if provided
+        if (surveyData && role === 'player') {
+          try {
+            await supabase.from('survey_responses').insert({
+              user_id: data.user.id,
+              league_rating: surveyData.leagueRating || null,
+              tournament_rating: surveyData.tournamentRating || null,
+              tournaments_yearly: surveyData.tournamentsYearly || null,
+              league_frequency: surveyData.leagueFrequency || null,
+              purpose_of_play: surveyData.purposeOfPlay || null,
+              practice_time: surveyData.practiceTime || null,
+              coaching_frequency: surveyData.coachingFrequency || null,
+              favorite_clubs: surveyData.favoriteClubs || null,
+              created_at: new Date().toISOString()
+            });
+          } catch (surveyError) {
+            console.error('Error saving survey data:', surveyError);
+            // Don't fail signup if survey save fails
+          }
+        }
       }
 
       // Check if email confirmation is required

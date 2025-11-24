@@ -133,11 +133,11 @@ const VideoUploadForm = ({
         return;
       }
       
-      // Check file size (limit to 500MB for example)
-      if (file.size > 500 * 1024 * 1024) {
+      // Check file size (limit to 5GB)
+      if (file.size > 5120 * 1024 * 1024) {
         toast({
           title: "File too large",
-          description: "Please upload a video smaller than 500MB.",
+          description: "Please upload a video smaller than 5GB.",
           variant: "destructive"
         });
         return;
@@ -251,7 +251,7 @@ const VideoUploadForm = ({
                   Drag and drop your video here, or click to browse
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Supports MP4, MOV, AVI up to 500MB
+                  Supports MP4, MOV, AVI up to 5GB
                 </p>
               </div>
               <Button type="button" variant="outline" className="relative" onClick={() => document.getElementById('videoInput')?.click()}>
