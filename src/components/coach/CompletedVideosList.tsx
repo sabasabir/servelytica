@@ -125,9 +125,9 @@ export const CompletedVideosList = ({ coachId }: CompletedVideosListProps) => {
   const openVideoModal = async (video: VideoData) => {
     setVideoUrlLoading(true);
     try {
-      const url = await getVideoUrl(video);
-      if (url) {
-        setSelectedVideo({ ...video, file_path: url });
+      const videoUrl = await getVideoUrl(video);
+      if (videoUrl) {
+        setSelectedVideo({ ...video, file_path: videoUrl });
         setVideoModalOpen(true);
       } else {
         toast({

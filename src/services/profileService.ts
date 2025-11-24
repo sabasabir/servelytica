@@ -260,54 +260,34 @@ export class ProfileService {
       // Fetch videos assigned to the coach that are still pending
       const { data: pendingVideos, error: pendingError } = await supabase
         .from('video_coaches')
-        .select(`*, profiles:player_id (*)`)
-        // .select(`
-        //   video_id,
-        //   status,
-        //   videos!inner(
-        //     id,
-        //     title,
-        //     file_name,
-        //     file_path,
-        //     uploaded_at,
-        //     focus_area,
-        //     user_id
-        //   )
-        // `)
-        // .eq('coach_id', currentCoachId)
+        .select(`*, videos(*)`)
         .eq('status', 'pending');
-        console.log({pendingVideos})
 
       if (pendingError) {
         console.error('Error fetching pending videos for coach:', pendingError);
         return [];
       }
 
-      return pendingVideos;
-
-      console.log('Pending videos result:', pendingVideos);
-
       if (!pendingVideos || pendingVideos.length === 0) {
-        console.log('No pending videos found for coach:', currentCoachId);
         return [];
       }
 
       // Get video user IDs to fetch student names
-      const videoUserIds = pendingVideos.map(assignment => (assignment.videos as any).user_id);
-      const { data: studentProfiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, username')
-        .in('user_id', videoUserIds);
+      const videoUserIds = pendingVideos.map(assignment => (assignment.videos as any).user_id).filter(Boolean);
+      let studentMap = new Map<string, string>();
+      
+      if (videoUserIds.length > 0) {
+        const { data: studentProfiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_id, display_name, username')
+          .in('user_id', videoUserIds);
 
-      if (profileError) {
-        console.error('Error fetching student profiles:', profileError);
+        if (!profileError && studentProfiles) {
+          studentProfiles.forEach(profile => {
+            studentMap.set(profile.user_id, profile.display_name || profile.username || 'Unknown Student');
+          });
+        }
       }
-
-      // Create a map of user_id to student names
-      const studentMap = new Map<string, string>();
-      studentProfiles?.forEach(profile => {
-        studentMap.set(profile.user_id, profile.display_name || profile.username || 'Unknown Student');
-      });
 
       // Transform the data
       const result = pendingVideos.map(assignment => {
@@ -318,7 +298,7 @@ export class ProfileService {
           file_name: video.file_name,
           file_path: video.file_path,
           uploaded_at: video.uploaded_at,
-          analyzed: false, // These are pending videos so not analyzed yet
+          analyzed: false,
           focus_area: video.focus_area,
           user_id: video.user_id,
           student_name: studentMap.get(video.user_id) || 'Unknown Student',
@@ -326,7 +306,6 @@ export class ProfileService {
         };
       });
 
-      console.log('Transformed pending videos result:', result);
       return result;
     } catch (error) {
       console.error('Error fetching pending videos:', error);
@@ -336,62 +315,38 @@ export class ProfileService {
 
   static async getAnalyzedVideos(coachId?: string): Promise<VideoData[]> {
     try {
-      console.log('getAnalyzedVideos called with coachId:', coachId);
-      
       if (coachId) {
         // Fetch videos assigned to the specific coach that have been completed (feedback provided)
-        console.log('Fetching completed videos for specific coach:', coachId);
         const { data: assignedVideos, error: assignedError } = await supabase
           .from('video_coaches')
-          .select(`*, profiles: player_id (*)`)
-            // video_id,
-            // status,
-            // videos!inner(
-            //   id,
-            //   title,
-            //   file_name,
-            //   file_path,
-            //   uploaded_at,
-            //   focus_area,
-            //   user_id
-            // )
-        //   .eq('coach_id', coachId)
+          .select(`*, videos(*)`)
           .eq('status', 'completed'); // Only fetch completed videos
-
-          console.log({assignedVideos})
 
         if (assignedError) {
           console.error('Error fetching assigned videos for coach:', assignedError);
           return [];
         }
 
-        console.log('Assigned videos result:', assignedVideos);
-
         if (!assignedVideos || assignedVideos.length === 0) {
-          console.log('No completed videos found for coach:', coachId);
           return [];
         }
 
-        return assignedVideos || [];
-
         // Get video user IDs to fetch student names
-        const videoUserIds = assignedVideos.map(assignment => (assignment.videos as any).user_id);
-        const { data: studentProfiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_id, display_name, username')
-          .in('user_id', videoUserIds);
+        const videoUserIds = assignedVideos.map(assignment => (assignment.videos as any).user_id).filter(Boolean);
+        let studentMap = new Map<string, string>();
+        
+        if (videoUserIds.length > 0) {
+          const { data: studentProfiles, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_id, display_name, username')
+            .in('user_id', videoUserIds);
 
-        if (profileError) {
-          console.error('Error fetching student profiles:', profileError);
+          if (!profileError && studentProfiles) {
+            studentProfiles.forEach(profile => {
+              studentMap.set(profile.user_id, profile.display_name || profile.username || 'Unknown Student');
+            });
+          }
         }
-
-        // Create a map of user_id to student names
-        const studentMap = new Map<string, string>();
-        studentProfiles?.forEach(profile => {
-          studentMap.set(profile.user_id, profile.display_name || profile.username || 'Unknown Student');
-        });
-
-        console.log('Student map:', studentMap);
 
         // Transform the data
         const result = assignedVideos.map(assignment => {
@@ -410,7 +365,6 @@ export class ProfileService {
           };
         });
 
-        console.log('Transformed videos result:', result);
         return result;
       } else {
         // Original behavior: Check user role and fetch based on role

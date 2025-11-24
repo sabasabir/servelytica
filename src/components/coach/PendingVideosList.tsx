@@ -80,8 +80,7 @@ export const PendingVideosList = ({ coachId }: PendingVideosListProps) => {
     try {
       const url = await getVideoUrl(video);
       if (url) {
-        // setSelectedVideo({ ...video, file_path: video });
-        setSelectedVideo({file_path: video });
+        setSelectedVideo({ ...video, file_path: url });
         setVideoModalOpen(true);
       } else {
         toast({
@@ -190,16 +189,16 @@ export const PendingVideosList = ({ coachId }: PendingVideosListProps) => {
                     {video?.title || video?.file_name}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {video.description}
+                    {(video as any).description || "-"}
                   </TableCell>
-                  <TableCell>{video?.profiles?.display_name}</TableCell>
+                  <TableCell>{video?.student_name || "Unknown"}</TableCell>
                   <TableCell>
-                    {video.created_at ? new Date(video.created_at).toLocaleDateString() : 'Unknown'}
+                    {video.uploaded_at ? new Date(video.uploaded_at).toLocaleDateString() : 'Unknown'}
                   </TableCell>
-                  <TableCell>{video.focus_areas || "General"}</TableCell>
+                  <TableCell>{video.focus_area || "General"}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
-                      Pending
+                      {video.status || "Pending"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -207,7 +206,7 @@ export const PendingVideosList = ({ coachId }: PendingVideosListProps) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(video?.video_link, '_blank')}
+                        onClick={() => openVideoModal(video)}
                         disabled={videoUrlLoading}
                       >
                         <Play className="h-3 w-3 mr-1" />

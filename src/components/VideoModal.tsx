@@ -89,8 +89,10 @@ const VideoModal = ({ isOpen, onClose, video, videoUrl }: VideoModalProps) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-//   if (!video || !videoUrl) return null;
-  if (!videoUrl) return null;
+  // Use file_path as URL if videoUrl not provided (backward compatibility)
+  const finalVideoUrl = videoUrl || (video?.file_path ? video.file_path : null);
+  
+  if (!finalVideoUrl) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -132,10 +134,10 @@ const VideoModal = ({ isOpen, onClose, video, videoUrl }: VideoModalProps) => {
             </div>
           ) : (
             <>
-              {/* <video
+              <video
                 ref={videoRef}
-                src={video?.video?.video_link}
-                className="w-full h-auto max-h-[70vh] object-contain"
+                src={finalVideoUrl}
+                className="w-full h-auto max-h-[70vh] object-contain bg-black"
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onLoadStart={handleLoadStart}
@@ -144,9 +146,7 @@ const VideoModal = ({ isOpen, onClose, video, videoUrl }: VideoModalProps) => {
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onClick={togglePlay}
-              /> */}
-
-              
+              />
               
               {isLoading && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
