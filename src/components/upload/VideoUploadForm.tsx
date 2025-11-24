@@ -339,10 +339,9 @@ const VideoUploadForm = ({
                       checked={formData.coachIds.includes(coach.id)}
                       onChange={() => handleCoachSelectionChange(coach.id)}
                       className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                      disabled={userRole === 'player' && quota && !quota.canCreate}
                     />
                     <div className="flex-1">
-                      <span className={`text-sm font-medium ${userRole === 'player' && quota && !quota.canCreate ? 'text-muted-foreground' : ''}`}>
+                      <span className="text-sm font-medium">
                         {coach.display_name}
                       </span>
                       {coach.username && (
@@ -380,7 +379,7 @@ const VideoUploadForm = ({
         <Button 
           type="submit" 
           className="w-full bg-tt-orange hover:bg-orange-600 text-white"
-          disabled={uploading || !videoFile || (userRole === 'player' && quota && !quota.canCreate)}
+          disabled={uploading || !videoFile}
         >
           {uploading ? (
             <>
