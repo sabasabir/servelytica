@@ -178,7 +178,7 @@ const VideoUploadForm = ({
   };
 
   return (
-    <div className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       {/* Title */}
       <div className="space-y-2">
         <Label htmlFor="title">Title</Label>
@@ -381,7 +381,6 @@ const VideoUploadForm = ({
           type="submit" 
           className="w-full bg-tt-orange hover:bg-orange-600 text-white"
           disabled={uploading || !videoFile || (userRole === 'player' && quota && !quota.canCreate)}
-          onClick={onSubmit}
         >
           {uploading ? (
             <>
@@ -396,7 +395,7 @@ const VideoUploadForm = ({
           )}
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 
