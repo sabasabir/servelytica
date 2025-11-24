@@ -120,6 +120,16 @@ const UploadPage = () => {
             description: "Video uploaded but coach assignment failed.",
             variant: "destructive"
           });
+        } else {
+          // Mark video as analyzed when coaches are assigned so they can see it
+          const { error: updateError } = await supabase
+            .from('videos')
+            .update({ analyzed: true })
+            .eq('id', videoData.id);
+
+          if (updateError) {
+            console.warn("Failed to mark video as analyzed, but upload was successful");
+          }
         }
       }
 
@@ -139,32 +149,6 @@ const UploadPage = () => {
         });
       } else {
         console.log('Successfully recorded analysis usage');
-      }
-
-      // Insert coach assignments if any coaches selected and mark video as ready for analysis
-      if (videoData && formData.coachIds.length > 0) {
-        const { error: coachError } = await supabase
-          .from('video_coaches')
-          .insert(
-            formData.coachIds.map(coachId => ({
-              video_id: videoData.id,
-              coach_id: coachId
-            }))
-          );
-
-        if (coachError) {
-          throw new Error("Failed to assign coaches: " + coachError.message);
-        }
-
-        // Mark video as analyzed when coaches are assigned so they can see it
-        const { error: updateError } = await supabase
-          .from('videos')
-          .update({ analyzed: true })
-          .eq('id', videoData.id);
-
-        if (updateError) {
-          console.warn("Failed to mark video as analyzed, but upload was successful");
-        }
       }
 
       toast({
