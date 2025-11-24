@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import VideoUploadForm from "@/components/upload/VideoUploadForm";
-import { uploadFileToStorage, saveMediaRecord } from "@/services/uploadService";
+import { uploadFileToStorage, saveMediaRecord, assignCoachesToVideo } from "@/services/uploadService";
 import { AnalysisQuotaService } from "@/services/analysisQuotaService";
 import { QuotaExceededDialog } from "@/components/profile/QuotaExceededDialog";
 
@@ -104,6 +104,23 @@ const UploadPage = () => {
 
       if (saveError) {
         throw new Error("Failed to save video record: " + saveError.message);
+      }
+
+      // Assign coaches to video if any were selected
+      if (formData.coachIds && formData.coachIds.length > 0) {
+        const coachAssignmentResult = await assignCoachesToVideo(
+          videoData.id,
+          formData.coachIds
+        );
+        
+        if (!coachAssignmentResult.success) {
+          console.error("Failed to assign coaches:", coachAssignmentResult.error);
+          toast({
+            title: "Warning",
+            description: "Video uploaded but coach assignment failed.",
+            variant: "destructive"
+          });
+        }
       }
 
       // Record analysis usage for all video uploads to track subscription limits

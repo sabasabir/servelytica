@@ -62,7 +62,6 @@ export const saveMediaRecord = async (
         title: null, // Will be set later in the upload form
         description: null,
         focus_area: null,
-        coach_id: null,
         analyzed: false,
         uploaded_at: new Date().toISOString()
       });
@@ -74,6 +73,45 @@ export const saveMediaRecord = async (
     return { success: true };
   } catch (error) {
     console.error('Error saving media record:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+};
+
+/**
+ * Assigns coaches to a video
+ * @param videoId The video ID
+ * @param coachIds Array of coach user IDs
+ * @returns Object with success status and error if any
+ */
+export const assignCoachesToVideo = async (
+  videoId: string,
+  coachIds: string[]
+) => {
+  try {
+    if (!coachIds || coachIds.length === 0) {
+      return { success: true }; // No coaches to assign
+    }
+
+    const coachAssignments = coachIds.map(coachId => ({
+      video_id: videoId,
+      coach_id: coachId,
+      status: 'pending'
+    }));
+
+    const { error } = await supabase
+      .from('video_coaches')
+      .insert(coachAssignments);
+    
+    if (error) {
+      throw error;
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error assigning coaches:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
