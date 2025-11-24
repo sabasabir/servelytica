@@ -1,7 +1,3 @@
-## Project info
-
-**URL**: https://lovable.dev/projects/32bfa972-f222-45f7-ae85-bd50af62c665
-
 ## How can I edit this code?
 
 There are several ways of editing your application.
@@ -14,7 +10,7 @@ Changes made via Lovable will be committed automatically to this repo.
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+The only requirement is having Node.js & npm installed -
 
 Follow these steps:
 
@@ -61,5 +57,3 @@ This project is built with:
 Yes it is!
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
