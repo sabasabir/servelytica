@@ -7,4 +7,9 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
+  // Supabase-specific config
+  migrations: {
+    table: 'drizzle_migrations',
+    schema: 'public'
+  }
 });
