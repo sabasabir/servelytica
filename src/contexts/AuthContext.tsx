@@ -123,68 +123,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { error };
       }
 
-      // Manually create profile after successful signup
+      // Profile will be auto-created by Supabase trigger on auth.users insert
+      // Just wait a moment to let the trigger execute
       if (data?.user?.id) {
-        try {
-          // Create profile record
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: data.user.id,
-              username: finalUsername,
-              display_name: displayName || finalUsername,
-              sport_id: sportId || null,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
-
-          if (profileError && !profileError.message?.includes('duplicate')) {
-            console.error('Profile creation error:', profileError);
-            throw new Error(`Profile creation failed: ${profileError.message}`);
-          }
-
-          // Create user role record
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: data.user.id,
-              role: role || 'player',
-              created_at: new Date().toISOString()
-            });
-
-          if (roleError && !roleError.message?.includes('duplicate')) {
-            console.error('Role creation error:', roleError);
-            throw new Error(`Role creation failed: ${roleError.message}`);
-          }
-
-          // Try to create free subscription if it exists
-          const { data: freePlan } = await supabase
-            .from('pricing')
-            .select('id')
-            .eq('name', 'Free')
-            .single();
-
-          if (freePlan) {
-            const { error: subError } = await supabase
-              .from('users_subscription')
-              .insert({
-                user_id: data.user.id,
-                pricing_plan_id: freePlan.id,
-                subscription_type: 'free',
-                status: 'active',
-                start_date: new Date().toISOString(),
-                price_paid: 0,
-                auto_renew: false
-              });
-            
-            if (subError && !subError.message?.includes('duplicate')) {
-              console.error('Subscription creation error:', subError);
-            }
-          }
-        } catch (err: any) {
-          console.error('Error creating user profile/role:', err);
-          throw err;
-        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       // Check if email confirmation is required
