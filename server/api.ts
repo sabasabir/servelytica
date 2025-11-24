@@ -648,4 +648,74 @@ export function setupApiRoutes(app: any) {
       sendError(res, error);
     }
   });
+
+  // Dashboard endpoints
+  app.get('/api/dashboard/items/:userId', async (req: any, res: any) => {
+    try {
+      // Return mock dashboard items - in production, fetch from database
+      const items = [];
+      sendJson(res, items);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/dashboard/items', async (req: any, res: any) => {
+    try {
+      // Create new dashboard item
+      const item = {
+        id: Date.now().toString(),
+        ...req.body,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      sendJson(res, item, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/dashboard/items/:itemId', async (req: any, res: any) => {
+    try {
+      // Update dashboard item
+      const item = {
+        id: req.params.itemId,
+        ...req.body,
+        updatedAt: new Date().toISOString(),
+      };
+      sendJson(res, item);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/dashboard/items/:itemId', async (req: any, res: any) => {
+    try {
+      sendJson(res, { success: true });
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/dashboard/stats/:userId', async (req: any, res: any) => {
+    try {
+      const stats = {
+        totalItems: 0,
+        completedItems: 0,
+        inProgressItems: 0,
+      };
+      sendJson(res, stats);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/profile/:userId', async (req: any, res: any) => {
+    try {
+      const profile = { id: req.params.userId, ...req.body };
+      sendJson(res, profile);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
 }

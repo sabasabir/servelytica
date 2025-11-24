@@ -184,6 +184,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Redirect to dashboard after signin
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
