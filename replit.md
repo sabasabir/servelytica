@@ -123,6 +123,23 @@ npx tsx server/test-db.ts
 - Node.js 20+
 - npm
 
+### ⚠️ REQUIRED: Supabase Storage Bucket Setup
+
+**IMPORTANT**: Before video uploads will work, you MUST create the storage bucket in Supabase.
+
+**Steps to set up video storage:**
+
+1. Go to your Supabase dashboard: https://supabase.com/dashboard/project/pxzlivocnykjjikkjago
+2. Navigate to **SQL Editor**
+3. Copy the entire contents of `SUPABASE_STORAGE_SETUP.sql` (in the root directory)
+4. Paste and run the SQL in the editor
+5. Verify the bucket was created by going to **Storage** in the sidebar
+
+**Why this is needed:**
+- The video upload feature requires a storage bucket named 'videos'
+- This bucket stores all user-uploaded videos
+- Without this bucket, video uploads will fail with storage errors
+
 ### Environment Variables
 
 **Required (Auto-configured by Replit):**
