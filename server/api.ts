@@ -5,6 +5,10 @@ import {
   coachRoutes,
   userRoleRoutes,
   subscriptionRoutes,
+  videoFeedbackRoutes,
+  commentRoutes,
+  reactionRoutes,
+  bookmarkRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -157,6 +161,149 @@ export function setupApiRoutes(app: any) {
     try {
       const plans = await subscriptionRoutes.getPricingPlans();
       sendJson(res, plans);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Video Feedback endpoints
+  app.get('/api/feedback/:videoId', async (req: any, res: any) => {
+    try {
+      const feedback = await videoFeedbackRoutes.getFeedback(req.params.videoId);
+      sendJson(res, feedback);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/feedback', async (req: any, res: any) => {
+    try {
+      const feedback = await videoFeedbackRoutes.createFeedback(req.body);
+      sendJson(res, feedback, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/feedback/:feedbackId', async (req: any, res: any) => {
+    try {
+      const feedback = await videoFeedbackRoutes.updateFeedback(req.params.feedbackId, req.body);
+      sendJson(res, feedback);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/feedback/:feedbackId', async (req: any, res: any) => {
+    try {
+      const result = await videoFeedbackRoutes.deleteFeedback(req.params.feedbackId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Comments endpoints
+  app.get('/api/comments/:articleId', async (req: any, res: any) => {
+    try {
+      const cmts = await commentRoutes.getComments(req.params.articleId);
+      sendJson(res, cmts);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/comments', async (req: any, res: any) => {
+    try {
+      const comment = await commentRoutes.createComment(req.body);
+      sendJson(res, comment, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/comments/:commentId', async (req: any, res: any) => {
+    try {
+      const comment = await commentRoutes.updateComment(req.params.commentId, req.body);
+      sendJson(res, comment);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/comments/:commentId', async (req: any, res: any) => {
+    try {
+      const result = await commentRoutes.deleteComment(req.params.commentId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Reactions endpoints
+  app.get('/api/reactions', async (req: any, res: any) => {
+    try {
+      const contentType = req.query.contentType;
+      const contentId = req.query.contentId;
+      if (!contentType || !contentId) {
+        return sendError(res, 'contentType and contentId required', 400);
+      }
+      const reacts = await reactionRoutes.getReactions(contentType, contentId);
+      sendJson(res, reacts);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/reactions', async (req: any, res: any) => {
+    try {
+      const reaction = await reactionRoutes.addReaction(req.body);
+      sendJson(res, reaction, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/reactions', async (req: any, res: any) => {
+    try {
+      const result = await reactionRoutes.removeReaction(
+        req.query.userId,
+        req.query.contentType,
+        req.query.contentId
+      );
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Bookmarks endpoints
+  app.get('/api/bookmarks/:userId', async (req: any, res: any) => {
+    try {
+      const bm = await bookmarkRoutes.getBookmarks(req.params.userId);
+      sendJson(res, bm);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/bookmarks', async (req: any, res: any) => {
+    try {
+      const bookmark = await bookmarkRoutes.addBookmark(req.body);
+      sendJson(res, bookmark, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/bookmarks', async (req: any, res: any) => {
+    try {
+      const result = await bookmarkRoutes.removeBookmark(
+        req.query.userId,
+        req.query.contentType,
+        req.query.contentId
+      );
+      sendJson(res, result);
     } catch (error) {
       sendError(res, error);
     }

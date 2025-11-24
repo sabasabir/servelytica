@@ -8,7 +8,13 @@ import {
   coachProfiles,
   usersSubscription,
   pricing,
+  videoFeedback,
+  comments,
+  reactions,
+  bookmarks,
+  articles,
 } from '@shared/schema';
+import { and } from 'drizzle-orm';
 
 export interface RouteHandler {
   [key: string]: (req: any, res: any) => Promise<void>;
@@ -178,6 +184,170 @@ export const subscriptionRoutes = {
       return plans;
     } catch (error) {
       throw new Error(`Failed to fetch pricing plans: ${error}`);
+    }
+  },
+};
+
+// Video Feedback routes
+export const videoFeedbackRoutes = {
+  async getFeedback(videoId: string) {
+    try {
+      return await db.select().from(videoFeedback).where(eq(videoFeedback.videoId, videoId as any));
+    } catch (error) {
+      throw new Error(`Failed to fetch feedback: ${error}`);
+    }
+  },
+
+  async createFeedback(data: any) {
+    try {
+      const created = await db.insert(videoFeedback).values(data).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to create feedback: ${error}`);
+    }
+  },
+
+  async updateFeedback(feedbackId: string, data: any) {
+    try {
+      const updated = await db
+        .update(videoFeedback)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(videoFeedback.id, feedbackId as any))
+        .returning();
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update feedback: ${error}`);
+    }
+  },
+
+  async deleteFeedback(feedbackId: string) {
+    try {
+      await db.delete(videoFeedback).where(eq(videoFeedback.id, feedbackId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete feedback: ${error}`);
+    }
+  },
+};
+
+// Comments routes
+export const commentRoutes = {
+  async getComments(articleId: string) {
+    try {
+      return await db.select().from(comments).where(eq(comments.articleId, articleId as any));
+    } catch (error) {
+      throw new Error(`Failed to fetch comments: ${error}`);
+    }
+  },
+
+  async createComment(data: any) {
+    try {
+      const created = await db.insert(comments).values(data).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to create comment: ${error}`);
+    }
+  },
+
+  async updateComment(commentId: string, data: any) {
+    try {
+      const updated = await db
+        .update(comments)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(comments.id, commentId as any))
+        .returning();
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update comment: ${error}`);
+    }
+  },
+
+  async deleteComment(commentId: string) {
+    try {
+      await db.delete(comments).where(eq(comments.id, commentId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete comment: ${error}`);
+    }
+  },
+};
+
+// Reactions routes
+export const reactionRoutes = {
+  async getReactions(contentType: string, contentId: string) {
+    try {
+      return await db
+        .select()
+        .from(reactions)
+        .where(and(
+          eq(reactions.contentType, contentType),
+          eq(reactions.contentId, contentId as any)
+        ));
+    } catch (error) {
+      throw new Error(`Failed to fetch reactions: ${error}`);
+    }
+  },
+
+  async addReaction(data: any) {
+    try {
+      const created = await db.insert(reactions).values(data).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to add reaction: ${error}`);
+    }
+  },
+
+  async removeReaction(userId: string, contentType: string, contentId: string) {
+    try {
+      await db
+        .delete(reactions)
+        .where(
+          and(
+            eq(reactions.userId, userId as any),
+            eq(reactions.contentType, contentType),
+            eq(reactions.contentId, contentId as any)
+          )
+        );
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to remove reaction: ${error}`);
+    }
+  },
+};
+
+// Bookmarks routes
+export const bookmarkRoutes = {
+  async getBookmarks(userId: string) {
+    try {
+      return await db.select().from(bookmarks).where(eq(bookmarks.userId, userId as any));
+    } catch (error) {
+      throw new Error(`Failed to fetch bookmarks: ${error}`);
+    }
+  },
+
+  async addBookmark(data: any) {
+    try {
+      const created = await db.insert(bookmarks).values(data).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to add bookmark: ${error}`);
+    }
+  },
+
+  async removeBookmark(userId: string, contentType: string, contentId: string) {
+    try {
+      await db
+        .delete(bookmarks)
+        .where(
+          and(
+            eq(bookmarks.userId, userId as any),
+            eq(bookmarks.contentType, contentType),
+            eq(bookmarks.contentId, contentId as any)
+          )
+        );
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to remove bookmark: ${error}`);
     }
   },
 };
