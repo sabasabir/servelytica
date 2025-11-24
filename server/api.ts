@@ -110,6 +110,7 @@ export function setupApiRoutes(app: any) {
   });
 
   // Coach endpoints
+  // Coach endpoints - COMPLETE CRUD
   app.get('/api/coaches/profile/:userId', async (req: any, res: any) => {
     try {
       const coach = await coachRoutes.getCoachProfile(req.params.userId);
@@ -122,10 +123,32 @@ export function setupApiRoutes(app: any) {
     }
   });
 
+  app.get('/api/coaches/:coachId', async (req: any, res: any) => {
+    try {
+      const coach = await coachRoutes.getCoachById(req.params.coachId);
+      if (!coach) {
+        return sendError(res, 'Coach not found', 404);
+      }
+      sendJson(res, coach);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
   app.get('/api/coaches', async (req: any, res: any) => {
     try {
-      const coaches = await coachRoutes.getAllCoaches();
+      const limit = req.query.limit ? parseInt(req.query.limit) : 100;
+      const coaches = await coachRoutes.getAllCoaches(limit);
       sendJson(res, coaches);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/coaches', async (req: any, res: any) => {
+    try {
+      const coach = await coachRoutes.createCoachProfile(req.body);
+      sendJson(res, coach, 201);
     } catch (error) {
       sendError(res, error);
     }
@@ -135,6 +158,25 @@ export function setupApiRoutes(app: any) {
     try {
       const coach = await coachRoutes.updateCoachProfile(req.params.userId, req.body);
       sendJson(res, coach);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/coaches/profile/:userId', async (req: any, res: any) => {
+    try {
+      const result = await coachRoutes.deleteCoachProfile(req.params.userId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/coaches/search/:query', async (req: any, res: any) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 50;
+      const coaches = await coachRoutes.searchCoaches(req.params.query, limit);
+      sendJson(res, coaches);
     } catch (error) {
       sendError(res, error);
     }

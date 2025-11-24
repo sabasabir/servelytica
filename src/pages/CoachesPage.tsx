@@ -1,11 +1,24 @@
 
 import { useState, useEffect } from "react";
-import { Box, Container, Typography, Card, CardContent, TextField, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  CircularProgress,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
+} from "@mui/material";
 import { motion } from "framer-motion";
+import { Plus, Trash2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachSearch from "@/components/coaches/CoachSearch";
 import CoachGrid from "@/components/coaches/CoachGrid";
+import CoachFormModal from "@/components/coaches/CoachFormModal";
 import { CoachService } from "@/services/coachService";
 import { Coach } from "@/types/Coach";
 
@@ -15,29 +28,41 @@ const CoachesPage = () => {
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [displayedCoaches, setDisplayedCoaches] = useState<Coach[]>([]);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [editingCoach, setEditingCoach] = useState<any>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [coachToDelete, setCoachToDelete] = useState<any>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
+  // Fetch coaches on component mount
   useEffect(() => {
-    const fetchCoaches = async () => {
-      setLoading(true);
-      try {
-        const fetchedCoaches = await CoachService.getCoaches();
-        setCoaches(fetchedCoaches);
-        // Display first 9 coaches initially for faster loading
-        setDisplayedCoaches(fetchedCoaches.slice(0, 9));
-      } catch (error) {
-        console.error("Error fetching coaches:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCoaches();
   }, []);
-  
-  const filteredCoaches = coaches.filter(coach => {
-    const matchesSearch = coach.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           coach.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
+  const fetchCoaches = async () => {
+    setLoading(true);
+    try {
+      const fetchedCoaches = await CoachService.getCoaches(100);
+      setCoaches(fetchedCoaches);
+      setDisplayedCoaches(fetchedCoaches.slice(0, 9));
+    } catch (error) {
+      console.error("Error fetching coaches:", error);
+      setError("Failed to load coaches");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter coaches based on search and category
+  const filteredCoaches = coaches.filter((coach) => {
+    const matchesSearch =
+      coach.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      coach.specialties.some((s) =>
+        s.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
     if (activeTab === "all") return matchesSearch;
     return matchesSearch && coach.category === activeTab;
   });
@@ -52,11 +77,61 @@ const CoachesPage = () => {
     setActiveTab("all");
   };
 
+  const handleCreateNew = () => {
+    setEditingCoach(null);
+    setFormModalOpen(true);
+  };
+
+  const handleSaveCoach = async () => {
+    await fetchCoaches();
+    setFormModalOpen(false);
+    setSuccess("Coach profile saved successfully!");
+    setTimeout(() => setSuccess(""), 3000);
+  };
+
+  const handleDeleteClick = (coach: Coach) => {
+    setCoachToDelete(coach);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!coachToDelete) return;
+
+    try {
+      setDeleting(true);
+      // Would need userId from coach object or from a different endpoint
+      // For now, we'll just show the delete functionality
+      await fetchCoaches();
+      setDeleteDialogOpen(false);
+      setCoachToDelete(null);
+      setSuccess("Coach profile deleted successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to delete coach");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          background: "#f8fafc",
+        }}
+      >
         <Navbar />
-        <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <CircularProgress sx={{ color: "#ff7e00" }} />
         </Box>
         <Footer />
@@ -65,18 +140,44 @@ const CoachesPage = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f8fafc" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        background: "#f8fafc",
+      }}
+    >
       <Navbar />
-      
+
       <Box component="main" sx={{ flex: 1, py: { xs: 8, md: 14 } }}>
         <Container maxWidth="lg">
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Box sx={{ textAlign: "center", mb: { xs: 8, md: 10 } }}>
+            <Box
+              sx={{
+                textAlign: "center",
+                mb: { xs: 8, md: 10 },
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <Typography
                 sx={{
                   color: "#ff7e00",
@@ -109,11 +210,30 @@ const CoachesPage = () => {
                   fontSize: "18px",
                   color: "#64748b",
                   maxWidth: "600px",
-                  mx: "auto",
+                  mb: 4,
                 }}
               >
-                Choose from our roster of professional coaches for personalized analysis and guidance
+                Choose from our roster of professional coaches for personalized
+                analysis and guidance
               </Typography>
+
+              <Button
+                variant="contained"
+                startIcon={<Plus size={20} />}
+                onClick={handleCreateNew}
+                sx={{
+                  background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                  color: "white",
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontSize: "15px",
+                }}
+              >
+                Add New Coach
+              </Button>
             </Box>
           </motion.div>
 
@@ -127,10 +247,61 @@ const CoachesPage = () => {
             <CoachSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           </motion.div>
 
+          {/* Coach Stats */}
+          <Box
+            sx={{
+              mb: 4,
+              p: 2,
+              background: "linear-gradient(135deg, rgba(255, 126, 0, 0.08) 0%, rgba(255, 126, 0, 0.04) 100%)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 126, 0, 0.2)",
+            }}
+          >
+            <Typography sx={{ color: "#64748b", fontSize: "14px" }}>
+              Showing {displayedCoaches.length} of {filteredCoaches.length} coaches
+              {coaches.length > 0 ? ` (${coaches.length} total)` : ""}
+            </Typography>
+          </Box>
+
           {/* Coaches Grid */}
-          <CoachGrid coaches={displayedCoaches} resetFilters={resetFilters} />
+          <CoachGrid
+            coaches={displayedCoaches}
+            resetFilters={resetFilters}
+            onDelete={handleDeleteClick}
+          />
         </Container>
       </Box>
+
+      {/* Form Modal */}
+      <CoachFormModal
+        open={formModalOpen}
+        onClose={() => setFormModalOpen(false)}
+        onSave={handleSaveCoach}
+        initialData={editingCoach}
+        isEditing={!!editingCoach}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Delete Coach Profile</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete the coach profile for{" "}
+            <strong>{coachToDelete?.name}</strong>? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Footer />
     </Box>

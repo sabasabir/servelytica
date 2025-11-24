@@ -9,9 +9,10 @@ import { motion } from "framer-motion";
 interface CoachGridProps {
   coaches: Coach[];
   resetFilters: () => void;
+  onDelete?: (coach: Coach) => void;
 }
 
-const CoachGrid = ({ coaches, resetFilters }: CoachGridProps) => {
+const CoachGrid = ({ coaches, resetFilters, onDelete }: CoachGridProps) => {
   if (coaches.length === 0) {
     return <EmptyCoachResults resetFilters={resetFilters} />;
   }
@@ -32,7 +33,7 @@ const CoachGrid = ({ coaches, resetFilters }: CoachGridProps) => {
           viewport={{ once: true }}
           transition={{ delay: index * 0.1 }}
         >
-          <DetailedCoachCard coach={coach} />
+          <DetailedCoachCard coach={coach} onDelete={onDelete} />
         </motion.div>
       ))}
     </Box>

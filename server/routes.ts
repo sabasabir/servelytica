@@ -136,7 +136,7 @@ export const videoRoutes = {
   },
 };
 
-// Coach routes
+// Coach routes - COMPLETE CRUD
 export const coachRoutes = {
   async getCoachProfile(userId: string) {
     try {
@@ -151,12 +151,54 @@ export const coachRoutes = {
     }
   },
 
-  async getAllCoaches() {
+  async getAllCoaches(limit: number = 100) {
     try {
-      const coaches = await db.select().from(coachProfiles).limit(100);
+      const coaches = await db.select().from(coachProfiles).limit(limit);
       return coaches;
     } catch (error) {
       throw new Error(`Failed to fetch coaches: ${error}`);
+    }
+  },
+
+  async getCoachById(coachId: string) {
+    try {
+      const coach = await db
+        .select()
+        .from(coachProfiles)
+        .where(eq(coachProfiles.id, coachId as any))
+        .limit(1);
+      return coach[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to fetch coach: ${error}`);
+    }
+  },
+
+  async createCoachProfile(data: any) {
+    try {
+      if (!data.userId) {
+        throw new Error('userId is required');
+      }
+
+      const coachInsert = {
+        userId: data.userId,
+        yearsCoaching: data.yearsCoaching || 0,
+        certifications: data.certifications || [],
+        languages: data.languages || [],
+        coachingPhilosophy: data.coachingPhilosophy || null,
+        ratePerHour: data.ratePerHour || null,
+        currency: data.currency || 'USD',
+        availabilitySchedule: data.availabilitySchedule || null,
+        verified: data.verified || false,
+      };
+
+      console.log('Creating coach profile:', coachInsert);
+
+      const created = await db.insert(coachProfiles).values(coachInsert).returning();
+      console.log('Coach profile created:', created[0]);
+      return created[0] || null;
+    } catch (error) {
+      console.error('Coach creation error:', error);
+      throw new Error(`Failed to create coach profile: ${error instanceof Error ? error.message : error}`);
     }
   },
 
@@ -170,6 +212,31 @@ export const coachRoutes = {
       return updated[0] || null;
     } catch (error) {
       throw new Error(`Failed to update coach profile: ${error}`);
+    }
+  },
+
+  async deleteCoachProfile(userId: string) {
+    try {
+      await db.delete(coachProfiles).where(eq(coachProfiles.userId, userId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete coach profile: ${error}`);
+    }
+  },
+
+  async searchCoaches(query: string, limit: number = 50) {
+    try {
+      const coaches = await db
+        .select()
+        .from(coachProfiles)
+        .limit(limit);
+      
+      // Filter coaches by query (in-memory search for simplicity)
+      return coaches.filter((coach: any) => 
+        coach.coachingPhilosophy?.toLowerCase().includes(query.toLowerCase())
+      );
+    } catch (error) {
+      throw new Error(`Failed to search coaches: ${error}`);
     }
   },
 };

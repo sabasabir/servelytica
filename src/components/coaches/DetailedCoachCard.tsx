@@ -1,14 +1,15 @@
-import { Card as MuiCard, CardContent as MuiCardContent, Box, Typography, Chip, Button, Rating } from "@mui/material";
-import { Star, Clock, MapPin } from "lucide-react";
+import { Card as MuiCard, CardContent as MuiCardContent, Box, Typography, Chip, Button, Rating, IconButton } from "@mui/material";
+import { Star, Clock, MapPin, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Coach } from "@/types/Coach";
 import { motion } from "framer-motion";
 
 interface DetailedCoachCardProps {
   coach: Coach;
+  onDelete?: (coach: Coach) => void;
 }
 
-const DetailedCoachCard = ({ coach }: DetailedCoachCardProps) => {
+const DetailedCoachCard = ({ coach, onDelete }: DetailedCoachCardProps) => {
   return (
     <motion.div
       whileHover={{ y: -8, boxShadow: "0 20px 60px rgba(255, 126, 0, 0.25)" }}
@@ -183,27 +184,50 @@ const DetailedCoachCard = ({ coach }: DetailedCoachCardProps) => {
             {coach.experience} experience
           </Typography>
 
-          {/* View Profile Button */}
-          <Link to={`/coaches/${coach.username}`} style={{ textDecoration: "none" }}>
-            <Button
-              fullWidth
-              sx={{
-                background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "13px",
-                textTransform: "uppercase",
-                py: 1.2,
-                borderRadius: "10px",
-                "&:hover": {
-                  background: "linear-gradient(135deg, #ff6b00 0%, #ff8800 100%)",
-                  boxShadow: "0 8px 20px rgba(255, 126, 0, 0.4)",
-                },
-              }}
-            >
-              VIEW PROFILE
-            </Button>
-          </Link>
+          {/* Buttons Container */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {/* View Profile Button */}
+            <Link to={`/coaches/${coach.username}`} style={{ textDecoration: "none", flex: 1 }}>
+              <Button
+                fullWidth
+                sx={{
+                  background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                  color: "white",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  textTransform: "uppercase",
+                  py: 1.2,
+                  borderRadius: "10px",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #ff6b00 0%, #ff8800 100%)",
+                    boxShadow: "0 8px 20px rgba(255, 126, 0, 0.4)",
+                  },
+                }}
+              >
+                VIEW PROFILE
+              </Button>
+            </Link>
+
+            {/* Delete Button */}
+            {onDelete && (
+              <IconButton
+                onClick={() => onDelete(coach)}
+                sx={{
+                  background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%)",
+                  color: "#ef4444",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  borderRadius: "10px",
+                  py: 1.2,
+                  px: 1.5,
+                  "&:hover": {
+                    background: "linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.15) 100%)",
+                  },
+                }}
+              >
+                <Trash2 size={18} />
+              </IconButton>
+            )}
+          </Box>
         </MuiCardContent>
       </MuiCard>
     </motion.div>
