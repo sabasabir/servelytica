@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Box, Container, Typography, Button, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { User, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,7 @@ import ConnectRequestModal from "@/components/social/ConnectRequestModal";
 const userMembership: MembershipType = "Free";
 
 const SocialConnector = () => {
+  const navigate = useNavigate();
   const { user, userProfile } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [showContactForm, setShowContactForm] = useState(false);

@@ -54,7 +54,14 @@ export const CreateProfileModal = ({ open, onClose, onSuccess }: CreateProfileMo
   };
 
   const handleCreateProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not authenticated",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (!formData.displayName.trim() || !formData.username.trim()) {
       toast({
@@ -67,6 +74,7 @@ export const CreateProfileModal = ({ open, onClose, onSuccess }: CreateProfileMo
 
     setLoading(true);
     try {
+      // Map form data to database schema (camelCase to snake_case)
       const profileData = {
         userId: user.id,
         displayName: formData.displayName,
@@ -78,14 +86,19 @@ export const CreateProfileModal = ({ open, onClose, onSuccess }: CreateProfileMo
         sportId: formData.sportId || null,
       };
 
+      console.log('Sending profile data:', profileData);
+
       const response = await fetch('/api/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData),
       });
 
+      const responseData = await response.json();
+      console.log('Profile creation response:', responseData);
+
       if (!response.ok) {
-        throw new Error('Failed to create profile');
+        throw new Error(responseData.error || 'Failed to create profile');
       }
 
       toast({
@@ -109,7 +122,7 @@ export const CreateProfileModal = ({ open, onClose, onSuccess }: CreateProfileMo
       console.error('Error creating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to create profile. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create profile. Please try again.",
         variant: "destructive"
       });
     } finally {

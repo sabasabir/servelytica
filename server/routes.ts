@@ -53,10 +53,31 @@ export const profileRoutes = {
 
   async createProfile(data: any) {
     try {
-      const created = await db.insert(profiles).values(data).returning();
+      // Ensure userId is present
+      if (!data.userId) {
+        throw new Error('userId is required');
+      }
+      
+      // Map the incoming data to match the schema
+      const profileInsert = {
+        userId: data.userId,
+        username: data.username,
+        displayName: data.displayName || null,
+        bio: data.bio || null,
+        location: data.location || null,
+        playingExperience: data.playingExperience || null,
+        preferredPlayStyle: data.preferredPlayStyle || null,
+        sportId: data.sportId || null,
+      };
+
+      console.log('Creating profile with data:', profileInsert);
+      
+      const created = await db.insert(profiles).values(profileInsert).returning();
+      console.log('Profile created successfully:', created[0]);
       return created[0] || null;
     } catch (error) {
-      throw new Error(`Failed to create profile: ${error}`);
+      console.error('Profile creation error:', error);
+      throw new Error(`Failed to create profile: ${error instanceof Error ? error.message : error}`);
     }
   },
 };
