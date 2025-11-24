@@ -99,16 +99,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ? `${window.location.origin}/plan-selection`
         : `${window.location.origin}/`;
       
+      // Ensure username is always provided
+      const finalUsername = username || `user_${Date.now()}`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            username,
-            display_name: displayName,
-            role,
-            sport_id: sportId
+            username: finalUsername,
+            display_name: displayName || finalUsername,
+            role: role || 'player',
+            sport_id: sportId || null
           }
         }
       });
