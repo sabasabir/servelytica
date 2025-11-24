@@ -164,37 +164,16 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         return;
       }
       
-      // Check file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select a video file smaller than 50MB",
-          variant: "destructive"
-        });
-        return;
-      }
-      
       setSelectedFile(file);
     }
   };
 
 
   const handleUpload = async () => {
-
-    // {quotaInfo?.usages_count}/{quotaInfo.videosLimit}
-    if(quotaInfo?.usages_count >= quotaInfo?.videosLimit) {
-        toast({
-          title: "Error",
-          description: "Please subscribe for more video upload credits",
-          variant: "destructive"
-        });
-        return;
-    }
-    // if (!selectedFile || !user) {
     if (!user) {
       toast({
         title: "Error",
-        description: "Please select a file and ensure you're logged in",
+        description: "Please ensure you're logged in",
         variant: "destructive"
       });
       return;
@@ -204,16 +183,6 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
       toast({
         title: "Error",
         description: "Please enter a title for your video",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check quota before upload
-    if (quotaInfo && !quotaInfo.canUpload) {
-      toast({
-        title: "Upload limit reached",
-        description: `You have reached your upload limit. Next upload available in ${quotaInfo.daysRemaining} days.`,
         variant: "destructive"
       });
       return;
@@ -503,7 +472,7 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
                 {selectedFile ? selectedFile.name : "Click to select video file"}
               </span>
               <span className="text-xs text-muted-foreground">
-                Supports MP4, MOV, AVI (Max 50MB)
+                Supports MP4, MOV, AVI
               </span>
             </label>
           </div>
@@ -511,11 +480,10 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
 
         <Button 
           onClick={handleUpload} 
-        //   disabled={uploading || !selectedFile || !formData.title.trim() || formData.coachIds.length === 0 || (quotaInfo && !quotaInfo.canUpload)}
-          disabled={uploading || !formData.title.trim() || formData.coachIds.length === 0 || (quotaInfo && !quotaInfo.canUpload) || quotaInfo?.usages_count >= quotaInfo?.videosLimit}
+          disabled={uploading || !formData.title.trim() || formData.coachIds.length === 0}
           className="w-full"
         >
-          {uploading ? "Uploading..." : (quotaInfo && !quotaInfo.canUpload ? "Upload Limit Reached" : "Upload Video")}
+          {uploading ? "Uploading..." : "Upload Video"}
         </Button>
       </CardContent>
     </Card>

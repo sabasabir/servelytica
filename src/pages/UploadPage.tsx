@@ -61,22 +61,7 @@ const UploadPage = () => {
         return;
       }
 
-      // Check quota BEFORE any upload using the proper RPC function
-      console.log('Checking quota for user:', userData.user.id);
-      const quota = await AnalysisQuotaService.checkUserQuota(userData.user.id);
-      console.log('Quota check result:', quota);
-      
-      if (!quota.canCreate) {
-        console.log('Quota exceeded, showing dialog');
-        setQuotaInfo({
-          analysesUsed: quota.analysesUsed,
-          analysesLimit: quota.analysesLimit,
-          nextResetDate: quota.nextResetDate
-        });
-        setQuotaExceededDialogOpen(true);
-        setUploading(false);
-        return;
-      }
+      // Quota check removed - unlimited uploads enabled
 
       // Upload file to storage
       const uploadResult = await uploadFileToStorage(videoFile, userData.user.id);
@@ -133,23 +118,7 @@ const UploadPage = () => {
         }
       }
 
-      // Record analysis usage for all video uploads to track subscription limits
-      console.log('About to record analysis usage for user:', userData.user.id, 'video:', videoData.id);
-      const usageRecorded = await AnalysisQuotaService.recordAnalysisUsage(
-        userData.user.id, 
-        videoData.id
-      );
-
-      if (!usageRecorded) {
-        console.error("Failed to record analysis usage - this is a critical error");
-        toast({
-          title: "Warning",
-          description: "Video uploaded but usage tracking failed. Please contact support.",
-          variant: "destructive"
-        });
-      } else {
-        console.log('Successfully recorded analysis usage');
-      }
+      // Usage tracking removed - unlimited uploads enabled
 
       toast({
         title: "Upload successful!",
