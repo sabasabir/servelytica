@@ -327,14 +327,14 @@ const AuthPage = () => {
                       <Button 
                         onClick={async () => {
                           setLoading(true);
-                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, selectedSport);
+                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, role === 'coach' ? '' : selectedSport);
                           if (!error) {
                             navigate('/dashboard', { replace: true });
                           }
                           setLoading(false);
                         }}
                         className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10"
-                        disabled={loading || !selectedSport}
+                        disabled={loading || (role === 'player' && !selectedSport)}
                       >
                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                       </Button>
