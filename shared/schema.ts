@@ -749,3 +749,17 @@ export const featuredCoaches = pgTable('featured_coaches', {
 }, (table) => ({
   uniqueCoachFeature: unique().on(table.coachId),
 }));
+
+// Dashboard Items table
+export const dashboardItems = pgTable('dashboard_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: varchar('type', { length: 50 }).default('task').notNull(),
+  status: varchar('status', { length: 50 }).default('pending').notNull(),
+  priority: varchar('priority', { length: 20 }).default('medium').notNull(),
+  dueDate: timestamp('due_date', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
