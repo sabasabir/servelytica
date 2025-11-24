@@ -16,6 +16,9 @@ import {
   surveyResponses,
   connectionRequests,
   connections,
+  privateAnalysisSessions,
+  sessionComments,
+  sessionNotes,
 } from '@shared/schema';
 
 export interface RouteHandler {
@@ -645,6 +648,153 @@ export const bookmarkRoutes = {
       return { success: true };
     } catch (error) {
       throw new Error(`Failed to remove bookmark: ${error}`);
+    }
+  },
+};
+
+// Analysis Sessions routes - COMPLETE CRUD
+export const analysisSessionRoutes = {
+  async getSessions(userId: string, role: 'coach' | 'player', limit: number = 50) {
+    try {
+      const column = role === 'coach' ? 'coachId' : 'studentId';
+      return await db
+        .select()
+        .from(privateAnalysisSessions)
+        .where(eq(privateAnalysisSessions[column as any], userId as any))
+        .limit(limit);
+    } catch (error) {
+      throw new Error(`Failed to fetch sessions: ${error}`);
+    }
+  },
+
+  async getSessionById(sessionId: string) {
+    try {
+      const session = await db
+        .select()
+        .from(privateAnalysisSessions)
+        .where(eq(privateAnalysisSessions.id, sessionId as any))
+        .limit(1);
+      return session[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to fetch session: ${error}`);
+    }
+  },
+
+  async createSession(data: any) {
+    try {
+      if (!data.coachId || !data.studentId || !data.title) {
+        throw new Error('coachId, studentId, and title are required');
+      }
+
+      const session = {
+        coachId: data.coachId,
+        studentId: data.studentId,
+        title: data.title,
+        description: data.description || null,
+        sessionType: data.sessionType || 'video_analysis',
+        status: 'draft',
+      };
+
+      const created = await db.insert(privateAnalysisSessions).values(session).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to create session: ${error}`);
+    }
+  },
+
+  async updateSession(sessionId: string, data: any) {
+    try {
+      const updated = await db
+        .update(privateAnalysisSessions)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(privateAnalysisSessions.id, sessionId as any))
+        .returning();
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update session: ${error}`);
+    }
+  },
+
+  async deleteSession(sessionId: string) {
+    try {
+      await db.delete(privateAnalysisSessions).where(eq(privateAnalysisSessions.id, sessionId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete session: ${error}`);
+    }
+  },
+
+  async addSessionComment(data: any) {
+    try {
+      const comment = {
+        sessionId: data.sessionId,
+        userId: data.userId,
+        commentText: data.commentText,
+        videoTimestampSeconds: data.videoTimestampSeconds || null,
+        isPrivate: data.isPrivate || false,
+      };
+
+      const created = await db.insert(sessionComments).values(comment).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to add comment: ${error}`);
+    }
+  },
+
+  async getSessionComments(sessionId: string) {
+    try {
+      return await db
+        .select()
+        .from(sessionComments)
+        .where(eq(sessionComments.sessionId, sessionId as any));
+    } catch (error) {
+      throw new Error(`Failed to fetch comments: ${error}`);
+    }
+  },
+
+  async deleteSessionComment(commentId: string) {
+    try {
+      await db.delete(sessionComments).where(eq(sessionComments.id, commentId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete comment: ${error}`);
+    }
+  },
+
+  async addSessionNote(data: any) {
+    try {
+      const note = {
+        sessionId: data.sessionId,
+        userId: data.userId,
+        noteText: data.noteText,
+        noteType: data.noteType || 'general',
+        isShared: data.isShared || false,
+      };
+
+      const created = await db.insert(sessionNotes).values(note).returning();
+      return created[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to add note: ${error}`);
+    }
+  },
+
+  async getSessionNotes(sessionId: string) {
+    try {
+      return await db
+        .select()
+        .from(sessionNotes)
+        .where(eq(sessionNotes.sessionId, sessionId as any));
+    } catch (error) {
+      throw new Error(`Failed to fetch notes: ${error}`);
+    }
+  },
+
+  async deleteSessionNote(noteId: string) {
+    try {
+      await db.delete(sessionNotes).where(eq(sessionNotes.id, noteId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete note: ${error}`);
     }
   },
 };

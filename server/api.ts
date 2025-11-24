@@ -12,6 +12,7 @@ import {
   surveyRoutes,
   connectionRequestRoutes,
   connectionRoutes,
+  analysisSessionRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -471,6 +472,116 @@ export function setupApiRoutes(app: any) {
   app.delete('/api/connections/:connectionId', async (req: any, res: any) => {
     try {
       const result = await connectionRoutes.deleteConnection(req.params.connectionId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Analysis Session endpoints - COMPLETE CRUD
+  app.get('/api/analysis-sessions/:userId/:role', async (req: any, res: any) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 50;
+      const sessions = await analysisSessionRoutes.getSessions(
+        req.params.userId,
+        req.params.role as 'coach' | 'player',
+        limit
+      );
+      sendJson(res, sessions);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/analysis-sessions/:sessionId', async (req: any, res: any) => {
+    try {
+      const session = await analysisSessionRoutes.getSessionById(req.params.sessionId);
+      if (!session) {
+        return sendError(res, 'Session not found', 404);
+      }
+      sendJson(res, session);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/analysis-sessions', async (req: any, res: any) => {
+    try {
+      const session = await analysisSessionRoutes.createSession(req.body);
+      sendJson(res, session, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/analysis-sessions/:sessionId', async (req: any, res: any) => {
+    try {
+      const session = await analysisSessionRoutes.updateSession(req.params.sessionId, req.body);
+      sendJson(res, session);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/analysis-sessions/:sessionId', async (req: any, res: any) => {
+    try {
+      const result = await analysisSessionRoutes.deleteSession(req.params.sessionId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Session Comments endpoints
+  app.post('/api/analysis-sessions/:sessionId/comments', async (req: any, res: any) => {
+    try {
+      const comment = await analysisSessionRoutes.addSessionComment(req.body);
+      sendJson(res, comment, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/analysis-sessions/:sessionId/comments', async (req: any, res: any) => {
+    try {
+      const comments = await analysisSessionRoutes.getSessionComments(req.params.sessionId);
+      sendJson(res, comments);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/analysis-sessions/:sessionId/comments/:commentId', async (req: any, res: any) => {
+    try {
+      const result = await analysisSessionRoutes.deleteSessionComment(req.params.commentId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Session Notes endpoints
+  app.post('/api/analysis-sessions/:sessionId/notes', async (req: any, res: any) => {
+    try {
+      const note = await analysisSessionRoutes.addSessionNote(req.body);
+      sendJson(res, note, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/analysis-sessions/:sessionId/notes', async (req: any, res: any) => {
+    try {
+      const notes = await analysisSessionRoutes.getSessionNotes(req.params.sessionId);
+      sendJson(res, notes);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/analysis-sessions/:sessionId/notes/:noteId', async (req: any, res: any) => {
+    try {
+      const result = await analysisSessionRoutes.deleteSessionNote(req.params.noteId);
       sendJson(res, result);
     } catch (error) {
       sendError(res, error);
