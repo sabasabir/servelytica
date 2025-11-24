@@ -10,7 +10,6 @@ import Index from "./pages/Index";
 import UploadPage from "./pages/UploadPage";
 import UploadCompletePage from "./pages/UploadCompletePage";
 import Dashboard from "./pages/Dashboard";
-import ComprehensiveDashboard from "./pages/ComprehensiveDashboard";
 import CoachesPage from "./pages/CoachesPage";
 import SocialConnector from "./pages/SocialConnector";
 import PricingPage from "./pages/PricingPage";
@@ -48,7 +47,6 @@ const App = () => (
             <Route path="/squash" element={<Index />} /> */}
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/upload-complete" element={<UploadCompletePage />} />
-            <Route path="/dashboard" element={<ComprehensiveDashboard />} />
             <Route path="/my-videos" element={<Dashboard />} />
             <Route path="/coaches" element={<CoachesPage />} />
             <Route path="/coaches/:username" element={<CoachProfilePage />} />

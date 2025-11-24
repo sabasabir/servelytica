@@ -95,8 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signUp = async (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string, surveyData?: any) => {
     try {
-      // Redirect to dashboard after signup
-      const redirectUrl = `${window.location.origin}/dashboard`;
+      // Redirect to home after signup
+      const redirectUrl = `${window.location.origin}/`;
       
       // Ensure username is always provided
       const finalUsername = username || `user_${Date.now()}`;
@@ -184,8 +184,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Redirect to dashboard after signin
-      const redirectUrl = `${window.location.origin}/dashboard`;
+      // Redirect to home after signin
+      const redirectUrl = `${window.location.origin}/`;
       
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
@@ -234,7 +234,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/`,
         },
       });
 

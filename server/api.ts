@@ -14,7 +14,6 @@ import {
   connectionRoutes,
   analysisSessionRoutes,
   featuredCoachesRoutes,
-  dashboardItemsRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -645,52 +644,6 @@ export function setupApiRoutes(app: any) {
     try {
       const result = await featuredCoachesRoutes.removeFeaturedCoach(req.params.coachId);
       sendJson(res, result);
-    } catch (error) {
-      sendError(res, error);
-    }
-  });
-
-  // Dashboard Items endpoints - FULLY FUNCTIONAL CRUD
-  app.get('/api/dashboard/items/:userId', async (req: any, res: any) => {
-    try {
-      const items = await dashboardItemsRoutes.getItems(req.params.userId);
-      sendJson(res, items);
-    } catch (error) {
-      sendError(res, error);
-    }
-  });
-
-  app.post('/api/dashboard/items', async (req: any, res: any) => {
-    try {
-      const item = await dashboardItemsRoutes.createItem(req.body);
-      sendJson(res, item, 201);
-    } catch (error) {
-      sendError(res, error);
-    }
-  });
-
-  app.put('/api/dashboard/items/:itemId', async (req: any, res: any) => {
-    try {
-      const item = await dashboardItemsRoutes.updateItem(req.params.itemId, req.body);
-      sendJson(res, item);
-    } catch (error) {
-      sendError(res, error);
-    }
-  });
-
-  app.delete('/api/dashboard/items/:itemId', async (req: any, res: any) => {
-    try {
-      const result = await dashboardItemsRoutes.deleteItem(req.params.itemId);
-      sendJson(res, result);
-    } catch (error) {
-      sendError(res, error);
-    }
-  });
-
-  app.get('/api/dashboard/stats/:userId', async (req: any, res: any) => {
-    try {
-      const stats = await dashboardItemsRoutes.getStats(req.params.userId);
-      sendJson(res, stats);
     } catch (error) {
       sendError(res, error);
     }
