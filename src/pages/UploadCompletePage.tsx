@@ -21,10 +21,6 @@ const UploadCompletePage = () => {
     navigate("/connect");
   };
 
-  const handleViewDashboard = () => {
-    navigate("/dashboard");
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -41,7 +37,7 @@ const UploadCompletePage = () => {
             </div>
             <h1 className="text-3xl font-bold text-tt-blue mb-2">Upload Successful!</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Your video has been successfully uploaded. You can now connect with a coach for analysis or check the dashboard for updates on your analysis status.
+              Your video has been successfully uploaded. You can now connect with a coach for personalized analysis and feedback.
             </p>
           </div>
           
@@ -147,17 +143,6 @@ const UploadCompletePage = () => {
                 </Button>
               </CardContent>
             </Card>
-          </div>
-          
-          <div className="text-center">
-            <Button 
-              variant="outline" 
-              className="px-8"
-              onClick={handleViewDashboard}
-            >
-              View Dashboard
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
         </div>
       </main>

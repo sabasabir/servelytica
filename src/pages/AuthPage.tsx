@@ -71,10 +71,10 @@ const AuthPage = () => {
     fetchData();
   }, []);
 
-  // Redirect to dashboard when user is authenticated
+  // Redirect to home when user is authenticated
   useEffect(() => {
     if (user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [user, navigate]);
 
@@ -86,8 +86,8 @@ const AuthPage = () => {
       // If there's an error, reset loading state
       setLoading(false);
     } else if (loggedInUser) {
-      // Redirect to dashboard on successful login
-      navigate('/dashboard', { replace: true });
+      // Redirect to home on successful login
+      navigate('/', { replace: true });
     }
   };
 
@@ -291,7 +291,7 @@ const AuthPage = () => {
                             setLoading(true);
                             const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, '');
                             if (!error) {
-                              navigate('/dashboard', { replace: true });
+                              navigate('/', { replace: true });
                             }
                             setLoading(false);
                           }
@@ -313,7 +313,7 @@ const AuthPage = () => {
                           setLoading(true);
                           const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, selectedSport, surveyData);
                           if (!error) {
-                            navigate('/dashboard', { replace: true });
+                            navigate('/', { replace: true });
                           }
                           setLoading(false);
                         }}

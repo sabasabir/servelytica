@@ -34,7 +34,6 @@ const Navbar = () => {
 
   const navItems = [
     { to: "/", label: "Home" },
-    ...(user ? [{ to: "/dashboard", label: "Dashboard" }] : []),
     ...(role !== 'coach' ? [{ to: "/coaches", label: "Coaches" }] : []),
     ...(role !== 'coach' ? [{ to: "/connect", label: "Connect", icon: Users }] : []),
     { to: "/blog", label: "Blog", icon: BookOpen },
