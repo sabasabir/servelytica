@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Player } from "./PlayerCard";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ContactFormProps {
   player: Player;
@@ -25,28 +24,26 @@ const ConnectRequestModal = ({ player, onClose }: ContactFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!userProfile || isSubmitting) return;
-
-    // console.log({ sender_id: user?.id,
-    //     receiver_id: player?.id,
-    //     message: `${
-    //       userProfile?.display_name || userProfile?.username || "A player"
-    //     } wants to connect with you!`,
-    //     status: "pending",})
+    if (!userProfile || !user?.id || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("connection_requests").insert({
-        sender_id: user?.id,
-        receiver_id: player?.id,
-        message: `${
-          userProfile?.display_name || userProfile?.username || "A player"
-        } wants to connect with you!`,
-        status: "pending",
+      const response = await fetch('/api/connection-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderId: user.id,
+          receiverId: player?.id,
+          message: `${
+            userProfile?.display_name || userProfile?.username || "A player"
+          } wants to connect with you!`,
+        }),
       });
 
-      if (error) {
-        if (error.code === "23505") {
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409 || responseData.error?.includes('unique')) {
           toast({
             title: "Already sent",
             description:
@@ -54,7 +51,7 @@ const ConnectRequestModal = ({ player, onClose }: ContactFormProps) => {
             variant: "destructive",
           });
         } else {
-          throw error;
+          throw new Error(responseData.error || 'Failed to send connection request');
         }
       } else {
         toast({
@@ -68,7 +65,7 @@ const ConnectRequestModal = ({ player, onClose }: ContactFormProps) => {
       console.error("Error sending connection request:", error);
       toast({
         title: "Error",
-        description: "Failed to send connection request. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to send connection request. Please try again.",
         variant: "destructive",
       });
     } finally {

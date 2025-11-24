@@ -10,6 +10,8 @@ import {
   reactionRoutes,
   bookmarkRoutes,
   surveyRoutes,
+  connectionRequestRoutes,
+  connectionRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -344,6 +346,89 @@ export function setupApiRoutes(app: any) {
   app.delete('/api/surveys/:userId', async (req: any, res: any) => {
     try {
       const result = await surveyRoutes.deleteSurveyResponse(req.params.userId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Connection Requests endpoints - COMPLETE CRUD
+  app.get('/api/connection-requests/received/:userId', async (req: any, res: any) => {
+    try {
+      const requests = await connectionRequestRoutes.getReceivedRequests(req.params.userId);
+      sendJson(res, requests);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/connection-requests/sent/:userId', async (req: any, res: any) => {
+    try {
+      const requests = await connectionRequestRoutes.getSentRequests(req.params.userId);
+      sendJson(res, requests);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/connection-requests', async (req: any, res: any) => {
+    try {
+      const request = await connectionRequestRoutes.createConnectionRequest(req.body);
+      sendJson(res, request, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/connection-requests/:requestId', async (req: any, res: any) => {
+    try {
+      const request = await connectionRequestRoutes.updateConnectionRequest(req.params.requestId, req.body);
+      sendJson(res, request);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/connection-requests/:requestId', async (req: any, res: any) => {
+    try {
+      const result = await connectionRequestRoutes.deleteConnectionRequest(req.params.requestId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Connections endpoints - COMPLETE CRUD
+  app.get('/api/connections/:userId', async (req: any, res: any) => {
+    try {
+      const conns = await connectionRoutes.getUserConnections(req.params.userId);
+      sendJson(res, conns);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/connections', async (req: any, res: any) => {
+    try {
+      const conn = await connectionRoutes.createConnection(req.body);
+      sendJson(res, conn, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/connections/:connectionId', async (req: any, res: any) => {
+    try {
+      const conn = await connectionRoutes.updateConnection(req.params.connectionId, req.body);
+      sendJson(res, conn);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/connections/:connectionId', async (req: any, res: any) => {
+    try {
+      const result = await connectionRoutes.deleteConnection(req.params.connectionId);
       sendJson(res, result);
     } catch (error) {
       sendError(res, error);

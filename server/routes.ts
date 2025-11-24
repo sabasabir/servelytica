@@ -1,5 +1,5 @@
 // API Routes for database operations using Drizzle + Neon
-import { eq } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { db } from './db';
 import {
   profiles,
@@ -14,8 +14,9 @@ import {
   bookmarks,
   articles,
   surveyResponses,
+  connectionRequests,
+  connections,
 } from '@shared/schema';
-import { and } from 'drizzle-orm';
 
 export interface RouteHandler {
   [key: string]: (req: any, res: any) => Promise<void>;
@@ -257,6 +258,137 @@ export const surveyRoutes = {
       return { success: true };
     } catch (error) {
       throw new Error(`Failed to delete survey: ${error}`);
+    }
+  },
+};
+
+// Connection Requests routes - COMPLETE CRUD
+export const connectionRequestRoutes = {
+  async getReceivedRequests(userId: string) {
+    try {
+      const requests = await db.select().from(connectionRequests).where(eq(connectionRequests.receiverId, userId as any)).orderBy((t) => t.createdAt);
+      return requests;
+    } catch (error) {
+      throw new Error(`Failed to fetch received requests: ${error}`);
+    }
+  },
+
+  async getSentRequests(userId: string) {
+    try {
+      const requests = await db.select().from(connectionRequests).where(eq(connectionRequests.senderId, userId as any)).orderBy((t) => t.createdAt);
+      return requests;
+    } catch (error) {
+      throw new Error(`Failed to fetch sent requests: ${error}`);
+    }
+  },
+
+  async createConnectionRequest(data: any) {
+    try {
+      if (!data.senderId || !data.receiverId) {
+        throw new Error('senderId and receiverId are required');
+      }
+
+      const requestInsert = {
+        senderId: data.senderId,
+        receiverId: data.receiverId,
+        message: data.message || null,
+        status: 'pending',
+      };
+
+      console.log('Creating connection request:', requestInsert);
+
+      const created = await db.insert(connectionRequests).values(requestInsert).returning();
+      console.log('Connection request created:', created[0]);
+      return created[0] || null;
+    } catch (error) {
+      console.error('Connection request creation error:', error);
+      throw new Error(`Failed to create connection request: ${error instanceof Error ? error.message : error}`);
+    }
+  },
+
+  async updateConnectionRequest(requestId: string, data: any) {
+    try {
+      const updated = await db
+        .update(connectionRequests)
+        .set({ status: data.status, updatedAt: new Date() })
+        .where(eq(connectionRequests.id, requestId as any))
+        .returning();
+
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update connection request: ${error}`);
+    }
+  },
+
+  async deleteConnectionRequest(requestId: string) {
+    try {
+      await db.delete(connectionRequests).where(eq(connectionRequests.id, requestId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete connection request: ${error}`);
+    }
+  },
+};
+
+// Connections routes - COMPLETE CRUD
+export const connectionRoutes = {
+  async getUserConnections(userId: string) {
+    try {
+      const conns = await db.select().from(connections).where(
+        and(
+          or(eq(connections.user1Id, userId as any), eq(connections.user2Id, userId as any)),
+          eq(connections.status, 'active')
+        )
+      ).orderBy((t) => t.connectionDate);
+      return conns;
+    } catch (error) {
+      throw new Error(`Failed to fetch connections: ${error}`);
+    }
+  },
+
+  async createConnection(data: any) {
+    try {
+      if (!data.user1Id || !data.user2Id) {
+        throw new Error('user1Id and user2Id are required');
+      }
+
+      const connInsert = {
+        user1Id: data.user1Id,
+        user2Id: data.user2Id,
+        status: 'active',
+      };
+
+      console.log('Creating connection:', connInsert);
+
+      const created = await db.insert(connections).values(connInsert).returning();
+      console.log('Connection created:', created[0]);
+      return created[0] || null;
+    } catch (error) {
+      console.error('Connection creation error:', error);
+      throw new Error(`Failed to create connection: ${error instanceof Error ? error.message : error}`);
+    }
+  },
+
+  async updateConnection(connectionId: string, data: any) {
+    try {
+      const updated = await db
+        .update(connections)
+        .set({ status: data.status, lastMessageAt: new Date(), updatedAt: new Date() })
+        .where(eq(connections.id, connectionId as any))
+        .returning();
+
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update connection: ${error}`);
+    }
+  },
+
+  async deleteConnection(connectionId: string) {
+    try {
+      await db.delete(connections).where(eq(connections.id, connectionId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete connection: ${error}`);
     }
   },
 };

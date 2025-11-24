@@ -15,6 +15,13 @@
       "when": 1764013911597,
       "tag": "0001_flawless_daredevil",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764014320003,
+      "tag": "0002_fearless_wendell_vaughn",
+      "breakpoints": true
     }
   ]
 }

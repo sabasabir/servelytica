@@ -711,3 +711,29 @@ export const liveSessionParticipants = pgTable('live_session_participants', {
   leftAt: timestamp('left_at', { withTimezone: true }),
   totalWatchTimeSeconds: integer('total_watch_time_seconds').default(0),
 });
+
+// Connection Requests and Connections tables
+export const connectionRequests = pgTable('connection_requests', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  senderId: uuid('sender_id').notNull(),
+  receiverId: uuid('receiver_id').notNull(),
+  message: text('message'),
+  status: varchar('status', { length: 20 }).default('pending').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueConnectionRequest: unique().on(table.senderId, table.receiverId),
+}));
+
+export const connections = pgTable('connections', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  user1Id: uuid('user1_id').notNull(),
+  user2Id: uuid('user2_id').notNull(),
+  status: varchar('status', { length: 20 }).default('active').notNull(),
+  connectionDate: timestamp('connection_date', { withTimezone: true }).defaultNow().notNull(),
+  lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueConnection: unique().on(table.user1Id, table.user2Id),
+}));

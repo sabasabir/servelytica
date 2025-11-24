@@ -10,34 +10,12 @@ const MyRequestsLists = () => {
   const [sentRequests, setSentRequests] = useState([]);
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
 
   useEffect(() => {
     if (currentAuthUser?.id) {
       fetchConnectionRequests();
     }
-  }, [currentAuthUser, activeTab]);
-
-
-  const fetchUserProfile = async () => {
-    try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        setUser(profile);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
-  };
+  }, [currentAuthUser?.id, activeTab]);
 
 
   const fetchConnectionRequests = async () => {
@@ -45,66 +23,21 @@ const MyRequestsLists = () => {
       setLoading(true);
       
       if (activeTab === 'received') {
-        // Fetch requests where current user is the receiver
-        // .select(`
-        //   id,
-        //   message,
-        //   status,
-        //   created_at,
-        //   sender:profiles!sender_id (
-        //     id,
-        //     username,
-        //     full_name,
-        //     avatar_url,
-        //     skill_level,
-        //     play_style,
-        //     rating
-        //   )
-        // `)
-        const { data, error } = await supabase
-          .from('connection_requests')
-          .select(`*`)
-          .eq('receiver_id', currentAuthUser.id)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
+        const response = await fetch(`/api/connection-requests/received/${currentAuthUser.id}`);
+        if (!response.ok) throw new Error('Failed to fetch received requests');
+        const data = await response.json();
         setReceivedRequests(data || []);
 
       } else if(activeTab === 'sent') {
-        // Fetch requests where current user is the sender
-        const { data, error } = await supabase
-          .from('connection_requests')
-          .select(`*`)
-            .eq('sender_id', currentAuthUser.id)
-            .order('created_at', { ascending: false });
-            // id,
-            // message,
-            // status,
-            // created_at,
-            // receiver:profiles!receiver_id (
-            //   id,
-            //   username,
-            //   full_name,
-            //   avatar_url,
-            //   skill_level,
-            //   play_style,
-            //   rating
-            // )
-
-        if (error) throw error;
+        const response = await fetch(`/api/connection-requests/sent/${currentAuthUser.id}`);
+        if (!response.ok) throw new Error('Failed to fetch sent requests');
+        const data = await response.json();
         setSentRequests(data || []);
-      }else{
+      } else {
         //  for connections getting
-        const { data, error } = await supabase
-          .from('connections')
-          .select(`*`)
-          .or(`user1_id.eq.${userProfile.id},user2_id.eq.${userProfile.id}`)
-          .order('connection_date', { ascending: false });
-
-        //   console.log({data, userProfile})
-
-        if (error) throw error;
+        const response = await fetch(`/api/connections/${userProfile?.id}`);
+        if (!response.ok) throw new Error('Failed to fetch connections');
+        const data = await response.json();
         setConnections(data || []);
       }
     } catch (error) {
@@ -115,27 +48,25 @@ const MyRequestsLists = () => {
   };
 
   const handleAcceptRequest = async (requestId, userProfileId) => {
-    // console.log({userProfile, userProfileId, requestId});
     try {
-    const { error: err1 } = await supabase
-      .from('connections')
-      .insert([
-        {
-        status: 'active',
-        user1_id: userProfile?.id,
-        user2_id: userProfileId
-        }
-      ]);
+      // Create connection
+      const connResponse = await fetch('/api/connections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user1Id: userProfile?.id,
+          user2Id: userProfileId,
+        }),
+      });
 
-      if (err1) throw err1;
+      if (!connResponse.ok) throw new Error('Failed to create connection');
 
+      // Delete connection request
+      const delResponse = await fetch(`/api/connection-requests/${requestId}`, {
+        method: 'DELETE',
+      });
 
-      const { error } = await supabase
-        .from('connection_requests')
-        .delete()
-        .eq('id', requestId);
-
-      if (error) throw error;
+      if (!delResponse.ok) throw new Error('Failed to delete request');
 
       // Refresh the requests list
       fetchConnectionRequests();
@@ -146,12 +77,11 @@ const MyRequestsLists = () => {
 
   const handleRejectRequest = async (requestId) => {
     try {
-      const { error } = await supabase
-        .from('connection_requests')
-        .delete()
-        .eq('id', requestId);
+      const response = await fetch(`/api/connection-requests/${requestId}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to reject request');
 
       // Refresh the requests list
       fetchConnectionRequests();
@@ -162,12 +92,11 @@ const MyRequestsLists = () => {
 
   const handleCancelRequest = async (requestId) => {
     try {
-      const { error } = await supabase
-        .from('connection_requests')
-        .delete()
-        .eq('id', requestId);
+      const response = await fetch(`/api/connection-requests/${requestId}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to cancel request');
 
       // Refresh the requests list
       fetchConnectionRequests();
@@ -256,8 +185,6 @@ const MyRequestsLists = () => {
                 key={request.id}
                 request={request}
                 type="connections"
-                onAccept={(userProfileId) => handleAcceptRequest(request.id, userProfileId)}
-                onReject={() => handleRejectRequest(request.id)}
                 formatDate={formatDate}
               />
             ))) : null
@@ -298,7 +225,7 @@ const MyRequestsLists = () => {
   );
 };
 
-const RequestCard = ({ request, type, onAccept, onReject, onCancel, formatDate }) => {
+const RequestCard = ({ request, type, onAccept, onReject, onCancel, formatDate }: any) => {
     const [currProfile, setCurrProfile] = useState(null);
     const navigate = useNavigate();
     const { user, userProfile } = useAuth();
