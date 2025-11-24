@@ -113,11 +113,12 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
 
       onComplete(session);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading video:', error);
+      const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
       toast({
         title: "Upload Failed",
-        description: "Failed to upload video. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
