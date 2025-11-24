@@ -9,6 +9,7 @@ import {
   commentRoutes,
   reactionRoutes,
   bookmarkRoutes,
+  surveyRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -303,6 +304,46 @@ export function setupApiRoutes(app: any) {
         req.query.contentType,
         req.query.contentId
       );
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Survey endpoints - COMPLETE CRUD
+  app.get('/api/surveys/:userId', async (req: any, res: any) => {
+    try {
+      const survey = await surveyRoutes.getSurveyResponse(req.params.userId);
+      if (!survey) {
+        return sendJson(res, null);
+      }
+      sendJson(res, survey);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/surveys', async (req: any, res: any) => {
+    try {
+      const survey = await surveyRoutes.createSurveyResponse(req.body);
+      sendJson(res, survey, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/surveys/:userId', async (req: any, res: any) => {
+    try {
+      const survey = await surveyRoutes.updateSurveyResponse(req.params.userId, req.body);
+      sendJson(res, survey);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/surveys/:userId', async (req: any, res: any) => {
+    try {
+      const result = await surveyRoutes.deleteSurveyResponse(req.params.userId);
       sendJson(res, result);
     } catch (error) {
       sendError(res, error);

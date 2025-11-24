@@ -13,6 +13,7 @@ import {
   reactions,
   bookmarks,
   articles,
+  surveyResponses,
 } from '@shared/schema';
 import { and } from 'drizzle-orm';
 
@@ -180,6 +181,82 @@ export const userRoleRoutes = {
       return roles;
     } catch (error) {
       throw new Error(`Failed to fetch user roles: ${error}`);
+    }
+  },
+};
+
+// Survey routes - COMPLETE CRUD
+export const surveyRoutes = {
+  async getSurveyResponse(userId: string) {
+    try {
+      const survey = await db.select().from(surveyResponses).where(eq(surveyResponses.userId, userId as any)).limit(1);
+      return survey[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to fetch survey: ${error}`);
+    }
+  },
+
+  async createSurveyResponse(data: any) {
+    try {
+      if (!data.userId) {
+        throw new Error('userId is required');
+      }
+
+      const surveyInsert = {
+        userId: data.userId,
+        leagueRating: data.leagueRating || null,
+        tournamentRating: data.tournamentRating || null,
+        tournamentsYearly: data.tournamentsYearly || null,
+        leagueFrequency: data.leagueFrequency || null,
+        purposeOfPlay: data.purposeOfPlay || null,
+        practiceTime: data.practiceTime || null,
+        coachingFrequency: data.coachingFrequency || null,
+        favoriteClubs: data.favoriteClubs || null,
+      };
+
+      console.log('Creating survey response with data:', surveyInsert);
+
+      const created = await db.insert(surveyResponses).values(surveyInsert).returning();
+      console.log('Survey response created successfully:', created[0]);
+      return created[0] || null;
+    } catch (error) {
+      console.error('Survey creation error:', error);
+      throw new Error(`Failed to create survey: ${error instanceof Error ? error.message : error}`);
+    }
+  },
+
+  async updateSurveyResponse(userId: string, data: any) {
+    try {
+      const surveyInsert = {
+        leagueRating: data.leagueRating || null,
+        tournamentRating: data.tournamentRating || null,
+        tournamentsYearly: data.tournamentsYearly || null,
+        leagueFrequency: data.leagueFrequency || null,
+        purposeOfPlay: data.purposeOfPlay || null,
+        practiceTime: data.practiceTime || null,
+        coachingFrequency: data.coachingFrequency || null,
+        favoriteClubs: data.favoriteClubs || null,
+        updatedAt: new Date(),
+      };
+
+      const updated = await db
+        .update(surveyResponses)
+        .set(surveyInsert)
+        .where(eq(surveyResponses.userId, userId as any))
+        .returning();
+
+      return updated[0] || null;
+    } catch (error) {
+      throw new Error(`Failed to update survey: ${error}`);
+    }
+  },
+
+  async deleteSurveyResponse(userId: string) {
+    try {
+      await db.delete(surveyResponses).where(eq(surveyResponses.userId, userId as any));
+      return { success: true };
+    } catch (error) {
+      throw new Error(`Failed to delete survey: ${error}`);
     }
   },
 };

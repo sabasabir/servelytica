@@ -129,21 +129,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (data?.user?.id) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Save survey data if provided
+        // Save survey data if provided via API
         if (surveyData && role === 'player') {
           try {
-            await supabase.from('survey_responses').insert({
-              user_id: data.user.id,
-              league_rating: surveyData.leagueRating || null,
-              tournament_rating: surveyData.tournamentRating || null,
-              tournaments_yearly: surveyData.tournamentsYearly || null,
-              league_frequency: surveyData.leagueFrequency || null,
-              purpose_of_play: surveyData.purposeOfPlay || null,
-              practice_time: surveyData.practiceTime || null,
-              coaching_frequency: surveyData.coachingFrequency || null,
-              favorite_clubs: surveyData.favoriteClubs || null,
-              created_at: new Date().toISOString()
+            const response = await fetch('/api/surveys', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: data.user.id,
+                leagueRating: surveyData.leagueRating || null,
+                tournamentRating: surveyData.tournamentRating || null,
+                tournamentsYearly: surveyData.tournamentsYearly || null,
+                leagueFrequency: surveyData.leagueFrequency || null,
+                purposeOfPlay: surveyData.purposeOfPlay || null,
+                practiceTime: surveyData.practiceTime || null,
+                coachingFrequency: surveyData.coachingFrequency || null,
+                favoriteClubs: surveyData.favoriteClubs || null,
+              }),
             });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error('Error saving survey data:', errorData);
+            }
           } catch (surveyError) {
             console.error('Error saving survey data:', surveyError);
             // Don't fail signup if survey save fails

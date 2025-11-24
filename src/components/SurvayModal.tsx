@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-import { createClient } from "@supabase/supabase-js";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,12 +8,9 @@ interface SurveyData {
   tournamentsYearly: string;
   leagueFrequency: string;
   purposeOfPlay: string;
-  sportsMeaning: string;
   practiceTime: string;
   coachingFrequency: string;
   favoriteClubs: string;
-  totalPoints: number;
-  category: string;
 }
 
 interface SurvayModalProps {
@@ -33,12 +28,9 @@ const SurvayModal: React.FC<SurvayModalProps> = ({ userId, onComplete }) => {
     tournamentsYearly: "",
     leagueFrequency: "",
     purposeOfPlay: "",
-    sportsMeaning: "",
     practiceTime: "",
     coachingFrequency: "",
     favoriteClubs: "",
-    totalPoints: 0,
-    category: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -128,9 +120,6 @@ const SurvayModal: React.FC<SurvayModalProps> = ({ userId, onComplete }) => {
         if (!formData.purposeOfPlay.trim()) {
           newErrors.purposeOfPlay = "Please describe your purpose of play";
         }
-        if (!formData.sportsMeaning.trim()) {
-          newErrors.sportsMeaning = "Please describe what sports means to you";
-        }
         break;
       case 4:
         if (!formData.practiceTime.trim()) {
@@ -168,48 +157,42 @@ const SurvayModal: React.FC<SurvayModalProps> = ({ userId, onComplete }) => {
     const totalPoints = calculatePoints(formData);
     const category = getCategory(totalPoints);
 
-    const finalData: SurveyData = {
-    //   ...(formData as SurveyData),
-    //   totalPoints,
-    //   category,
-
-    user_id: userId,
-    league_rating: formData.leagueRating,
-    tournament_rating: formData.tournamentRating,
-    tournaments_yearly: formData.tournamentsYearly,
-    league_frequency: formData.leagueFrequency,
-    purpose_of_play: formData.purposeOfPlay,
-    sports_meaning: formData.sportsMeaning,
-    practice_time: formData.practiceTime,
-    coaching_frequency: formData.coachingFrequency,
-    favorite_clubs: formData.favoriteClubs,
-    total_points: totalPoints,
-    category: category,
+    const surveyData = {
+      userId: userId,
+      leagueRating: formData.leagueRating,
+      tournamentRating: formData.tournamentRating,
+      tournamentsYearly: formData.tournamentsYearly,
+      leagueFrequency: formData.leagueFrequency,
+      purposeOfPlay: formData.purposeOfPlay,
+      practiceTime: formData.practiceTime,
+      coachingFrequency: formData.coachingFrequency,
+      favoriteClubs: formData.favoriteClubs,
     };
 
-
-
-    console.log({finalData})
+    console.log('Submitting survey data:', surveyData);
 
     try {
-      const { error } = await supabase
-        .from("survey_responses")
-        .insert([finalData]);
+      const response = await fetch('/api/surveys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(surveyData),
+      });
 
-      if (error) {
-        console.error("Error saving survey:", error);
-        toast.error("Failed to save survey. Please try again.");
-        return;
+      const responseData = await response.json();
+      console.log('Survey submission response:', responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to save survey');
       }
 
       toast.success(
-        `Survey completed! You scored ${totalPoints} points and are categorized as ${category}`
+        `Survey completed! Your responses have been saved successfully.`
       );
       setIsOpen(false);
       onComplete();
     } catch (error) {
       console.error("Error:", error);
-      toast.error("An error occurred. Please try again.");
+      toast.error(error instanceof Error ? error.message : "An error occurred. Please try again.");
     }
   };
 
@@ -359,25 +342,6 @@ const SurvayModal: React.FC<SurvayModalProps> = ({ userId, onComplete }) => {
               {errors.purposeOfPlay && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.purposeOfPlay}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                What does sports mean to you?
-              </label>
-              <textarea
-                value={formData.sportsMeaning || ""}
-                onChange={(e) =>
-                  handleInputChange("sportsMeaning", e.target.value)
-                }
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 h-24"
-                placeholder="Describe what sports means to you..."
-              />
-              {errors.sportsMeaning && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.sportsMeaning}
                 </p>
               )}
             </div>
