@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, Upload, AlertTriangle } from "lucide-react";
+import { Check, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { processVideo } from "@/services/videoProcessing";
 import { supabase } from "@/integrations/supabase/client";
-import { AnalysisQuotaService, type AnalysisQuota } from "@/services/analysisQuotaService";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface VideoUploadFormProps {
   uploading: boolean;
@@ -45,8 +43,6 @@ const VideoUploadForm = ({
   const [userRole, setUserRole] = useState<'coach' | 'player' | null>(null);
   const [loading, setLoading] = useState(true);
   const [coaches, setCoaches] = useState<Array<{id: string, display_name: string, username: string}>>([]);
-  const [quota, setQuota] = useState<AnalysisQuota | null>(null);
-  const [loadingQuota, setLoadingQuota] = useState(true);
 
   useEffect(() => {
     const checkUserRole = async () => {
@@ -58,18 +54,11 @@ const VideoUploadForm = ({
           // In a real app, you might need to fetch this from a profiles table
           const role = user.user_metadata?.role as 'coach' | 'player' || 'player';
           setUserRole(role);
-          
-          // Check quota for players
-          if (role === 'player') {
-            const userQuota = await AnalysisQuotaService.checkUserQuota(user.id);
-            setQuota(userQuota);
-          }
         }
       } catch (error) {
         console.error("Error fetching user role:", error);
       } finally {
         setLoading(false);
-        setLoadingQuota(false);
       }
     };
     
@@ -291,29 +280,6 @@ const VideoUploadForm = ({
         </div>
       </div>
 
-      {/* Analysis Quota Info - Only show to players */}
-      {userRole === 'player' && quota && (
-        <Alert className={quota.canCreate ? "border-green-200 bg-green-50" : "border-orange-200 bg-orange-50"}>
-          <AlertTriangle className={`h-4 w-4 ${quota.canCreate ? "text-green-600" : "text-orange-600"}`} />
-          <AlertDescription className={quota.canCreate ? "text-green-700" : "text-orange-700"}>
-            <div className="space-y-1">
-              <p className="font-medium">
-                Analysis Quota: {quota.analysesUsed}/{quota.analysesLimit} used this month
-              </p>
-              {!quota.canCreate && quota.nextResetDate && (
-                <p className="text-sm">
-                  Next analysis available in {AnalysisQuotaService.formatResetDate(quota.nextResetDate)}
-                </p>
-              )}
-              {quota.canCreate && (
-                <p className="text-sm">
-                  You can upload {quota.analysesLimit - quota.analysesUsed} more video{quota.analysesLimit - quota.analysesUsed !== 1 ? 's' : ''} for analysis.
-                </p>
-              )}
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Coach Selection - Only show to players */}
       {userRole !== 'coach' && (
