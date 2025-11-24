@@ -94,10 +94,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signUp = async (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => {
     try {
-      // For players, redirect to plan selection; for coaches, redirect to home
-      const redirectUrl = role === 'player' 
-        ? `${window.location.origin}/plan-selection`
-        : `${window.location.origin}/`;
+      // Redirect to dashboard after signup
+      const redirectUrl = `${window.location.origin}/dashboard`;
       
       // Ensure username is always provided
       const finalUsername = username || `user_${Date.now()}`;

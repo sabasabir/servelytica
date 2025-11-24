@@ -284,7 +284,10 @@ const AuthPage = () => {
                       <Button 
                         onClick={async () => {
                           setLoading(true);
-                          await signUp(signupEmail, signupPassword, username, displayName, role, selectedSport);
+                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, selectedSport);
+                          if (!error) {
+                            navigate('/dashboard', { replace: true });
+                          }
                           setLoading(false);
                         }}
                         className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10"
