@@ -22,6 +22,7 @@ import { AnalyzedVideosList } from "@/components/profile/AnalyzedVideosList";
 import { PendingVideosList } from "@/components/coach/PendingVideosList";
 import PlayerCoachFeedbacks from "@/components/coach/PlayerCoachFeedbacks";
 import CoachReviews from "@/components/coach/CoachReviews";
+import CreateProfileModal from "@/components/profile/CreateProfileModal";
 import { Navigate } from "react-router-dom";
 
 const ProfilePage = () => {
@@ -32,6 +33,7 @@ const ProfilePage = () => {
   const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>([]);
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateProfileModal, setShowCreateProfileModal] = useState(false);
   const { toast } = useToast();
   const { user: authUser, loading: authLoading } = useAuth();
   
@@ -83,16 +85,17 @@ const ProfilePage = () => {
       if (profileData) {
         setUser(profileData);
         setEditedUser(profileData);
+        setShowCreateProfileModal(false);
+      } else {
+        // Show create profile modal if no profile exists
+        setShowCreateProfileModal(true);
       }
       setPerformanceData(metrics);
       setVideos(videosData);
     } catch (error) {
       console.error('Error loading profile data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile data",
-        variant: "destructive",
-      });
+      // If profile doesn't exist, show create modal
+      setShowCreateProfileModal(true);
     } finally {
       setLoading(false);
     }
@@ -617,32 +620,44 @@ const ProfilePage = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Profile</h1>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-6">
-            <ProfileCard
-              user={user}
-              isEditing={isEditing}
-              onEdit={handleEdit}
-              previewImage={previewImage}
-              handleImageUpload={handleImageUpload}
-            />
-            <AnalysisQuotaCard />
+        {user ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1 space-y-6">
+              <ProfileCard
+                user={user}
+                isEditing={isEditing}
+                onEdit={handleEdit}
+                previewImage={previewImage}
+                handleImageUpload={handleImageUpload}
+              />
+              <AnalysisQuotaCard />
+            </div>
+            <div className="lg:col-span-2">
+              <ProfileTabs
+                user={user}
+                isEditing={isEditing}
+                editedUser={editedUser}
+                performanceData={performanceData}
+                videos={videos}
+                handleChange={handleChange}
+                handleCancel={handleCancel}
+                handleSave={handleSave}
+                onDataUpdate={loadProfileData}
+              />
+            </div>
           </div>
-          <div className="lg:col-span-2">
-            <ProfileTabs
-              user={user}
-              isEditing={isEditing}
-              editedUser={editedUser}
-              performanceData={performanceData}
-              videos={videos}
-              handleChange={handleChange}
-              handleCancel={handleCancel}
-              handleSave={handleSave}
-              onDataUpdate={loadProfileData}
-            />
+        ) : (
+          <div className="flex items-center justify-center py-20">
+            <p className="text-muted-foreground">Loading profile...</p>
           </div>
-        </div>
+        )}
       </div>
+      
+      <CreateProfileModal
+        open={showCreateProfileModal}
+        onClose={() => setShowCreateProfileModal(false)}
+        onSuccess={loadProfileData}
+      />
     </div>
   );
 };
