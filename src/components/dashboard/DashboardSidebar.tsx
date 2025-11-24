@@ -1,5 +1,5 @@
-import { Box, Typography, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import { LayoutDashboard, Package, ShoppingCart, ShoppingBag, Truck, BarChart3, Settings, Activity, HelpCircle, LogOut } from "lucide-react";
+import { Box, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from "@mui/material";
+import { LayoutDashboard, Package, ShoppingCart, ShoppingBag, Truck, BarChart3, Settings, Activity, HelpCircle, LogOut, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -36,49 +36,67 @@ export const DashboardSidebar = () => {
   return (
     <Box
       sx={{
-        width: 200,
+        width: 220,
         background: "linear-gradient(180deg, #0f5f47 0%, #0d4d3a 100%)",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        padding: "20px 0",
+        padding: "24px 0",
         position: "sticky",
         top: 0,
         overflow: "hidden",
+        boxShadow: "2px 0 8px rgba(0, 0, 0, 0.15)",
       }}
     >
-      {/* Logo */}
-      <Box sx={{ px: 2, mb: 4 }}>
-        <Typography
+      {/* Logo Section */}
+      <Box sx={{ px: 3, mb: 4, display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
           sx={{
-            color: "#00ff88",
-            fontSize: "14px",
-            fontWeight: 800,
-            letterSpacing: "2px",
+            width: 28,
+            height: 28,
+            background: "linear-gradient(135deg, #00ff88 0%, #00cc6f 100%)",
+            borderRadius: "6px",
             display: "flex",
             alignItems: "center",
-            gap: 1,
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(0, 255, 136, 0.3)",
           }}
         >
-          <Package size={18} /> MANAGE
+          <Package size={16} style={{ color: "#0f5f47", fontWeight: 900 }} />
+        </Box>
+        <Typography
+          sx={{
+            color: "#ffffff",
+            fontSize: "16px",
+            fontWeight: 900,
+            letterSpacing: "1.5px",
+            fontFamily: '"Sora", sans-serif',
+          }}
+        >
+          DASHBOARD
         </Typography>
       </Box>
 
       {/* Main Menu */}
-      <List sx={{ flex: 1, px: 1 }}>
+      <List sx={{ flex: 1, px: 2 }}>
         {menuItems.map((item, index) => (
           <ListItem
             key={index}
             component="button"
             onClick={item.onClick}
             sx={{
-              mb: 0.5,
+              mb: 1,
               borderRadius: "8px",
               color: "#a0a0a0",
-              transition: "all 0.3s",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              cursor: "pointer",
+              border: "none",
+              background: "transparent",
+              padding: "10px 12px",
               "&:hover": {
-                background: "rgba(0, 255, 136, 0.1)",
+                background: "rgba(0, 255, 136, 0.15)",
                 color: "#00ff88",
+                transform: "translateX(4px)",
               },
               "& .MuiListItemIcon-root": {
                 minWidth: "40px",
@@ -95,6 +113,7 @@ export const DashboardSidebar = () => {
                 "& .MuiTypography-root": {
                   fontSize: "13px",
                   fontWeight: 500,
+                  fontFamily: '"Sora", sans-serif',
                 },
               }}
             />
@@ -102,8 +121,11 @@ export const DashboardSidebar = () => {
         ))}
       </List>
 
+      {/* Divider */}
+      <Divider sx={{ background: "rgba(0, 255, 136, 0.2)", my: 2, mx: 2 }} />
+
       {/* Bottom Menu */}
-      <Box sx={{ px: 1, borderTop: "1px solid rgba(0, 255, 136, 0.2)", pt: 2 }}>
+      <Box sx={{ px: 2 }}>
         <List>
           {bottomMenuItems.map((item, index) => (
             <ListItem
@@ -111,12 +133,16 @@ export const DashboardSidebar = () => {
               component="button"
               onClick={item.onClick}
               sx={{
-                mb: 0.5,
+                mb: 1,
                 borderRadius: "8px",
                 color: "#a0a0a0",
                 transition: "all 0.3s",
+                cursor: "pointer",
+                border: "none",
+                background: "transparent",
+                padding: "10px 12px",
                 "&:hover": {
-                  background: "rgba(0, 255, 136, 0.1)",
+                  background: "rgba(0, 255, 136, 0.15)",
                   color: "#00ff88",
                 },
                 "& .MuiListItemIcon-root": {
@@ -134,6 +160,7 @@ export const DashboardSidebar = () => {
                   "& .MuiTypography-root": {
                     fontSize: "13px",
                     fontWeight: 500,
+                    fontFamily: '"Sora", sans-serif',
                   },
                 }}
               />
@@ -146,12 +173,16 @@ export const DashboardSidebar = () => {
           component="button"
           onClick={handleLogout}
           sx={{
-            mt: 2,
+            mt: 3,
             borderRadius: "8px",
             color: "#ff6b6b",
             transition: "all 0.3s",
+            cursor: "pointer",
+            border: "none",
+            background: "transparent",
+            padding: "10px 12px",
             "&:hover": {
-              background: "rgba(255, 107, 107, 0.1)",
+              background: "rgba(255, 107, 107, 0.15)",
             },
             "& .MuiListItemIcon-root": {
               minWidth: "40px",
@@ -168,6 +199,7 @@ export const DashboardSidebar = () => {
               "& .MuiTypography-root": {
                 fontSize: "13px",
                 fontWeight: 500,
+                fontFamily: '"Sora", sans-serif',
               },
             }}
           />

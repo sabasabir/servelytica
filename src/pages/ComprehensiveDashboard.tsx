@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Chip,
 } from "@mui/material";
 import {
   Plus,
@@ -25,6 +26,8 @@ import {
   Trash2,
   ChevronRight,
   CheckCircle2,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { DashboardService, DashboardItem } from "@/services/dashboardService";
@@ -146,6 +149,17 @@ const ComprehensiveDashboard = () => {
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 size={16} />;
+      case "in_progress":
+        return <Clock size={16} />;
+      default:
+        return <AlertCircle size={16} />;
+    }
+  };
+
   const getStatusColor = (status: string) => {
     const colors: any = {
       pending: "#fbbf24",
@@ -170,7 +184,7 @@ const ComprehensiveDashboard = () => {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        background: "#f0f4f8",
+        background: "#f8fafc",
       }}
     >
       {/* Sidebar */}
@@ -189,34 +203,40 @@ const ComprehensiveDashboard = () => {
             alignItems: "center",
           }}
         >
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "24px",
-              fontWeight: 800,
-              color: "#1a365d",
-            }}
-          >
-            Dashboard
-          </h1>
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "28px",
+                fontWeight: 900,
+                color: "#0f5f47",
+                fontFamily: '"Sora", "Poppins", sans-serif',
+              }}
+            >
+              Dashboard
+            </h1>
+            <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#94a3b8" }}>
+              Manage your items and track progress
+            </p>
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             <Button
               onClick={() => {}}
-              className="flex items-center gap-2 border-2 border-orange-500 text-orange-500 hover:bg-orange-50"
+              className="flex items-center gap-2 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 px-4 py-2 rounded-lg font-semibold"
             >
               <ChevronRight size={18} />
               Action
             </Button>
             <Button
               onClick={() => {}}
-              className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 hover:bg-blue-50"
+              className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-lg font-semibold"
             >
               <ChevronRight size={18} />
-              More Options
+              List Options
             </Button>
             <Button
               onClick={handleCreateNew}
-              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg font-semibold"
             >
               <Plus size={18} />
               Add New
@@ -227,7 +247,7 @@ const ComprehensiveDashboard = () => {
         {/* Content Area */}
         <Box sx={{ flex: 1, padding: "30px 40px", overflowY: "auto" }}>
           {/* Search Bar */}
-          <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
+          <Box sx={{ mb: 4, display: "flex", gap: 2, alignItems: "center" }}>
             <TextField
               placeholder="Search items..."
               value={searchTerm}
@@ -238,10 +258,17 @@ const ComprehensiveDashboard = () => {
                 startAdornment: <Search size={18} style={{ marginRight: "8px" }} />,
               }}
               sx={{
-                width: "300px",
+                width: "350px",
                 "& .MuiOutlinedInput-root": {
                   background: "white",
                   borderRadius: "8px",
+                  border: "1px solid #e5e7eb",
+                  "& fieldset": {
+                    border: "none",
+                  },
+                  "&:hover fieldset": {
+                    border: "1px solid #0f5f47",
+                  },
                 },
               }}
             />
@@ -266,7 +293,7 @@ const ComprehensiveDashboard = () => {
               </p>
               <Button
                 onClick={handleCreateNew}
-                className="mt-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white"
+                className="mt-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-lg font-semibold"
               >
                 <Plus size={18} className="mr-2" />
                 Create First Item
@@ -284,13 +311,19 @@ const ComprehensiveDashboard = () => {
               <Table>
                 <TableHead>
                   <TableRow sx={{ background: "#f9fafb", borderBottom: "2px solid #e5e7eb" }}>
+                    <TableCell sx={{ fontWeight: 700, color: "#374151", width: "40px" }}>
+                      
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Title</TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Description</TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Type</TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Status</TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Priority</TableCell>
                     <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Due Date</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#374151" }}>Created</TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#374151", textAlign: "center" }}>
+                      Actions
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -303,71 +336,78 @@ const ComprehensiveDashboard = () => {
                         transition: "background 0.2s",
                       }}
                     >
-                      <TableCell sx={{ fontWeight: 600, color: "#1f2937" }}>
+                      <TableCell sx={{ textAlign: "center", color: getStatusColor(item.status) }}>
+                        {getStatusIcon(item.status)}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#1f2937", maxWidth: "150px" }}>
                         {item.title}
                       </TableCell>
                       <TableCell sx={{ color: "#6b7280", maxWidth: "200px" }}>
                         {item.description || "-"}
                       </TableCell>
                       <TableCell>
-                        <span
-                          style={{
+                        <Chip
+                          label={item.type}
+                          size="small"
+                          sx={{
                             background: "rgba(0, 255, 136, 0.1)",
                             color: "#00ff88",
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontSize: "12px",
                             fontWeight: 600,
                           }}
-                        >
-                          {item.type}
-                        </span>
+                        />
                       </TableCell>
                       <TableCell>
-                        <span
-                          style={{
+                        <Chip
+                          label={item.status.replace("_", " ")}
+                          size="small"
+                          sx={{
                             background: `${getStatusColor(item.status)}20`,
                             color: getStatusColor(item.status),
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontSize: "12px",
                             fontWeight: 600,
                           }}
-                        >
-                          {item.status.replace("_", " ")}
-                        </span>
+                        />
                       </TableCell>
                       <TableCell>
-                        <span
-                          style={{
+                        <Chip
+                          label={item.priority}
+                          size="small"
+                          sx={{
                             background: `${getPriorityColor(item.priority)}20`,
                             color: getPriorityColor(item.priority),
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontSize: "12px",
                             fontWeight: 600,
                           }}
-                        >
-                          {item.priority}
-                        </span>
+                        />
                       </TableCell>
-                      <TableCell sx={{ color: "#6b7280" }}>
+                      <TableCell sx={{ color: "#6b7280", fontSize: "13px" }}>
                         {item.dueDate
-                          ? new Date(item.dueDate).toLocaleDateString()
+                          ? new Date(item.dueDate).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
                           : "-"}
                       </TableCell>
+                      <TableCell sx={{ color: "#6b7280", fontSize: "13px" }}>
+                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </TableCell>
                       <TableCell>
-                        <Box sx={{ display: "flex", gap: 1 }}>
+                        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                           {item.status !== "completed" && (
                             <MuiButton
                               size="small"
                               onClick={() => handleComplete(item.id)}
                               sx={{
                                 color: "#10b981",
+                                minWidth: "32px",
+                                padding: "4px",
                                 "&:hover": { background: "rgba(16, 185, 129, 0.1)" },
                               }}
+                              title="Mark Complete"
                             >
-                              <CheckCircle2 size={16} />
+                              <CheckCircle2 size={18} />
                             </MuiButton>
                           )}
                           <MuiButton
@@ -375,10 +415,13 @@ const ComprehensiveDashboard = () => {
                             onClick={() => handleEdit(item)}
                             sx={{
                               color: "#3b82f6",
+                              minWidth: "32px",
+                              padding: "4px",
                               "&:hover": { background: "rgba(59, 130, 246, 0.1)" },
                             }}
+                            title="Edit"
                           >
-                            <Edit2 size={16} />
+                            <Edit2 size={18} />
                           </MuiButton>
                           <MuiButton
                             size="small"
@@ -388,10 +431,13 @@ const ComprehensiveDashboard = () => {
                             }}
                             sx={{
                               color: "#ef4444",
+                              minWidth: "32px",
+                              padding: "4px",
                               "&:hover": { background: "rgba(239, 68, 68, 0.1)" },
                             }}
+                            title="Delete"
                           >
-                            <Trash2 size={16} />
+                            <Trash2 size={18} />
                           </MuiButton>
                         </Box>
                       </TableCell>
