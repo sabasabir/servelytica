@@ -737,3 +737,15 @@ export const connections = pgTable('connections', {
 }, (table) => ({
   uniqueConnection: unique().on(table.user1Id, table.user2Id),
 }));
+
+// Featured Coaches table
+export const featuredCoaches = pgTable('featured_coaches', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  coachId: uuid('coach_id').notNull(),
+  displayOrder: integer('display_order').default(0).notNull(),
+  featuredSince: timestamp('featured_since', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueCoachFeature: unique().on(table.coachId),
+}));

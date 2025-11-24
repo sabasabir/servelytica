@@ -1,34 +1,123 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Card, CardContent, Avatar } from "@mui/material";
-import { Star } from "lucide-react";
+import { Box, Container, Typography, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import FeaturedCoachCard from "./FeaturedCoachCard";
+import FeaturedCoachesFormModal from "./FeaturedCoachesFormModal";
+import { FeaturedCoachService } from "@/services/featuredCoachService";
 
 const FeaturedCoachesSection = () => {
-  const coaches = [
-    {
-      id: 1,
-      name: "Michael Chen",
-      role: "Former National Champion",
-      image: "MC",
-      rating: 4.9,
-      reviews: 124,
-    },
-    {
-      id: 2,
-      name: "Sarah Wong",
-      role: "Olympic Medalist",
-      image: "SW",
-      rating: 5.0,
-      reviews: 98,
-    },
-    {
-      id: 3,
-      name: "David Müller",
-      role: "Professional Coach",
-      image: "DM",
-      rating: 4.8,
-      reviews: 156,
-    },
-  ];
+  const [coaches, setCoaches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [formOpen, setFormOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [coachToDelete, setCoachToDelete] = useState<any>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    fetchFeaturedCoaches();
+  }, []);
+
+  const fetchFeaturedCoaches = async () => {
+    setLoading(true);
+    try {
+      const data = await FeaturedCoachService.getFeaturedCoaches(3);
+      // If no data, show sample coaches
+      if (!data || data.length === 0) {
+        setCoaches([
+          {
+            id: 1,
+            coachId: "sample-1",
+            name: "Michael Chen",
+            title: "Former National Champion",
+            rating: 4.9,
+            reviews: 124,
+            image: "MC",
+            displayOrder: 1,
+          },
+          {
+            id: 2,
+            coachId: "sample-2",
+            name: "Sarah Wong",
+            title: "Olympic Medalist",
+            rating: 5.0,
+            reviews: 98,
+            image: "SW",
+            displayOrder: 2,
+          },
+          {
+            id: 3,
+            coachId: "sample-3",
+            name: "David Müller",
+            title: "Professional Coach",
+            rating: 4.8,
+            reviews: 156,
+            image: "DM",
+            displayOrder: 3,
+          },
+        ]);
+      } else {
+        setCoaches(data);
+      }
+    } catch (error) {
+      console.error("Error fetching featured coaches:", error);
+      // Show sample coaches on error
+      setCoaches([
+        {
+          id: 1,
+          coachId: "sample-1",
+          name: "Michael Chen",
+          title: "Former National Champion",
+          rating: 4.9,
+          reviews: 124,
+          image: "MC",
+          displayOrder: 1,
+        },
+        {
+          id: 2,
+          coachId: "sample-2",
+          name: "Sarah Wong",
+          title: "Olympic Medalist",
+          rating: 5.0,
+          reviews: 98,
+          image: "SW",
+          displayOrder: 2,
+        },
+        {
+          id: 3,
+          coachId: "sample-3",
+          name: "David Müller",
+          title: "Professional Coach",
+          rating: 4.8,
+          reviews: 156,
+          image: "DM",
+          displayOrder: 3,
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (coach: any) => {
+    setCoachToDelete(coach);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!coachToDelete) return;
+    try {
+      setDeleting(true);
+      await FeaturedCoachService.removeFeaturedCoach(coachToDelete.id || coachToDelete.coachId);
+      await fetchFeaturedCoaches();
+      setDeleteDialogOpen(false);
+      setCoachToDelete(null);
+    } catch (error) {
+      console.error("Error deleting coach:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <Box
@@ -101,125 +190,96 @@ const FeaturedCoachesSection = () => {
             </motion.div>
           </Box>
 
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-              gap: { xs: 3, md: 4 },
-            }}
-          >
-            {coaches.map((coach, index) => (
-              <motion.div
-                key={coach.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
-              >
-                <Card
-                  sx={{
-                    height: "100%",
-                    background: "white",
-                    border: "2px solid #f0f4f8",
-                    borderRadius: "16px",
-                    overflow: "hidden",
-                    transition: "all 0.3s ease",
-                    cursor: "pointer",
-                    "&:hover": {
-                      borderColor: "#ff7e00",
-                      boxShadow: "0 16px 32px rgba(255, 126, 0, 0.12)",
-                    },
-                  }}
-                >
-                  {/* Coach Avatar Section */}
-                  <Box
-                    sx={{
-                      height: "180px",
-                      background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      position: "relative",
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        fontSize: "40px",
-                        fontWeight: 700,
-                        background: "rgba(255, 255, 255, 0.25)",
-                        color: "white",
-                        border: "3px solid white",
-                      }}
-                    >
-                      {coach.image}
-                    </Avatar>
-                  </Box>
-
-                  <CardContent sx={{ p: 4 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: "#1a365d",
-                        mb: 1,
-                        fontSize: "18px",
-                        fontFamily: '"Poppins", "Sora", sans-serif',
-                      }}
-                    >
-                      {coach.name}
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        color: "#ff7e00",
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        mb: 3,
-                      }}
-                    >
-                      {coach.role}
-                    </Typography>
-
-                    {/* Rating */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={14}
-                            fill={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
-                            color={i < Math.floor(coach.rating) ? "#ff7e00" : "rgba(255, 126, 0, 0.2)"}
-                          />
-                        ))}
-                      </Box>
-                      <Typography
-                        sx={{
-                          fontWeight: 700,
-                          color: "#1a365d",
-                          fontSize: "13px",
-                        }}
-                      >
-                        {coach.rating}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: "#94a3b8",
-                          fontSize: "13px",
-                        }}
-                      >
-                        ({coach.reviews})
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+          <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+            <Button
+              variant="contained"
+              startIcon={<Plus size={20} />}
+              onClick={() => setFormOpen(true)}
+              sx={{
+                background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
+                color: "white",
+                fontWeight: 600,
+                px: 3,
+                py: 1.5,
+                borderRadius: "8px",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
+            >
+              Add Featured Coach
+            </Button>
           </Box>
+
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+              <CircularProgress sx={{ color: "#ff7e00" }} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+                gap: { xs: 3, md: 4 },
+              }}
+            >
+              {coaches.length > 0 ? (
+                coaches.map((coach, index) => (
+                  <FeaturedCoachCard
+                    key={coach.id || coach.coachId}
+                    coach={coach}
+                    index={index}
+                    onDelete={handleDeleteClick}
+                  />
+                ))
+              ) : (
+                <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 8 }}>
+                  <Typography sx={{ color: "#94a3b8", mb: 2 }}>
+                    No featured coaches yet. Add one to get started!
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => setFormOpen(true)}
+                    sx={{ background: "#ff7e00" }}
+                  >
+                    Add First Coach
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          )}
         </motion.div>
       </Container>
+
+      {/* Add Coach Modal */}
+      <FeaturedCoachesFormModal
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        onSave={() => {
+          setFormOpen(false);
+          fetchFeaturedCoaches();
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Remove Featured Coach</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to remove <strong>{coachToDelete?.name}</strong> from featured coaches?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            disabled={deleting}
+          >
+            {deleting ? "Removing..." : "Remove"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

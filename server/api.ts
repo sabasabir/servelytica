@@ -13,6 +13,7 @@ import {
   connectionRequestRoutes,
   connectionRoutes,
   analysisSessionRoutes,
+  featuredCoachesRoutes,
 } from './routes';
 
 const sendJson = (res: any, data: any, status = 200) => {
@@ -582,6 +583,66 @@ export function setupApiRoutes(app: any) {
   app.delete('/api/analysis-sessions/:sessionId/notes/:noteId', async (req: any, res: any) => {
     try {
       const result = await analysisSessionRoutes.deleteSessionNote(req.params.noteId);
+      sendJson(res, result);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  // Featured Coaches endpoints (most specific routes first)
+  app.get('/api/featured-coaches/search', async (req: any, res: any) => {
+    try {
+      const query = req.query.query || '';
+      const results = await featuredCoachesRoutes.searchCoaches(query);
+      sendJson(res, results);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/featured-coaches', async (req: any, res: any) => {
+    try {
+      const limit = parseInt(req.query.limit) || 10;
+      const coaches = await featuredCoachesRoutes.getFeaturedCoaches(limit);
+      sendJson(res, coaches);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.post('/api/featured-coaches', async (req: any, res: any) => {
+    try {
+      const coach = await featuredCoachesRoutes.addFeaturedCoach(req.body);
+      sendJson(res, coach, 201);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.get('/api/featured-coaches/:coachId', async (req: any, res: any) => {
+    try {
+      const coach = await featuredCoachesRoutes.getFeaturedCoachById(req.params.coachId);
+      if (!coach) {
+        return sendError(res, 'Featured coach not found', 404);
+      }
+      sendJson(res, coach);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.put('/api/featured-coaches/:coachId', async (req: any, res: any) => {
+    try {
+      const coach = await featuredCoachesRoutes.updateFeaturedCoach(req.params.coachId, req.body);
+      sendJson(res, coach);
+    } catch (error) {
+      sendError(res, error);
+    }
+  });
+
+  app.delete('/api/featured-coaches/:coachId', async (req: any, res: any) => {
+    try {
+      const result = await featuredCoachesRoutes.removeFeaturedCoach(req.params.coachId);
       sendJson(res, result);
     } catch (error) {
       sendError(res, error);
