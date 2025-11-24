@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validatePassword } from '@/utils/passwordValidation';
+import { PasswordInput } from '@/components/PasswordInput';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SurvayModal from '@/components/SurvayModal';
@@ -170,10 +171,9 @@ const AuthPage = () => {
                     </div>
                     <div className="space-y-2">
                       <Label className="font-semibold text-sm">Password</Label>
-                      <Input
-                        type="password"
+                      <PasswordInput
                         value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
+                        onChange={setLoginPassword}
                         placeholder="••••••••"
                         required
                       />
@@ -225,10 +225,9 @@ const AuthPage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="space-y-2">
                           <Label className="font-semibold text-sm">Password</Label>
-                          <Input
-                            type="password"
+                          <PasswordInput
                             value={signupPassword}
-                            onChange={(e) => setSignupPassword(e.target.value)}
+                            onChange={setSignupPassword}
                             placeholder="••••••••"
                             required
                             className="h-11 md:h-10"
@@ -236,10 +235,9 @@ const AuthPage = () => {
                         </div>
                         <div className="space-y-2">
                           <Label className="font-semibold text-sm">Confirm Password</Label>
-                          <Input
-                            type="password"
+                          <PasswordInput
                             value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onChange={setConfirmPassword}
                             placeholder="••••••••"
                             required
                             className="h-11 md:h-10"
