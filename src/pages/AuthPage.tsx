@@ -18,6 +18,7 @@ import Footer from '@/components/Footer';
 import SurvayModal from '@/components/SurvayModal';
 import { Box, Container, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
+import { Chrome } from 'lucide-react';
 
 interface Sport {
   id: string;
@@ -38,7 +39,7 @@ interface PricingPlan {
 }
 
 const AuthPage = () => {
-  const { user, signIn, signUp, userRoles } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, userRoles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -181,6 +182,27 @@ const AuthPage = () => {
                     <Button type="submit" className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10" disabled={loading}>
                       {loading ? 'SIGNING IN...' : 'SIGN IN'}
                     </Button>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-300"></span>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">OR</span>
+                      </div>
+                    </div>
+                    <Button 
+                      type="button"
+                      onClick={async () => {
+                        setLoading(true);
+                        await signInWithGoogle();
+                        setLoading(false);
+                      }}
+                      className="w-full bg-white text-gray-900 border-2 border-gray-300 font-semibold h-10 hover:bg-gray-50 flex items-center justify-center gap-2"
+                      disabled={loading}
+                    >
+                      <Chrome size={18} />
+                      SIGN IN WITH GOOGLE
+                    </Button>
                   </form>
                 </TabsContent>
                 
@@ -246,6 +268,27 @@ const AuthPage = () => {
                       </div>
                       <Button type="submit" className="w-full bg-gradient-to-r from-[#ff7e00] to-[#ff9500] text-white font-semibold h-10">
                         NEXT STEP
+                      </Button>
+                      <div className="relative mt-4">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t border-gray-300"></span>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-2 bg-white text-gray-500">OR</span>
+                        </div>
+                      </div>
+                      <Button 
+                        type="button"
+                        onClick={async () => {
+                          setLoading(true);
+                          await signInWithGoogle();
+                          setLoading(false);
+                        }}
+                        className="w-full bg-white text-gray-900 border-2 border-gray-300 font-semibold h-10 hover:bg-gray-50 flex items-center justify-center gap-2 mt-4"
+                        disabled={loading}
+                      >
+                        <Chrome size={18} />
+                        SIGN UP WITH GOOGLE
                       </Button>
                     </form>
                   ) : (

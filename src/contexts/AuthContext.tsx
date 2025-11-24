@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, username: string, displayName: string, role: 'coach' | 'player', sportId: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any; user?: User | null }>;
+  signInWithGoogle: () => Promise<{ error: any; user?: User | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -196,6 +197,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: "Google sign-in failed",
+          description: error.message || "Failed to sign in with Google",
+          variant: "destructive",
+        });
+        return { error };
+      }
+
+      return { error: null, user: data?.user };
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      toast({
+        title: "Google sign-in failed",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -232,6 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     userProfile,
   };
