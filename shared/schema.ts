@@ -565,6 +565,21 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
+export const surveyResponses = pgTable('survey_responses', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().unique(),
+  leagueRating: integer('league_rating'),
+  tournamentRating: integer('tournament_rating'),
+  tournamentsYearly: text('tournaments_yearly'),
+  leagueFrequency: text('league_frequency'),
+  purposeOfPlay: text('purpose_of_play'),
+  practiceTime: text('practice_time'),
+  coachingFrequency: text('coaching_frequency'),
+  favoriteClubs: text('favorite_clubs'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
 export const comments = pgTable('comments', {
   id: uuid('id').defaultRandom().primaryKey(),
   articleId: uuid('article_id').notNull(),

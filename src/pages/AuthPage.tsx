@@ -250,7 +250,7 @@ const AuthPage = () => {
                         NEXT STEP
                       </Button>
                     </form>
-                  ) : (
+                  ) : signupStep === 2 ? (
                     <div className="space-y-4">
                       <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#1a365d" }}>SELECT YOUR ROLE</Typography>
                       <RadioGroup value={role} onValueChange={(val) => setRole(val as 'coach' | 'player')}>
@@ -288,7 +288,6 @@ const AuthPage = () => {
                           if (role === 'player') {
                             setSignupStep(3);
                           } else {
-                            // Coaches skip survey and go directly to account creation
                             setLoading(true);
                             const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, '');
                             if (!error) {
@@ -306,14 +305,13 @@ const AuthPage = () => {
                   ) : signupStep === 3 ? (
                     <div className="space-y-4 max-h-96 overflow-y-auto">
                       <SignupSurvey data={surveyData} onChange={setSurveyData} />
-                      
                       <Button onClick={() => setSignupStep(2)} className="w-full mb-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-0">
                         BACK
                       </Button>
                       <Button 
                         onClick={async () => {
                           setLoading(true);
-                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, role === 'coach' ? '' : selectedSport, role === 'player' ? surveyData : undefined);
+                          const { error } = await signUp(signupEmail, signupPassword, username, displayName, role, selectedSport, surveyData);
                           if (!error) {
                             navigate('/dashboard', { replace: true });
                           }
