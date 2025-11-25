@@ -27,6 +27,7 @@ import ChatPage from "./pages/ChatPage";
 import MotionAnalysisPage from "./pages/MotionAnalysisPage";
 import PrivateAnalysisSpace from "./pages/PrivateAnalysisSpace";
 import PrivateAnalysisSession from "./pages/PrivateAnalysisSession";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/plan-selection" element={<PlanSelectionPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/coach-dashboard" element={<CoachDashboardPage />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/following" element={<BlogPage />} />
             <Route path="/blog/latest" element={<BlogPage />} />

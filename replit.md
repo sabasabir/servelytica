@@ -1,55 +1,77 @@
 # Servelytica Sports Analytics Platform
-**Last Updated:** November 24, 2025
+**Last Updated:** November 25, 2025
 
 ## Project Overview
-Migrate Servelytica sports analytics platform from Supabase to Replit environment with Neon PostgreSQL backend, while maintaining Supabase for authentication. Platform includes video analysis, coaching services, social networking, and comprehensive CRUD operations.
+Maintain and refine Servelytica sports analytics platform with Neon PostgreSQL backend and Supabase authentication. Platform provides video analysis, coaching services, social networking features, blog system, comprehensive sports analytics tools for table tennis, pickleball, and other racquet sports. Features admin panel with full platform management capabilities.
 
-## 🎯 Current Status: MVP Complete ✅
+## 🎯 Current Status: Admin Panel Complete ✅
 
-### Latest Implementation: Comprehensive Dashboard with Full CRUD
+### Latest Implementation: Complete Admin Management Panel (Nov 25, 2025)
 
 #### Features Implemented
-1. **Dashboard Homepage** (`/dashboard`)
-   - Personal dashboard landing page for all authenticated users
-   - Stats overview: Total Items, Completed, In Progress, Pending
-   - Tabbed interface for filtering items by status
-   - Create/Edit/Delete operations for dashboard items
-   - Item priority levels (low, medium, high)
-   - Item types: Tasks, Goals, Notes, Achievements
-   - Status tracking: Pending, In Progress, Completed, Archived
 
-2. **Authentication Flow with Redirects**
-   - Login/Signup redirects to `/dashboard` after successful authentication
-   - Protected dashboard route - redirects to `/auth` if not logged in
-   - Dashboard link in Navbar (visible only to authenticated users)
-   - Logout functionality with redirect to home
+##### 1. **Admin Dashboard Panel** (`/admin`)
+   - Admin-only access with role-based routing protection
+   - Four main tabs for platform management:
+     - **Statistics Tab**: Overview of platform metrics
+     - **Coaches Tab**: Full CRUD for coach profiles
+     - **Videos Tab**: Full CRUD for video management
+     - **Users Tab**: Full CRUD for user accounts and roles
+   - Real-time data loading with error handling
+   - Search functionality across all data types
 
-3. **CRUD Operations**
-   - **Create**: Add new dashboard items with title, description, type, priority, status, and due date
-   - **Read**: Fetch all items, filter by status, display statistics
-   - **Update**: Edit item details and status (including mark as complete)
-   - **Delete**: Remove items with confirmation dialog
+##### 2. **Statistics Dashboard**
+   - Total Users count with user icon
+   - Total Coaches count with bar chart icon
+   - Total Videos count with video camera icon
+   - Total Blog Posts count with book open icon
+   - Color-coded stat cards for visual clarity
+   - Real-time data from Supabase
 
-4. **API Endpoints** (6 endpoints)
-   - `GET /api/dashboard/items/:userId` - Fetch all items
-   - `POST /api/dashboard/items` - Create new item
-   - `PUT /api/dashboard/items/:itemId` - Update item
-   - `DELETE /api/dashboard/items/:itemId` - Delete item
-   - `GET /api/dashboard/stats/:userId` - Fetch dashboard stats
-   - `PUT /api/profile/:userId` - Update user profile
+##### 3. **Coach Management CRUD**
+   - **Create**: Add new coaches with display name, years coaching, and bio
+   - **Read**: List all coaches with search functionality
+   - **Update**: Edit coach information via modal form
+   - **Delete**: Remove coaches with confirmation dialog
+   - Form validation and error handling
+   - Modal dialog for create/edit operations
 
-5. **Component Architecture**
-   - `ComprehensiveDashboard.tsx` - Main dashboard page with stats, tabs, and layout
-   - `DashboardItemCard.tsx` - Individual item card display with action buttons
-   - `DashboardItemModal.tsx` - Create/Edit modal dialog
-   - `DashboardService.ts` - Client-side API service layer
+##### 4. **Video Management CRUD**
+   - **Read**: Display all videos with detailed information
+   - **Delete**: Remove video records with confirmation
+   - File size formatting (MB display)
+   - Analysis status indicator (Yes/No badge)
+   - Upload date tracking
+   - Search functionality for videos
 
-#### Featured Coaches CRUD (Previously Implemented)
-- Complete Featured Coaches section with database table
-- 6 API endpoints for CRUD operations
-- Frontend components for display, create, edit, and delete
-- Form modal with search autocomplete
-- Sample data display with error recovery
+##### 5. **User Management CRUD**
+   - **Read**: Display all users with profile information
+   - **Delete**: Remove user accounts (irreversible)
+   - Role display with admin shield icon
+   - Join date tracking
+   - Search by name or email
+   - User role visualization
+
+##### 6. **Component Architecture**
+   - `src/pages/AdminPanel.tsx` - Main admin dashboard page
+   - `src/components/admin/AdminStatsTab.tsx` - Statistics overview
+   - `src/components/admin/AdminCoachesTab.tsx` - Coach CRUD management
+   - `src/components/admin/AdminCoachForm.tsx` - Coach creation/editing form
+   - `src/components/admin/AdminVideosTab.tsx` - Video management
+   - `src/components/admin/AdminUsersTab.tsx` - User management
+   - Admin link in Navbar (visible only to admin users)
+
+##### 7. **Video Upload System** (Previously Fixed)
+   - Base64 encoding for file uploads
+   - Backend `/api/videos/upload` endpoint
+   - User-isolated file storage in `uploads/{userId}/{timestamp}.{ext}`
+   - Error handling and validation
+   - Automatic directory creation
+
+#### Additional Features
+- Featured Coaches CRUD with database integration
+- Dashboard with personal item management
+- Video analysis workflow
 
 ## 🏗️ Project Architecture
 
@@ -84,25 +106,33 @@ Migrate Servelytica sports analytics platform from Supabase to Replit environmen
 ```
 src/
 ├── pages/
-│   ├── ComprehensiveDashboard.tsx    ← Main dashboard page
-│   ├── Dashboard.tsx                  ← Old video dashboard
+│   ├── AdminPanel.tsx                 ← Main admin dashboard
+│   ├── CoachesPage.tsx                ← Public coaches directory
+│   ├── Dashboard.tsx                  ← Personal video dashboard
 │   ├── AuthPage.tsx                   ← Login/signup page
 │   └── Index.tsx                      ← Home page
 ├── components/
-│   ├── dashboard/
-│   │   ├── DashboardItemCard.tsx      ← Item card component
-│   │   └── DashboardItemModal.tsx     ← Create/edit modal
-│   ├── Navbar.tsx                     ← Navigation with dashboard link
+│   ├── admin/
+│   │   ├── AdminPanel.tsx             ← Admin page layout
+│   │   ├── AdminStatsTab.tsx          ← Platform statistics
+│   │   ├── AdminCoachesTab.tsx        ← Coach CRUD interface
+│   │   ├── AdminCoachForm.tsx         ← Coach form modal
+│   │   ├── AdminVideosTab.tsx         ← Video management
+│   │   └── AdminUsersTab.tsx          ← User management
+│   ├── Navbar.tsx                     ← Navigation with admin link
 │   └── ...
 ├── services/
+│   ├── uploadService.ts               ← Video upload client
 │   ├── dashboardService.ts            ← Dashboard API client
 │   └── featuredCoachService.ts
 ├── contexts/
-│   └── AuthContext.tsx                ← Auth state + redirects
+│   └── AuthContext.tsx                ← Auth state + user roles
+├── hooks/
+│   └── useUserRole.tsx                ← Role checking hook
 └── ...
 
 server/
-├── api.ts                             ← Express endpoints
+├── api.ts                             ← Express endpoints (including /api/videos/upload)
 ├── routes.ts                          ← Route handlers
 └── index.ts
 
@@ -125,15 +155,30 @@ User at /auth page
     ↓ Displays dashboard with stats
 ```
 
-## ✨ Connected Pages (All Redirect After Login)
+## ✨ Key Pages & Routes
 
-- `/` → Shows Dashboard link in Navbar when logged in
-- `/auth` → Redirects to `/dashboard` after successful login
-- `/dashboard` → Full CRUD management interface
-- `/my-videos` → Video upload/analysis management
-- `/coaches` → Browse coaches
+**Public Pages:**
+- `/` → Home page
+- `/auth` → Login/signup page
+- `/coaches` → Browse all coaches
+- `/pricing` → Pricing plans
 - `/blog` → Community blog
-- All authenticated routes → Include Dashboard in navigation
+- `/how-it-works` → Platform guide
+
+**Authenticated User Pages:**
+- `/profile` → User profile management
+- `/my-videos` → Video upload/analysis
+- `/connect` → Social connections
+- `/analysis-space` → Analysis workspace
+- `/motion-analysis` → Motion analysis tools
+
+**Admin-Only Pages:**
+- `/admin` → Admin dashboard with CRUD for coaches, videos, users, and statistics (role-based access control)
+
+**Coach-Specific Pages:**
+- `/coach-dashboard` → Coach profile dashboard
+- `/coaches/:username` → Coach profile view
+- `/coaches/:username/analysis` → Upload analysis for specific coach
 
 ## 🚀 Development Workflow
 
@@ -149,12 +194,14 @@ npm run db:push  # Push schema to Neon PostgreSQL
 - All CRUD operations functional through DashboardService
 - Error handling with toast notifications
 
-## 📊 Dashboard Statistics Tracked
+## 📊 Admin Panel Statistics
 
-- **Total Items**: All items across all statuses
-- **Completed**: Items marked as completed
-- **In Progress**: Items currently being worked on
-- **Pending**: Items not yet started
+- **Total Users**: Count of all registered users
+- **Total Coaches**: Count of all coach profiles
+- **Total Videos**: Count of all uploaded videos
+- **Total Blog Posts**: Count of all published blog posts
+
+All stats updated in real-time from Supabase database.
 
 ## 🔐 Security & Best Practices
 
@@ -164,13 +211,35 @@ npm run db:push  # Push schema to Neon PostgreSQL
 - ✅ Confirmation dialogs for destructive actions
 - ✅ Supabase authentication tokens managed securely
 
-## 📝 User Preferences & Patterns
+## 📝 Recent Changes & Fixes (Nov 25, 2025)
 
-- Uses Supabase for authentication (not switching to Replit Auth)
+**Admin Panel Implementation:**
+- Created complete admin management dashboard at `/admin`
+- Implemented role-based access control with admin route protection
+- Added 4 main admin tabs: Statistics, Coaches, Videos, Users
+- Full CRUD operations for coaches (Create, Read, Update, Delete)
+- Video management with deletion and status tracking
+- User management with role display and deletion
+- Platform statistics dashboard with real-time data
+- Added admin link to navbar (visible only to admin users)
+- All admin components with proper error handling and search
+
+**Video Upload System Fixes:**
+- Implemented base64 file encoding for client-side uploads
+- Created `/api/videos/upload` backend endpoint
+- Fixed multipart form data parsing issues
+- User-isolated file storage with timestamps
+- Automatic uploads directory creation
+- Improved error messages and validation
+
+**User Preferences & Patterns:**
+- Supabase for authentication (not switching to Replit Auth)
 - Neon PostgreSQL for data persistence
-- Prefers fully functional CRUD for all features
-- Dashboard is central hub connecting all pages
-- Emphasis on smooth user experience with animations
+- Requires fully functional CRUD operations for all features
+- Admin panel needed for platform management
+- Emphasis on clean architecture and reusable components
+- Search functionality across all data types
+- Role-based access control for admin features
 
 ## 🎨 Design System
 
@@ -208,9 +277,16 @@ npm run db:push  # Push schema to Neon PostgreSQL
 
 ## 🐛 Known Issues & Troubleshooting
 
-- Dashboard items stored in memory (no persistence without Express server running)
-- API endpoints return mock data (ready for backend integration)
-- All other features functional with full Supabase integration
+**Fixed Issues:**
+- ✅ Video upload failing due to Supabase storage - fixed with local file storage
+- ✅ Coach deletion available - removed from all interfaces
+- ✅ React infinite loop warning - fixed useEffect dependencies
+- ✅ Coach profile display issues - fixed with static data and fallbacks
+
+**Remaining Notes:**
+- Admin panel requires admin role (check user_roles table for role assignment)
+- Video files stored locally in `uploads/` directory
+- All admin operations require proper user_roles database entries
 
 ## 📞 Support & Maintenance
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Users, BookOpen, Brain } from "lucide-react";
+import { Menu, X, Users, BookOpen, Brain, Shield } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,6 +45,7 @@ const Navbar = () => {
       { to: "/how-it-works", label: "How It Works" },
       { to: "/pricing", label: "Pricing" }
     ] : []),
+    ...(role === 'admin' ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
   ];
 
   return (
