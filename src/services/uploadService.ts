@@ -5,27 +5,45 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Uploads a file to Supabase storage
+ * Uploads a file to backend storage via base64 encoding
  * @param file The file to upload
  * @param userId The user ID
  * @returns Object with success status, file path and error if any
  */
 export const uploadFileToStorage = async (file: File, userId: string) => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${userId}/${Date.now()}.${fileExt}`;
-    
-    const { error } = await supabase.storage
-      .from('videos')
-      .upload(filePath, file);
-    
-    if (error) {
-      throw error;
+    // Convert file to base64
+    const arrayBuffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binary += String.fromCharCode(uint8Array[i]);
     }
+    const base64 = btoa(binary);
+    
+    const response = await fetch('/api/videos/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        file: base64,
+        fileName: file.name,
+        fileSize: file.size,
+        userId: userId
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Upload failed with status ${response.status}`);
+    }
+    
+    const data = await response.json();
     
     return {
       success: true,
-      filePath: filePath
+      filePath: data.filePath || data.path
     };
   } catch (error) {
     console.error('Error uploading file:', error);

@@ -84,6 +84,52 @@ export function setupApiRoutes(app: any) {
     }
   });
 
+  // Video upload endpoint - handles file uploads via base64
+  app.post('/api/videos/upload', async (req: any, res: any) => {
+    try {
+      const { file, fileName, fileSize, userId } = req.body;
+      
+      if (!file || !userId) {
+        return sendError(res, 'Missing file or userId', 400);
+      }
+      
+      if (!fileName) {
+        return sendError(res, 'Missing fileName', 400);
+      }
+      
+      // Decode base64 to buffer
+      const fileData = Buffer.from(file, 'base64');
+      
+      // Create filename with timestamp
+      const timestamp = Date.now();
+      const ext = fileName.split('.').pop() || 'bin';
+      const filePath = `uploads/${userId}/${timestamp}.${ext}`;
+      
+      // Save file to filesystem
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      fs.writeFileSync(filePath, fileData);
+      
+      console.log(`Video uploaded: ${filePath} (${fileData.length} bytes)`);
+      
+      sendJson(res, {
+        success: true,
+        filePath: filePath,
+        fileName: fileName,
+        size: fileData.length
+      }, 201);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      sendError(res, error, 500);
+    }
+  });
+
   app.post('/api/videos', async (req: any, res: any) => {
     try {
       const video = await videoRoutes.createVideo(req.body);
