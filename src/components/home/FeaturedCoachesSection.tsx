@@ -1,18 +1,12 @@
 import { motion } from "framer-motion";
-import { Box, Container, Typography, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Box, Container, Typography, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import FeaturedCoachCard from "./FeaturedCoachCard";
-import FeaturedCoachesFormModal from "./FeaturedCoachesFormModal";
 import { FeaturedCoachService } from "@/services/featuredCoachService";
 
 const FeaturedCoachesSection = () => {
   const [coaches, setCoaches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [formOpen, setFormOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [coachToDelete, setCoachToDelete] = useState<any>(null);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchFeaturedCoaches();
@@ -99,26 +93,6 @@ const FeaturedCoachesSection = () => {
     }
   };
 
-  const handleDeleteClick = (coach: any) => {
-    setCoachToDelete(coach);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!coachToDelete) return;
-    try {
-      setDeleting(true);
-      await FeaturedCoachService.removeFeaturedCoach(coachToDelete.id || coachToDelete.coachId);
-      await fetchFeaturedCoaches();
-      setDeleteDialogOpen(false);
-      setCoachToDelete(null);
-    } catch (error) {
-      console.error("Error deleting coach:", error);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   return (
     <Box
       component="section"
@@ -190,25 +164,6 @@ const FeaturedCoachesSection = () => {
             </motion.div>
           </Box>
 
-          <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-            <Button
-              variant="contained"
-              startIcon={<Plus size={20} />}
-              onClick={() => setFormOpen(true)}
-              sx={{
-                background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                color: "white",
-                fontWeight: 600,
-                px: 3,
-                py: 1.5,
-                borderRadius: "8px",
-                textTransform: "none",
-                fontSize: "15px",
-              }}
-            >
-              Add Featured Coach
-            </Button>
-          </Box>
 
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
@@ -228,21 +183,13 @@ const FeaturedCoachesSection = () => {
                     key={coach.id || coach.coachId}
                     coach={coach}
                     index={index}
-                    onDelete={handleDeleteClick}
                   />
                 ))
               ) : (
                 <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 8 }}>
-                  <Typography sx={{ color: "#94a3b8", mb: 2 }}>
-                    No featured coaches yet. Add one to get started!
+                  <Typography sx={{ color: "#94a3b8" }}>
+                    Featured coaches will appear here
                   </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => setFormOpen(true)}
-                    sx={{ background: "#ff7e00" }}
-                  >
-                    Add First Coach
-                  </Button>
                 </Box>
               )}
             </Box>
@@ -250,36 +197,6 @@ const FeaturedCoachesSection = () => {
         </motion.div>
       </Container>
 
-      {/* Add Coach Modal */}
-      <FeaturedCoachesFormModal
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSave={() => {
-          setFormOpen(false);
-          fetchFeaturedCoaches();
-        }}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Remove Featured Coach</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to remove <strong>{coachToDelete?.name}</strong> from featured coaches?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleConfirmDelete}
-            variant="contained"
-            color="error"
-            disabled={deleting}
-          >
-            {deleting ? "Removing..." : "Remove"}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

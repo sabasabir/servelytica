@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
-import { Box, Card, CardContent, Typography, Avatar, IconButton } from "@mui/material";
-import { Star, Trash2 } from "lucide-react";
+import { Box, Card, CardContent, Typography, Avatar } from "@mui/material";
+import { Star } from "lucide-react";
 
 interface FeaturedCoachCardProps {
   coach: any;
   index: number;
-  onDelete?: (coachId: string) => void;
 }
 
-const FeaturedCoachCard = ({ coach, index, onDelete }: FeaturedCoachCardProps) => {
+const FeaturedCoachCard = ({ coach, index }: FeaturedCoachCardProps) => {
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -41,26 +40,6 @@ const FeaturedCoachCard = ({ coach, index, onDelete }: FeaturedCoachCardProps) =
           },
         }}
       >
-        {/* Delete Button */}
-        {onDelete && (
-          <IconButton
-            onClick={() => onDelete(coach.id || coach.coachId)}
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              background: "rgba(239, 68, 68, 0.1)",
-              color: "#ef4444",
-              zIndex: 10,
-              "&:hover": {
-                background: "rgba(239, 68, 68, 0.2)",
-              },
-            }}
-          >
-            <Trash2 size={18} />
-          </IconButton>
-        )}
-
         {/* Coach Avatar Section */}
         <Box
           sx={{

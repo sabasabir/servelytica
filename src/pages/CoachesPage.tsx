@@ -5,16 +5,13 @@ import {
   Container,
   Typography,
   CircularProgress,
-  Button,
   Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachSearch from "@/components/coaches/CoachSearch";
 import CoachGrid from "@/components/coaches/CoachGrid";
-import CoachFormModal from "@/components/coaches/CoachFormModal";
 import { CoachService } from "@/services/coachService";
 import { Coach } from "@/types/Coach";
 
@@ -24,8 +21,6 @@ const CoachesPage = () => {
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [displayedCoaches, setDisplayedCoaches] = useState<Coach[]>([]);
-  const [formModalOpen, setFormModalOpen] = useState(false);
-  const [editingCoach, setEditingCoach] = useState<any>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -68,18 +63,6 @@ const CoachesPage = () => {
   const resetFilters = () => {
     setSearchQuery("");
     setActiveTab("all");
-  };
-
-  const handleCreateNew = () => {
-    setEditingCoach(null);
-    setFormModalOpen(true);
-  };
-
-  const handleSaveCoach = async () => {
-    await fetchCoaches();
-    setFormModalOpen(false);
-    setSuccess("Coach profile saved successfully!");
-    setTimeout(() => setSuccess(""), 3000);
   };
 
 
@@ -180,30 +163,11 @@ const CoachesPage = () => {
                   fontSize: "18px",
                   color: "#64748b",
                   maxWidth: "600px",
-                  mb: 4,
                 }}
               >
                 Choose from our roster of professional coaches for personalized
                 analysis and guidance
               </Typography>
-
-              <Button
-                variant="contained"
-                startIcon={<Plus size={20} />}
-                onClick={handleCreateNew}
-                sx={{
-                  background: "linear-gradient(135deg, #ff7e00 0%, #ff9500 100%)",
-                  color: "white",
-                  fontWeight: 600,
-                  px: 3,
-                  py: 1.5,
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  fontSize: "15px",
-                }}
-              >
-                Add New Coach
-              </Button>
             </Box>
           </motion.div>
 
@@ -240,15 +204,6 @@ const CoachesPage = () => {
           />
         </Container>
       </Box>
-
-      {/* Form Modal */}
-      <CoachFormModal
-        open={formModalOpen}
-        onClose={() => setFormModalOpen(false)}
-        onSave={handleSaveCoach}
-        initialData={editingCoach}
-        isEditing={!!editingCoach}
-      />
 
       <Footer />
     </Box>
