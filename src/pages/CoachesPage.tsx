@@ -21,8 +21,11 @@ import CoachGrid from "@/components/coaches/CoachGrid";
 import CoachFormModal from "@/components/coaches/CoachFormModal";
 import { CoachService } from "@/services/coachService";
 import { Coach } from "@/types/Coach";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const CoachesPage = () => {
+  const { isCoach } = useUserRole();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [coaches, setCoaches] = useState<Coach[]>([]);
@@ -39,7 +42,7 @@ const CoachesPage = () => {
   // Fetch coaches on component mount
   useEffect(() => {
     fetchCoaches();
-  }, []);
+  }, []); // Empty dependency array - only run once
 
   const fetchCoaches = async () => {
     setLoading(true);
@@ -70,7 +73,7 @@ const CoachesPage = () => {
   // Update displayed coaches when filters change
   useEffect(() => {
     setDisplayedCoaches(filteredCoaches.slice(0, 9));
-  }, [searchQuery, activeTab, filteredCoaches]);
+  }, [searchQuery, activeTab, filteredCoaches]); // Dependencies are stable
 
   const resetFilters = () => {
     setSearchQuery("");
@@ -90,6 +93,11 @@ const CoachesPage = () => {
   };
 
   const handleDeleteClick = (coach: Coach) => {
+    // Only coaches can delete
+    if (!isCoach) {
+      setError("Only coaches can delete coach profiles");
+      return;
+    }
     setCoachToDelete(coach);
     setDeleteDialogOpen(true);
   };
@@ -267,7 +275,7 @@ const CoachesPage = () => {
           <CoachGrid
             coaches={displayedCoaches}
             resetFilters={resetFilters}
-            onDelete={handleDeleteClick}
+            onDelete={isCoach ? handleDeleteClick : undefined}
           />
         </Container>
       </Box>

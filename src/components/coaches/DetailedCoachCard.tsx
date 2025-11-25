@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 interface DetailedCoachCardProps {
   coach: Coach;
-  onDelete?: (coach: Coach) => void;
+  onDelete?: (coach: Coach) => void | undefined;
 }
 
 const DetailedCoachCard = ({ coach, onDelete }: DetailedCoachCardProps) => {
