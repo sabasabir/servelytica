@@ -703,4 +703,68 @@ export function setupApiRoutes(app: any) {
       sendError(res, error);
     }
   });
+
+  // Admin setup endpoint - Creates admin user role in database
+  // This endpoint is for initializing an admin user after they sign up in Supabase
+  app.post('/api/admin/setup', async (req: any, res: any) => {
+    try {
+      const { userId, email, displayName } = req.body;
+      
+      if (!userId || !email) {
+        return sendError(res, 'userId and email required', 400);
+      }
+
+      // Import supabase
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+      );
+
+      // Get or create profile
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (!existingProfile) {
+        await supabase
+          .from('profiles')
+          .insert({
+            user_id: userId,
+            username: email.split('@')[0],
+            display_name: displayName || email.split('@')[0],
+            email: email
+          });
+      }
+
+      // Create admin role
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+
+      if (!existingRole) {
+        await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role: 'admin'
+          });
+      }
+
+      sendJson(res, { 
+        success: true, 
+        message: 'Admin user created successfully',
+        userId,
+        email 
+      }, 201);
+    } catch (error) {
+      console.error('Admin setup error:', error);
+      sendError(res, error, 500);
+    }
+  });
 }
