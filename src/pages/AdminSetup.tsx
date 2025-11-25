@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const AdminSetup = () => {
   const { user } = useAuth();
+  const { role, isAdmin } = useUserRole();
   const [loading, setLoading] = useState(false);
+  const [setupComplete, setSetupComplete] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // If already admin, redirect to admin panel
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, navigate]);
+
+  // If setup complete, check role and redirect
+  useEffect(() => {
+    if (setupComplete && isAdmin) {
+      toast({ 
+        title: "Success", 
+        description: "Admin privileges granted! Redirecting to admin panel..." 
+      });
+      setTimeout(() => {
+        navigate('/admin', { replace: true });
+      }, 1500);
+    }
+  }, [setupComplete, isAdmin, navigate, toast]);
 
   const handleSetupAdmin = async () => {
     if (!user) {
@@ -34,10 +58,16 @@ const AdminSetup = () => {
       }
 
       const data = await response.json();
+      setSetupComplete(true);
       toast({ 
         title: "Success", 
-        description: "Admin user setup complete! You can now access the admin panel at /admin" 
+        description: "Admin setup complete! Checking privileges..." 
       });
+
+      // Wait a moment for the database to update, then try to refresh role
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Setup error:", error);
       toast({ 
@@ -45,7 +75,6 @@ const AdminSetup = () => {
         description: error instanceof Error ? error.message : "Setup failed",
         variant: "destructive" 
       });
-    } finally {
       setLoading(false);
     }
   };

@@ -13,19 +13,28 @@ import AdminStatsTab from "@/components/admin/AdminStatsTab";
 import { AlertCircle } from "lucide-react";
 
 const AdminPanel = () => {
-  const { user, loading } = useAuth();
-  const { role } = useUserRole();
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading, isAdmin } = useUserRole();
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Redirect if not admin
-  if (!loading && (!user || role !== 'admin')) {
+  // Redirect if not authenticated
+  if (!authLoading && !user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect if not admin (after both auth and role are loaded)
+  if (!authLoading && !roleLoading && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
-  if (loading) {
+  // Show loading while checking authentication or role
+  if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+          <p className="text-gray-600">Loading admin panel...</p>
+        </div>
       </div>
     );
   }
