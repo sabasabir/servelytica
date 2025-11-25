@@ -84,10 +84,12 @@ export function setupApiRoutes(app: any) {
     }
   });
 
-  // Video upload endpoint - handles file uploads via base64
+  // Video upload endpoint - handles file uploads via base64 and database record creation
+  // NOTE: Frontend verifies user via Supabase auth before calling this endpoint
+  // TODO: Add JWT verification on backend for production security
   app.post('/api/videos/upload', async (req: any, res: any) => {
     try {
-      const { file, fileName, fileSize, userId } = req.body;
+      const { file, fileName, fileSize, userId, title, description, focusArea, coachIds } = req.body;
       
       if (!file || !userId) {
         return sendError(res, 'Missing file or userId', 400);
@@ -95,6 +97,12 @@ export function setupApiRoutes(app: any) {
       
       if (!fileName) {
         return sendError(res, 'Missing fileName', 400);
+      }
+      
+      // Basic validation: userId should be a valid UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userId)) {
+        return sendError(res, 'Invalid userId format', 400);
       }
       
       // Decode base64 to buffer
@@ -118,8 +126,48 @@ export function setupApiRoutes(app: any) {
       
       console.log(`Video uploaded: ${filePath} (${fileData.length} bytes)`);
       
+      // Create video record in database
+      const videoData = {
+        userId: userId,
+        filePath: filePath,
+        fileName: fileName,
+        fileSize: fileData.length,
+        title: title || null,
+        description: description || null,
+        focusArea: focusArea || null,
+        analyzed: false,
+        uploadedAt: new Date()
+      };
+      
+      const createdVideo = await videoRoutes.createVideo(videoData);
+      
+      if (!createdVideo) {
+        throw new Error('Failed to create video record in database');
+      }
+      
+      // Assign coaches if provided
+      if (coachIds && Array.isArray(coachIds) && coachIds.length > 0) {
+        const { db } = await import('./db');
+        const { videoCoaches } = await import('@shared/schema');
+        
+        const coachAssignments = coachIds.map((coachId: string) => ({
+          videoId: createdVideo.id,
+          coachId: coachId,
+          status: 'pending'
+        }));
+        
+        await db.insert(videoCoaches).values(coachAssignments);
+        
+        // Mark video as analyzed when coaches are assigned
+        await videoRoutes.updateVideo(createdVideo.id, { analyzed: true });
+        createdVideo.analyzed = true;
+      }
+      
+      console.log(`Video record created with ID: ${createdVideo.id}`);
+      
       sendJson(res, {
         success: true,
+        video: createdVideo,
         filePath: filePath,
         fileName: fileName,
         size: fileData.length

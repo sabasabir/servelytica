@@ -5,12 +5,22 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Uploads a file to backend storage via base64 encoding
+ * Uploads a file to backend storage via base64 encoding and creates database record
  * @param file The file to upload
  * @param userId The user ID
- * @returns Object with success status, file path and error if any
+ * @param formData Additional form data (title, description, focusArea, coachIds)
+ * @returns Object with success status, video data, file path and error if any
  */
-export const uploadFileToStorage = async (file: File, userId: string) => {
+export const uploadFileToStorage = async (
+  file: File, 
+  userId: string,
+  formData?: {
+    title?: string;
+    description?: string;
+    focusArea?: string;
+    coachIds?: string[];
+  }
+) => {
   try {
     // Convert file to base64
     const arrayBuffer = await file.arrayBuffer();
@@ -30,7 +40,11 @@ export const uploadFileToStorage = async (file: File, userId: string) => {
         file: base64,
         fileName: file.name,
         fileSize: file.size,
-        userId: userId
+        userId: userId,
+        title: formData?.title || null,
+        description: formData?.description || null,
+        focusArea: formData?.focusArea || null,
+        coachIds: formData?.coachIds || []
       })
     });
     
@@ -43,7 +57,8 @@ export const uploadFileToStorage = async (file: File, userId: string) => {
     
     return {
       success: true,
-      filePath: data.filePath || data.path
+      filePath: data.filePath || data.path,
+      video: data.video
     };
   } catch (error) {
     console.error('Error uploading file:', error);

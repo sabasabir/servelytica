@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import VideoUploadForm from "@/components/upload/VideoUploadForm";
-import { uploadFileToStorage, saveMediaRecord, assignCoachesToVideo } from "@/services/uploadService";
+import { uploadFileToStorage } from "@/services/uploadService";
 import { AnalysisQuotaService } from "@/services/analysisQuotaService";
 import { QuotaExceededDialog } from "@/components/profile/QuotaExceededDialog";
 
@@ -63,60 +63,15 @@ const UploadPage = () => {
 
       // Quota check removed - unlimited uploads enabled
 
-      // Upload file to storage
-      const uploadResult = await uploadFileToStorage(videoFile, userData.user.id);
+      // Upload file to storage and create database record with all form data
+      const uploadResult = await uploadFileToStorage(videoFile, userData.user.id, formData);
       
-      if (!uploadResult.success || !uploadResult.filePath) {
+      if (!uploadResult.success || !uploadResult.video) {
         throw new Error(uploadResult.error || "Failed to upload file");
       }
 
-      // Save video record with form data
-      const { data: videoData, error: saveError } = await supabase
-        .from('videos')
-        .insert({
-          user_id: userData.user.id,
-          file_path: uploadResult.filePath,
-          file_name: videoFile.name,
-          file_size: videoFile.size,
-          title: formData.title || null,
-          description: formData.description || null,
-          focus_area: formData.focusArea || null,
-          analyzed: false,
-          uploaded_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (saveError) {
-        throw new Error("Failed to save video record: " + saveError.message);
-      }
-
-      // Assign coaches to video if any were selected
-      if (formData.coachIds && formData.coachIds.length > 0) {
-        const coachAssignmentResult = await assignCoachesToVideo(
-          videoData.id,
-          formData.coachIds
-        );
-        
-        if (!coachAssignmentResult.success) {
-          console.error("Failed to assign coaches:", coachAssignmentResult.error);
-          toast({
-            title: "Warning",
-            description: "Video uploaded but coach assignment failed.",
-            variant: "destructive"
-          });
-        } else {
-          // Mark video as analyzed when coaches are assigned so they can see it
-          const { error: updateError } = await supabase
-            .from('videos')
-            .update({ analyzed: true })
-            .eq('id', videoData.id);
-
-          if (updateError) {
-            console.warn("Failed to mark video as analyzed, but upload was successful");
-          }
-        }
-      }
+      // Backend now handles database insertion and coach assignment
+      // No need for Supabase client operations here
 
       // Usage tracking removed - unlimited uploads enabled
 
