@@ -63,7 +63,7 @@ const CoachesPage = () => {
   // Update displayed coaches when filters change
   useEffect(() => {
     setDisplayedCoaches(filteredCoaches.slice(0, 9));
-  }, [searchQuery, activeTab, filteredCoaches]); // Dependencies are stable
+  }, [searchQuery, activeTab, coaches]);
 
   const resetFilters = () => {
     setSearchQuery("");

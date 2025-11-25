@@ -13,13 +13,6 @@ export default defineConfig(({ mode }) => ({
       protocol: 'wss',
     },
     cors: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path,
-      },
-    },
   },
   plugins: [
     react(),
