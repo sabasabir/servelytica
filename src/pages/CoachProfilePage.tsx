@@ -16,6 +16,7 @@ import PlayerCoachAchievements from "@/components/coach/PlayerCoachAchievements"
 import CoachEducation from "@/components/coach/CoachEducation";
 import CoachSpecialties from "@/components/coach/CoachSpecialties";
 import { AnalyzedVideosList } from "@/components/profile/AnalyzedVideosList"; // Added import
+import { allCoaches } from "@/data/coachesData";
 
 const CoachProfilePage = () => {
   const { username } = useParams();
@@ -34,28 +35,90 @@ const CoachProfilePage = () => {
       try {
         setLoading(true);
         
-        // Find coach by username from profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('username', username)
+        // First try to find coach in static data
+        const staticCoach = allCoaches.find(coach => coach.username === username);
+        
+        if (staticCoach) {
+          // Convert Coach to FullCoachProfile
+          const fullProfile: FullCoachProfile = {
+            id: String(staticCoach.id),
+            user_id: String(staticCoach.id),
+            years_coaching: parseInt(staticCoach.experience) || 10,
+            certifications: [staticCoach.title || "Professional Coach"],
+            bio: `${staticCoach.title} with ${staticCoach.experience} of coaching experience`,
+            avatar_url: staticCoach.image,
+            banner_url: staticCoach.image,
+            specialties: staticCoach.specialties.map(s => ({
+              id: Math.random().toString(),
+              specialty_type_id: Math.random().toString(),
+              proficiency: 'expert' as const,
+              years_experience: 10
+            })),
+            achievements: (staticCoach.achievements || []).map(a => ({
+              id: Math.random().toString(),
+              title: a.title,
+              description: a.description,
+              year: parseInt(a.year) || new Date().getFullYear(),
+              organization: '',
+              achievement_type: 'coaching' as const
+            })),
+            education: [],
+            languages: ["English"],
+            rate_per_hour: 50,
+            availability_status: "available" as const,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            currency: 'USD',
+            coaching_philosophy: `Expert ${staticCoach.title} with ${staticCoach.experience} experience`,
+            profile: {
+              user_id: String(staticCoach.id),
+              display_name: staticCoach.name,
+              username: staticCoach.username,
+              avatar_url: staticCoach.image,
+              profile_image: staticCoach.image,
+              bio: `${staticCoach.title} with ${staticCoach.experience} of coaching experience`,
+              location: '',
+              playing_experience: staticCoach.experience,
+              preferred_play_style: '',
+            },
+            statistics: {
+              id: Math.random().toString(),
+              total_sessions: staticCoach.reviews * 2,
+              total_students: staticCoach.reviews,
+              average_rating: staticCoach.rating,
+              total_reviews: staticCoach.reviews,
+              response_time_hours: 24,
+              success_rate: 0.95,
+              updated_at: new Date().toISOString(),
+            },
+          };
+          
+          setCoachProfile(fullProfile);
+          setLoading(false);
+          return;
+        }
+
+        // If not in static data, try database
+        const { data: coachData, error: coachError } = await supabase
+          .from('coach_profiles')
+          .select('*')
+          .eq('id', username)
           .maybeSingle();
 
-        if (profileError) {
-          console.error("Error fetching profile by username:", profileError);
+        if (coachError) {
+          console.error("Error fetching coach by username:", coachError);
           setLoading(false);
           return;
         }
 
-        if (!profileData) {
-          console.error("No profile found for username:", username);
+        if (!coachData) {
+          console.error("No coach found for username:", username);
           setLoading(false);
           return;
         }
 
-        // Get the full coach profile using their user_id
-        const fullProfile = await CoachProfileService.getCoachProfile(profileData.user_id);
-        setCoachProfile(fullProfile);
+        // Set the coach profile directly
+        setCoachProfile(coachData as FullCoachProfile);
       } catch (error) {
         console.error("Error loading coach profile:", error);
       } finally {
