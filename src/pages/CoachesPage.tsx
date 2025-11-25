@@ -6,14 +6,10 @@ import {
   Typography,
   CircularProgress,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CoachSearch from "@/components/coaches/CoachSearch";
@@ -21,11 +17,8 @@ import CoachGrid from "@/components/coaches/CoachGrid";
 import CoachFormModal from "@/components/coaches/CoachFormModal";
 import { CoachService } from "@/services/coachService";
 import { Coach } from "@/types/Coach";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/useUserRole";
 
 const CoachesPage = () => {
-  const { isCoach } = useUserRole();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [coaches, setCoaches] = useState<Coach[]>([]);
@@ -33,9 +26,6 @@ const CoachesPage = () => {
   const [displayedCoaches, setDisplayedCoaches] = useState<Coach[]>([]);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editingCoach, setEditingCoach] = useState<any>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [coachToDelete, setCoachToDelete] = useState<any>(null);
-  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -92,34 +82,6 @@ const CoachesPage = () => {
     setTimeout(() => setSuccess(""), 3000);
   };
 
-  const handleDeleteClick = (coach: Coach) => {
-    // Only coaches can delete
-    if (!isCoach) {
-      setError("Only coaches can delete coach profiles");
-      return;
-    }
-    setCoachToDelete(coach);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!coachToDelete) return;
-
-    try {
-      setDeleting(true);
-      // Would need userId from coach object or from a different endpoint
-      // For now, we'll just show the delete functionality
-      await fetchCoaches();
-      setDeleteDialogOpen(false);
-      setCoachToDelete(null);
-      setSuccess("Coach profile deleted successfully!");
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err: any) {
-      setError(err.message || "Failed to delete coach");
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -275,7 +237,6 @@ const CoachesPage = () => {
           <CoachGrid
             coaches={displayedCoaches}
             resetFilters={resetFilters}
-            onDelete={isCoach ? handleDeleteClick : undefined}
           />
         </Container>
       </Box>
@@ -288,28 +249,6 @@ const CoachesPage = () => {
         initialData={editingCoach}
         isEditing={!!editingCoach}
       />
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Coach Profile</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete the coach profile for{" "}
-            <strong>{coachToDelete?.name}</strong>? This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleConfirmDelete}
-            variant="contained"
-            color="error"
-            disabled={deleting}
-          >
-            {deleting ? "Deleting..." : "Delete"}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       <Footer />
     </Box>
