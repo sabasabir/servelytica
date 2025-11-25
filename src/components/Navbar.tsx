@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Users, BookOpen, Brain, Shield } from "lucide-react";
+import { Menu, X, Users, BookOpen, Brain, Shield, Zap, Video } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,7 +39,9 @@ const Navbar = () => {
     { to: "/blog", label: "Blog", icon: BookOpen },
     ...(user ? [
       { to: "/motion-analysis", label: "Motion Analysis", icon: Brain },
-      { to: "/analysis-space", label: "Analysis Space", icon: Users }
+      { to: "/analysis-space", label: "Analysis Space", icon: Users },
+      { to: "/matchmaking", label: "Matchmaking", icon: Zap },
+      { to: "/live-stream", label: "Live Coaching", icon: Video }
     ] : []),
     ...(role !== 'coach' ? [
       { to: "/how-it-works", label: "How It Works" },

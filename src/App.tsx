@@ -29,6 +29,8 @@ import PrivateAnalysisSpace from "./pages/PrivateAnalysisSpace";
 import PrivateAnalysisSession from "./pages/PrivateAnalysisSession";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
+import MatchmakingPage from "./pages/MatchmakingPage";
+import LiveStreamingPage from "./pages/LiveStreamingPage";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +75,8 @@ const App = () => (
             <Route path="/motion-analysis" element={<MotionAnalysisPage />} />
             <Route path="/analysis-space" element={<PrivateAnalysisSpace />} />
             <Route path="/analysis-session/:sessionId" element={<PrivateAnalysisSession />} />
+            <Route path="/matchmaking" element={<MatchmakingPage />} />
+            <Route path="/live-stream" element={<LiveStreamingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
