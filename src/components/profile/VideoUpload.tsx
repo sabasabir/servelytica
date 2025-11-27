@@ -205,25 +205,66 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
       setUploadProgress(50);
       setUploadStatus("processing");
 
-      if (formData.coachIds.length > 0) {
+      let videoRecord: any = null;
+
+      if (hasFile && selectedFile) {
+        const fileExt = selectedFile.name.split('.').pop();
+        const filePath = `videos/${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('videos')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: video, error: videoError } = await supabase
+          .from('videos')
+          .insert({
+            user_id: user.id,
+            file_path: filePath,
+            file_name: selectedFile.name,
+            file_size: selectedFile.size,
+            title: formData.title || selectedFile.name,
+            description: formData.description,
+            focus_area: formData.focusArea,
+            analyzed: false
+          })
+          .select()
+          .single();
+
+        if (videoError) throw videoError;
+        videoRecord = video;
+      } else if (hasLink) {
+        const { data: video, error: videoError } = await supabase
+          .from('videos')
+          .insert({
+            user_id: user.id,
+            file_path: formData.videoLink,
+            file_name: formData.title || 'Video from URL',
+            title: formData.title,
+            description: formData.description,
+            focus_area: formData.focusArea,
+            analyzed: false
+          })
+          .select()
+          .single();
+
+        if (videoError) throw videoError;
+        videoRecord = video;
+      }
+
+      if (videoRecord && formData.coachIds.length > 0) {
         const { error: coachError } = await supabase
           .from('video_coaches')
           .insert(
             formData.coachIds.map(coachId => ({
-              player_id: user.id,
-              video_id: null,
-              video_link: formData.videoLink || null,
+              video_id: videoRecord.id,
               coach_id: coachId,
-              title: formData.title,
-              description: formData.description,
-              focus_areas: formData.focusArea,
-              video_platform: linkMetadata?.platform || null,
+              status: 'pending'
             }))
           );
 
-        if (coachError) {
-          throw coachError;
-        }
+        if (coachError) throw coachError;
       }
 
       setUploadProgress(80);

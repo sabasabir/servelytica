@@ -123,18 +123,24 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       setUploadProgress(60);
       setUploadStatus("processing");
       
+      const insertData: any = {
+        user_id: user.id,
+        title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
+        description: formData.description,
+        sport_type: 'table-tennis',
+        analysis_status: 'pending'
+      };
+
+      if (hasLink) {
+        insertData.video_link = videoLink;
+        insertData.video_platform = linkMetadata?.platform || null;
+      } else {
+        insertData.video_file_path = filePath;
+      }
+
       const { data: session, error: sessionError } = await (supabase
         .from('motion_analysis_sessions' as any)
-        .insert({
-          user_id: user.id,
-          title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
-          description: formData.description,
-          video_file_path: hasLink ? null : filePath,
-          video_link: hasLink ? videoLink : null,
-          video_platform: linkMetadata?.platform || null,
-          sport_type: 'table-tennis',
-          analysis_status: 'pending'
-        })
+        .insert(insertData)
         .select()
         .single() as any);
       

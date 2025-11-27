@@ -81,7 +81,6 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
           description: description,
           video_file_path: filePath,
           sport_type: 'table-tennis',
-          media_type: 'video',
           analysis_status: 'pending'
         })
         .select()
