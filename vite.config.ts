@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => ({
       protocol: 'wss',
     },
     cors: true,
+    allowedHosts: true,
   },
   plugins: [
     react(),
