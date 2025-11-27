@@ -1,0 +1,14 @@
+{
+  "featured-coaches": [
+    {
+      "id": "1",
+      "name": "Expert Coach",
+      "description": "Professional sports coach",
+      "rating": 4.8,
+      "reviews": 150
+    }
+  ],
+  "videos": [],
+  "profiles": {},
+  "status": "API not available - using mock data"
+}
