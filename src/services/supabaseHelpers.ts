@@ -26,10 +26,10 @@ export const handleSupabaseError = (error: any, context: string) => {
   });
 
   const errorMessages: Record<string, string> = {
-    'new row violates row-level security policy': 'Your session may have expired. Please refresh and try again.',
-    'permission denied': 'You do not have permission to perform this action.',
-    'invalid input syntax': 'Invalid data format provided.',
-    'relation does not exist': 'Database table not found.',
+    'new row violates row-level security policy': '⚠️ RLS Configuration Issue - Please run DISABLE_ALL_RLS_FINAL.sql in Supabase SQL Editor. Go to: SQL Editor → New Query → Paste script → Run.',
+    'permission denied': 'You do not have permission to perform this action. Please check your account settings.',
+    'invalid input syntax': 'Invalid data format provided. Please check your input.',
+    'relation does not exist': 'Database table not found. Please contact support.',
     'duplicate key value': 'This record already exists.',
   };
 
