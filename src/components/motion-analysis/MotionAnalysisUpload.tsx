@@ -117,25 +117,6 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
         
         if (uploadError) throw uploadError;
       } else if (hasLink) {
-        const response = await fetch('/api/videos/upload-url', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            videoLink,
-            userId: user.id,
-            title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
-            description: formData.description,
-            platform: linkMetadata?.platform,
-            thumbnailUrl: linkMetadata?.thumbnailUrl,
-            embedUrl: linkMetadata?.embedUrl
-          })
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to save video URL');
-        }
-        
         filePath = videoLink;
       }
       
