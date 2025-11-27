@@ -14,7 +14,6 @@ import { VideoSubscriptionService } from "@/services/videoSubscriptionService";
 import DragDropZone from "@/components/upload/DragDropZone";
 import UploadProgressBar from "@/components/upload/UploadProgressBar";
 import VideoLinkInput from "@/components/upload/VideoLinkInput";
-import { verifyUserSession, handleSupabaseError } from "@/services/supabaseHelpers";
 
 interface VideoUploadProps {
   onUploadSuccess?: () => void;
@@ -203,10 +202,6 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
     setUploadProgress(20);
 
     try {
-      // Verify user session before uploading
-      const session = await verifyUserSession();
-      console.log('[UPLOAD] Starting upload for user:', session.user.id);
-      
       setUploadProgress(50);
       setUploadStatus("processing");
 
@@ -317,10 +312,9 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
     } catch (error: any) {
       console.error('Upload error:', error);
       setUploadStatus("error");
-      const errorMessage = handleSupabaseError(error, 'VIDEO_UPLOAD');
       toast({
         title: "Upload failed",
-        description: errorMessage,
+        description: error instanceof Error ? error.message : "An error occurred during upload",
         variant: "destructive"
       });
       setTimeout(() => {

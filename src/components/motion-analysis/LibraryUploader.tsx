@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import DragDropZone from "@/components/upload/DragDropZone";
 import UploadProgressBar from "@/components/upload/UploadProgressBar";
-import { verifyUserSession, handleSupabaseError } from "@/services/supabaseHelpers";
 
 interface LibraryUploaderProps {
   onBack: () => void;
@@ -60,12 +59,8 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
     setUploadProgress(10);
     
     try {
-      // Verify user session before uploading
-      const authSession = await verifyUserSession();
-      console.log('[LIBRARY_UPLOAD] Starting upload for user:', authSession.user.id);
-      
       const fileExt = videoFile.name.split('.').pop();
-      const filePath = `videos/${authSession.user.id}/${Date.now()}.${fileExt}`;
+      const filePath = `videos/${user.id}/${Date.now()}.${fileExt}`;
       
       setUploadProgress(30);
       
@@ -81,7 +76,7 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
       const { data: analysisSession, error: sessionError } = await (supabase
         .from('motion_analysis_sessions' as any)
         .insert({
-          user_id: authSession.user.id,
+          user_id: user.id,
           title: title || videoFile.name,
           description: description,
           video_file_path: filePath,
@@ -111,7 +106,7 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
     } catch (error: any) {
       console.error('Error uploading video:', error);
       setUploadStatus("error");
-      const errorMessage = handleSupabaseError(error, 'LIBRARY_UPLOAD');
+      const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
       toast({
         title: "Upload Failed",
         description: errorMessage,

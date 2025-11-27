@@ -13,7 +13,6 @@ import DragDropZone from "@/components/upload/DragDropZone";
 import UploadProgressBar from "@/components/upload/UploadProgressBar";
 import VideoLinkInput from "@/components/upload/VideoLinkInput";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { verifyUserSession, handleSupabaseError } from "@/services/supabaseHelpers";
 
 interface MotionAnalysisUploadProps {
   onUploadComplete: (sessionId: string) => void;
@@ -104,15 +103,11 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
     setUploadProgress(10);
 
     try {
-      // Verify user session before uploading
-      const authSession = await verifyUserSession();
-      console.log('[MOTION_UPLOAD] Starting upload for user:', authSession.user.id);
-      
       let filePath = "";
       
       if (hasFile && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
-        filePath = `motion-analysis/${authSession.user.id}/${Date.now()}.${fileExt}`;
+        filePath = `motion-analysis/${user.id}/${Date.now()}.${fileExt}`;
         
         setUploadProgress(30);
         
@@ -129,7 +124,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       setUploadStatus("processing");
       
       const insertData: any = {
-        user_id: authSession.user.id,
+        user_id: user.id,
         title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
         description: formData.description,
         sport_type: 'table-tennis',
@@ -192,7 +187,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
     } catch (error: any) {
       console.error('Error uploading video:', error);
       setUploadStatus("error");
-      const errorMessage = handleSupabaseError(error, 'MOTION_ANALYSIS_UPLOAD');
+      const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
       toast({
         title: "Upload Failed",
         description: errorMessage,
