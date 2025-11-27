@@ -3,8 +3,12 @@ export const FeaturedCoachService = {
   async getFeaturedCoaches(limit: number = 10): Promise<any[]> {
     try {
       const response = await fetch(`/api/featured-coaches?limit=${limit}`);
-      if (!response.ok) throw new Error('Failed to fetch featured coaches');
-      return await response.json();
+      if (!response.ok) {
+        console.warn('Featured coaches API returned:', response.status);
+        return [];
+      }
+      const text = await response.text();
+      return JSON.parse(text);
     } catch (error) {
       console.error('Error fetching featured coaches:', error);
       return [];
