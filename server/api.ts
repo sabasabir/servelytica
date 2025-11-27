@@ -106,25 +106,19 @@ export function setupApiRoutes(app: any) {
       }
       
       // Decode base64 to buffer
-      const fileData = Buffer.from(file, 'base64');
+      let fileData;
+      try {
+        fileData = Buffer.from(file, 'base64');
+      } catch (e) {
+        return sendError(res, 'Invalid base64 encoded file', 400);
+      }
       
       // Create filename with timestamp
       const timestamp = Date.now();
       const ext = fileName.split('.').pop() || 'bin';
-      const filePath = `uploads/${userId}/${timestamp}.${ext}`;
+      const filePath = `${userId}/${timestamp}.${ext}`;
       
-      // Save file to filesystem
-      const fs = await import('fs');
-      const path = await import('path');
-      
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      
-      fs.writeFileSync(filePath, fileData);
-      
-      console.log(`Video uploaded: ${filePath} (${fileData.length} bytes)`);
+      console.log(`Processing video upload: ${filePath} (${fileData.length} bytes)`);
       
       // Create video record in database
       const videoData = {
@@ -147,20 +141,25 @@ export function setupApiRoutes(app: any) {
       
       // Assign coaches if provided
       if (coachIds && Array.isArray(coachIds) && coachIds.length > 0) {
-        const { db } = await import('./db');
-        const { videoCoaches } = await import('@shared/schema');
-        
-        const coachAssignments = coachIds.map((coachId: string) => ({
-          videoId: createdVideo.id,
-          coachId: coachId,
-          status: 'pending'
-        }));
-        
-        await db.insert(videoCoaches).values(coachAssignments);
-        
-        // Mark video as analyzed when coaches are assigned
-        await videoRoutes.updateVideo(createdVideo.id, { analyzed: true });
-        createdVideo.analyzed = true;
+        try {
+          const { db } = await import('./db');
+          const { videoCoaches } = await import('@shared/schema');
+          
+          const coachAssignments = coachIds.map((coachId: string) => ({
+            videoId: createdVideo.id,
+            coachId: coachId,
+            status: 'pending'
+          }));
+          
+          await db.insert(videoCoaches).values(coachAssignments);
+          
+          // Mark video as analyzed when coaches are assigned
+          await videoRoutes.updateVideo(createdVideo.id, { analyzed: true });
+          createdVideo.analyzed = true;
+        } catch (coachError) {
+          console.warn('Warning: Failed to assign coaches, but video was created:', coachError);
+          // Don't fail the entire upload if coach assignment fails
+        }
       }
       
       console.log(`Video record created with ID: ${createdVideo.id}`);
