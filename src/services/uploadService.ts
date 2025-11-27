@@ -49,11 +49,26 @@ export const uploadFileToStorage = async (
     });
     
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Upload failed with status ${response.status}`);
+      try {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Upload failed with status ${response.status}`);
+      } catch (parseError) {
+        throw new Error(`Upload failed with status ${response.status}: ${response.statusText}`);
+      }
     }
     
-    const data = await response.json();
+    const responseText = await response.text();
+    if (!responseText) {
+      throw new Error('Server returned empty response');
+    }
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse response:', responseText);
+      throw new Error(`Invalid response from server: ${responseText.substring(0, 100)}`);
+    }
     
     return {
       success: true,

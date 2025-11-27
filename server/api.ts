@@ -88,6 +88,7 @@ export function setupApiRoutes(app: any) {
   // NOTE: Frontend verifies user via Supabase auth before calling this endpoint
   // TODO: Add JWT verification on backend for production security
   app.post('/api/videos/upload', async (req: any, res: any) => {
+    let videoData: any = null;
     try {
       const { file, fileName, fileSize, userId, title, description, focusArea, coachIds } = req.body;
       
@@ -118,10 +119,10 @@ export function setupApiRoutes(app: any) {
       const ext = fileName.split('.').pop() || 'bin';
       const filePath = `${userId}/${timestamp}.${ext}`;
       
-      console.log(`Processing video upload: ${filePath} (${fileData.length} bytes)`);
+      console.log(`[UPLOAD] Processing video upload: ${filePath} (${fileData.length} bytes)`);
       
       // Create video record in database
-      const videoData = {
+      videoData = {
         userId: userId,
         filePath: filePath,
         fileName: fileName,
@@ -133,11 +134,21 @@ export function setupApiRoutes(app: any) {
         uploadedAt: new Date()
       };
       
-      const createdVideo = await videoRoutes.createVideo(videoData);
+      console.log(`[UPLOAD] Video data to insert:`, videoData);
+      
+      let createdVideo;
+      try {
+        createdVideo = await videoRoutes.createVideo(videoData);
+      } catch (dbError) {
+        console.error(`[UPLOAD] Database error creating video:`, dbError);
+        throw new Error(`Failed to create video record: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
+      }
       
       if (!createdVideo) {
-        throw new Error('Failed to create video record in database');
+        throw new Error('Failed to create video record in database - returned null');
       }
+      
+      console.log(`[UPLOAD] Video record created with ID: ${createdVideo.id}`);
       
       // Assign coaches if provided
       if (coachIds && Array.isArray(coachIds) && coachIds.length > 0) {
@@ -151,28 +162,32 @@ export function setupApiRoutes(app: any) {
             status: 'pending'
           }));
           
+          console.log(`[UPLOAD] Assigning coaches:`, coachAssignments);
           await db.insert(videoCoaches).values(coachAssignments);
           
           // Mark video as analyzed when coaches are assigned
           await videoRoutes.updateVideo(createdVideo.id, { analyzed: true });
           createdVideo.analyzed = true;
+          console.log(`[UPLOAD] Coaches assigned successfully`);
         } catch (coachError) {
-          console.warn('Warning: Failed to assign coaches, but video was created:', coachError);
+          console.warn('[UPLOAD] Warning: Failed to assign coaches, but video was created:', coachError);
           // Don't fail the entire upload if coach assignment fails
         }
       }
       
-      console.log(`Video record created with ID: ${createdVideo.id}`);
-      
-      sendJson(res, {
+      const response = {
         success: true,
         video: createdVideo,
         filePath: filePath,
         fileName: fileName,
         size: fileData.length
-      }, 201);
+      };
+      
+      console.log(`[UPLOAD] Sending response:`, response);
+      sendJson(res, response, 201);
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('[UPLOAD] Error uploading file:', error);
+      console.error('[UPLOAD] Stack trace:', error instanceof Error ? error.stack : 'N/A');
       sendError(res, error, 500);
     }
   });
