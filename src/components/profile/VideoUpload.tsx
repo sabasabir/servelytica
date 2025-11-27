@@ -6,10 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { VideoSubscriptionService } from "@/services/videoSubscriptionService";
+import DragDropZone from "@/components/upload/DragDropZone";
+import UploadProgressBar from "@/components/upload/UploadProgressBar";
+import VideoLinkInput from "@/components/upload/VideoLinkInput";
 
 interface VideoUploadProps {
   onUploadSuccess?: () => void;
@@ -19,6 +23,12 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "complete" | "error">("idle");
+  const [uploadMode, setUploadMode] = useState<"file" | "link">("link");
+  const [isLinkValid, setIsLinkValid] = useState(false);
+  const [linkMetadata, setLinkMetadata] = useState<any>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -42,8 +52,6 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
     "Overall Game Analysis"
   ];
 
-
-  // Check quota when component mounts
   useEffect(() => {
     const checkQuota = async () => {
       if (!user) return;
@@ -62,23 +70,16 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
     checkQuota();
   }, [user]);
 
-//   console.log({user})
-
   useEffect(() => {
     const fetchCoaches = async () => {
       if (!user) return;
       
       try {
-        // console.log("Fetching coaches for user sport...");
-        
-        // First get the current user's sport
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
           .select('sport_id')
           .eq('user_id', user.id)
           .single();
-
-        // console.log("User profile result:", { userProfile, profileError });
 
         if (profileError) {
           console.error("Error fetching user profile:", profileError);
@@ -90,13 +91,10 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
           return;
         }
 
-        // Get coach user_ids
         const { data: coachRoles, error: rolesError } = await supabase
           .from('user_roles')
-          .select('user_id: user_id (*)')
+          .select('user_id')
           .eq('role', 'coach');
-
-        // console.log("Coach roles result:", { coachRoles, rolesError });
 
         if (rolesError) {
           console.error("Error fetching coach roles:", rolesError);
@@ -104,42 +102,26 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         }
 
         if (coachRoles && coachRoles.length > 0) {
-        //   const coachUserIds = coachRoles.map(role => role.user_id);
-        //   console.log("Coach user IDs:", coachUserIds);
+          const coachUserIds = coachRoles.map((role: any) => role.user_id);
           
-        //   // Get coach profiles filtered by sport
-        //   const { data: coachProfiles, error: profilesError } = await supabase
-        //     .from('profiles')
-        //     .select('user_id, display_name, username')
-        //     .in('user_id', coachUserIds)
-        //     .eq('sport_id', userProfile.sport_id);
-            
-        //     console.log({coachProfiles})
+          const { data: coachProfiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('user_id, display_name, username')
+            .in('user_id', coachUserIds);
 
-        //   console.log("Coach profiles result:", { coachProfiles, profilesError });
+          if (profilesError) {
+            console.error("Error fetching coach profiles:", profilesError);
+            return;
+          }
 
-        //   if (profilesError) {
-        //     console.error("Error fetching coach profiles:", profilesError);
-        //     return;
-        //   }
-
-        //   if (coachProfiles) {
-        //     const mappedCoaches = coachProfiles.map(coach => ({
-        //       id: coach.user_id,
-        //       display_name: coach.display_name || coach.username || 'Unnamed Coach',
-        //       username: coach.username || ''
-        //     }));
-        //     console.log("Mapped coaches:", mappedCoaches);
-        //     setCoaches(mappedCoaches);
-        //   }
-
-          const mappedCoaches = coachRoles.map(coach => ({
-              id: coach?.user_id?.user_id,
-              display_name: coach?.user_id?.display_name || coach?.user_id?.username || 'Unnamed Coach',
-              username: coach?.user_id?.username || ''
+          if (coachProfiles) {
+            const mappedCoaches = coachProfiles.map((coach: any) => ({
+              id: coach.user_id,
+              display_name: coach.display_name || coach.username || 'Unnamed Coach',
+              username: coach.username || ''
             }));
-            // console.log("Mapped coaches:", mappedCoaches);
             setCoaches(mappedCoaches);
+          }
         } else {
           console.log("No coaches found in user_roles table");
         }
@@ -151,23 +133,27 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
     fetchCoaches();
   }, [user]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file type
-      if (!file.type.startsWith('video/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select a video file",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      setSelectedFile(file);
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    if (!formData.title) {
+      setFormData(prev => ({ ...prev, title: file.name.replace(/\.[^/.]+$/, "") }));
     }
   };
 
+  const handleFileClear = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+  };
+
+  const handleLinkValidate = (isValid: boolean, metadata?: any) => {
+    setIsLinkValid(isValid);
+    setLinkMetadata(metadata);
+  };
 
   const handleUpload = async () => {
     if (!user) {
@@ -197,43 +183,28 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
       return;
     }
 
+    const hasFile = uploadMode === "file" && selectedFile;
+    const hasLink = uploadMode === "link" && (formData.videoLink || isLinkValid);
+
+    if (!hasFile && !hasLink) {
+      toast({
+        title: "Error",
+        description: uploadMode === "file" 
+          ? "Please select a video file" 
+          : "Please enter a valid video link",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setUploading(true);
+    setUploadStatus("uploading");
+    setUploadProgress(20);
 
     try {
-      // Create file path with user ID and timestamp //! TODO: don't remove below codes: Warnings
-    //   const fileExt = selectedFile.name.split('.').pop();
-    //   const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+      setUploadProgress(50);
+      setUploadStatus("processing");
 
-    //   // Upload to Supabase Storage
-    //   const { error: uploadError } = await supabase.storage
-    //     .from('videos')
-    //     .upload(filePath, selectedFile);
-
-    //   if (uploadError) {
-    //     throw uploadError;
-    //   }
-
-      // Save video record to database
-    //   const { data: videoData, error: dbError } = await supabase
-    //     .from('videos')
-    //     .insert({
-    //       user_id: user.id,
-    //       file_path: filePath,
-    //       file_name: selectedFile.name,
-    //       file_size: selectedFile.size,
-    //       title: formData.title,
-    //       description: formData.description,
-    //       focus_area: formData.focusArea
-    //     })
-    //     .select()
-    //     .single();
-
-    //   if (dbError) {
-    //     throw dbError;
-    //   }
-
-      // Insert coach assignments
-    //   if (videoData && formData.coachIds.length > 0) {
       if (formData.coachIds.length > 0) {
         const { error: coachError } = await supabase
           .from('video_coaches')
@@ -241,11 +212,12 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
             formData.coachIds.map(coachId => ({
               player_id: user.id,
               video_id: null,
-              video_link: formData?.videoLink,
+              video_link: formData.videoLink || null,
               coach_id: coachId,
               title: formData.title,
               description: formData.description,
               focus_areas: formData.focusArea,
+              video_platform: linkMetadata?.platform || null,
             }))
           );
 
@@ -254,27 +226,29 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         }
       }
 
-       const { data: subData, error } = await supabase
-            .from('users_subscription')
-            .update({
-              usages_count: quotaInfo?.usages_count + 1,
-            })
-            .eq('id', quotaInfo?.users_sub_id);
+      setUploadProgress(80);
 
-        if(error) {
-            toast({
-              title: "Subscription Update failed",
-              description: "Video upload count error "
-            });
+      if (quotaInfo?.users_sub_id) {
+        const { error } = await supabase
+          .from('users_subscription')
+          .update({
+            usages_count: (quotaInfo?.usages_count || 0) + 1,
+          } as any)
+          .eq('id', quotaInfo?.users_sub_id);
 
+        if (error) {
+          console.warn('Failed to update subscription count:', error);
         }
+      }
+
+      setUploadProgress(100);
+      setUploadStatus("complete");
 
       toast({
         title: "Upload successful",
-        description: "Your video has been uploaded for analysis"
+        description: "Your video has been submitted for analysis"
       });
 
-      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -283,33 +257,35 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         coachIds: []
       });
       setSelectedFile(null);
-      
-      // Reset file input
-      const fileInput = document.getElementById('video-file') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-      }
+      setPreviewUrl(null);
+      setIsLinkValid(false);
+      setLinkMetadata(null);
 
-      // Call the callback to trigger navigation and refresh
-      onUploadSuccess?.();
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        setUploadStatus("idle");
+        onUploadSuccess?.();
+      }, 1500);
 
     } catch (error) {
       console.error('Upload error:', error);
+      setUploadStatus("error");
       toast({
         title: "Upload failed",
         description: error instanceof Error ? error.message : "An error occurred during upload",
         variant: "destructive"
       });
-    } finally {
-      setUploading(false);
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        setUploadStatus("idle");
+      }, 2000);
     }
   };
 
-//   console.log({quotaInfo})
-
   return (
     <div className="space-y-4">
-      {/* Subscription Status */}
       {quotaLoading ? (
         <div className="bg-muted/50 rounded-lg p-4">
           <div className="animate-pulse flex space-x-4">
@@ -345,148 +321,161 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
             Upload your game footage for professional analysis by our expert coaches
           </CardDescription>
         </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="video-title">Video Title *</Label>
-          <Input
-            id="video-title"
-            placeholder="e.g., Serve practice session"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="video-description">Description</Label>
-          <Textarea
-            id="video-description"
-            placeholder="Describe what you'd like the coach to focus on..."
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="video-title">Video Link *</Label>
-          <Input
-            id="video-title"
-            placeholder="e.g., Serve practice session"
-            value={formData.videoLink}
-            required
-            onChange={(e) => setFormData({ ...formData, videoLink: e.target.value })}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="focus-area">Focus Area</Label>
-          <Select value={formData.focusArea} onValueChange={(value) => setFormData({ ...formData, focusArea: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select area to focus on" />
-            </SelectTrigger>
-            <SelectContent>
-              {focusAreas.map((area) => (
-                <SelectItem key={area} value={area}>
-                  {area}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="coach-selection">Select Coaches *</Label>
+        <CardContent className="space-y-4">
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Choose one or more coaches to analyze your video
-            </p>
-            <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
-              {coaches.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No coaches available for your sport
-                </p>
-              ) : (
-                coaches.map((coach) => (
-                  <label
-                    key={coach.id}
-                    className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted/50 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.coachIds.includes(coach.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({ ...formData, coachIds: [...formData.coachIds, coach.id] });
-                        } else {
-                          setFormData({ ...formData, coachIds: formData.coachIds.filter(id => id !== coach.id) });
-                        }
-                      }}
-                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm font-medium">{coach.display_name}</span>
-                      {coach.username && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          @{coach.username}
-                        </span>
-                      )}
-                    </div>
-                  </label>
-                ))
+            <Label htmlFor="video-title">Video Title *</Label>
+            <Input
+              id="video-title"
+              placeholder="e.g., Serve practice session"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="video-description">Description</Label>
+            <Textarea
+              id="video-description"
+              placeholder="Describe what you'd like the coach to focus on..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label>Video Source</Label>
+            <Tabs value={uploadMode} onValueChange={(v) => setUploadMode(v as "file" | "link")}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="link">Video Link</TabsTrigger>
+                <TabsTrigger value="file">Upload File</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="link" className="mt-4">
+                <VideoLinkInput
+                  value={formData.videoLink}
+                  onChange={(value) => setFormData({ ...formData, videoLink: value })}
+                  onValidate={handleLinkValidate}
+                  disabled={uploading}
+                />
+              </TabsContent>
+              
+              <TabsContent value="file" className="mt-4">
+                <DragDropZone
+                  onFileSelect={handleFileSelect}
+                  selectedFile={selectedFile}
+                  onClear={handleFileClear}
+                  previewUrl={previewUrl}
+                  disabled={uploading}
+                  maxSize={500 * 1024 * 1024}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="focus-area">Focus Area</Label>
+            <Select value={formData.focusArea} onValueChange={(value) => setFormData({ ...formData, focusArea: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select area to focus on" />
+              </SelectTrigger>
+              <SelectContent>
+                {focusAreas.map((area) => (
+                  <SelectItem key={area} value={area}>
+                    {area}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="coach-selection">Select Coaches *</Label>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Choose one or more coaches to analyze your video
+              </p>
+              <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
+                {coaches.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No coaches available for your sport
+                  </p>
+                ) : (
+                  coaches.map((coach) => (
+                    <label
+                      key={coach.id}
+                      className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted/50 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.coachIds.includes(coach.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, coachIds: [...formData.coachIds, coach.id] });
+                          } else {
+                            setFormData({ ...formData, coachIds: formData.coachIds.filter(id => id !== coach.id) });
+                          }
+                        }}
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">{coach.display_name}</span>
+                        {coach.username && (
+                          <span className="text-xs text-muted-foreground ml-2">
+                            @{coach.username}
+                          </span>
+                        )}
+                      </div>
+                    </label>
+                  ))
+                )}
+              </div>
+              {formData.coachIds.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  <span className="text-xs text-muted-foreground">Selected:</span>
+                  {formData.coachIds.map((coachId) => {
+                    const coach = coaches.find(c => c.id === coachId);
+                    return coach ? (
+                      <span
+                        key={coachId}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                      >
+                        {coach.display_name}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
               )}
             </div>
-            {formData.coachIds.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                <span className="text-xs text-muted-foreground">Selected:</span>
-                {formData.coachIds.map((coachId) => {
-                  const coach = coaches.find(c => c.id === coachId);
-                  return coach ? (
-                    <span
-                      key={coachId}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
-                    >
-                      {coach.display_name}
-                    </span>
-                  ) : null;
-                })}
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* <div className="space-y-2">
-          <Label htmlFor="video-file">Video File *</Label>
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-            <input
-              id="video-file"
-              type="file"
-              accept="video/*"
-              onChange={handleFileChange}
-              className="hidden"
+          {uploading && (
+            <UploadProgressBar
+              progress={uploadProgress}
+              status={uploadStatus}
+              showPercentage={true}
             />
-            <label
-              htmlFor="video-file"
-              className="cursor-pointer flex flex-col items-center space-y-2"
-            >
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {selectedFile ? selectedFile.name : "Click to select video file"}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Supports MP4, MOV, AVI
-              </span>
-            </label>
-          </div>
-        </div> */}
+          )}
 
-        <Button 
-          onClick={handleUpload} 
-          disabled={uploading || !formData.title.trim() || formData.coachIds.length === 0}
-          className="w-full"
-        >
-          {uploading ? "Uploading..." : "Upload Video"}
-        </Button>
-      </CardContent>
-    </Card>
+          <Button 
+            onClick={handleUpload} 
+            disabled={uploading || !formData.title.trim() || formData.coachIds.length === 0 || 
+              (uploadMode === "file" ? !selectedFile : !formData.videoLink)}
+            className="w-full"
+          >
+            {uploading ? (
+              <>
+                <Upload className="mr-2 h-4 w-4 animate-pulse" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Video
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

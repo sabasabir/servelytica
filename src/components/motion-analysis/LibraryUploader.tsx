@@ -6,7 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Video, ArrowLeft, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Upload, Loader2 } from "lucide-react";
+import DragDropZone from "@/components/upload/DragDropZone";
+import UploadProgressBar from "@/components/upload/UploadProgressBar";
 
 interface LibraryUploaderProps {
   onBack: () => void;
@@ -16,6 +18,8 @@ interface LibraryUploaderProps {
 const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "complete" | "error">("idle");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -23,47 +27,20 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file type (video formats)
-      const allowedTypes = [
-        'video/mp4',
-        'video/webm',
-        'video/quicktime',
-        'video/x-msvideo',
-        'video/avi'
-      ];
+  const handleFileSelect = (file: File) => {
+    setVideoFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    if (!title) {
+      setTitle(file.name.replace(/\.[^/.]+$/, ""));
+    }
+  };
 
-      if (!allowedTypes.includes(file.type)) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload a video file (MP4, WebM, MOV, AVI).",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // 500MB limit for videos
-      if (file.size > 500 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please upload a video smaller than 500MB.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      setVideoFile(file);
-      
-      // Create preview URL
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      
-      // Auto-fill title from filename if empty
-      if (!title) {
-        setTitle(file.name.replace(/\.[^/.]+$/, ""));
-      }
+  const handleFileClear = () => {
+    setVideoFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
     }
   };
 
@@ -78,10 +55,14 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
     }
 
     setUploading(true);
+    setUploadStatus("uploading");
+    setUploadProgress(10);
+    
     try {
-      // Upload to Supabase Storage
       const fileExt = videoFile.name.split('.').pop();
       const filePath = `videos/${user.id}/${Date.now()}.${fileExt}`;
+      
+      setUploadProgress(30);
       
       const { error: uploadError } = await supabase.storage
         .from('videos')
@@ -89,9 +70,11 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
 
       if (uploadError) throw uploadError;
 
-      // Create session entry for the video with media_type
-      const { data: session, error: sessionError } = await supabase
-        .from('motion_analysis_sessions')
+      setUploadProgress(60);
+      setUploadStatus("processing");
+
+      const { data: session, error: sessionError } = await (supabase
+        .from('motion_analysis_sessions' as any)
         .insert({
           user_id: user.id,
           title: title || videoFile.name,
@@ -102,27 +85,39 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
           analysis_status: 'pending'
         })
         .select()
-        .single();
+        .single() as any);
 
       if (sessionError) throw sessionError;
+
+      setUploadProgress(100);
+      setUploadStatus("complete");
 
       toast({
         title: "Upload Successful",
         description: "Your video has been uploaded and is ready for analysis.",
       });
 
-      onComplete(session);
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        setUploadStatus("idle");
+        onComplete(session);
+      }, 1500);
 
     } catch (error: any) {
       console.error('Error uploading video:', error);
+      setUploadStatus("error");
       const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
       toast({
         title: "Upload Failed",
         description: errorMessage,
         variant: "destructive"
       });
-    } finally {
-      setUploading(false);
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        setUploadStatus("idle");
+      }, 2000);
     }
   };
 
@@ -133,63 +128,24 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
         Back
       </Button>
 
-      <div className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-        uploading ? 'border-blue-500 bg-blue-50' : 
-        videoFile ? 'border-green-500 bg-green-50' : 
-        'border-gray-300 hover:border-tt-blue'
-      }`}>
-        {!videoFile ? (
-          <div className="space-y-4">
-            <Video className="h-12 w-12 text-gray-500 mx-auto" />
-            <div>
-              <p className="text-gray-600">
-                Upload a video from your device for analysis
-              </p>
-              <p className="text-sm text-gray-400 mt-1">
-                Supports MP4, WebM, MOV, AVI up to 500MB
-              </p>
-            </div>
-            <Button type="button" variant="outline" className="relative">
-              Select Video
-              <input
-                type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/avi"
-                onChange={handleFileChange}
-              />
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {previewUrl && (
-              <video
-                src={previewUrl}
-                controls
-                className="w-full max-h-64 rounded-lg mx-auto"
-              />
-            )}
-            <div>
-              <p className="font-medium">{videoFile.name}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="text-red-500 border-red-200 hover:bg-red-50"
-              onClick={() => {
-                setVideoFile(null);
-                setPreviewUrl(null);
-              }}
-            >
-              Remove
-            </Button>
-          </div>
-        )}
-      </div>
+      <DragDropZone
+        onFileSelect={handleFileSelect}
+        selectedFile={videoFile}
+        onClear={handleFileClear}
+        previewUrl={previewUrl}
+        disabled={uploading}
+        maxSize={500 * 1024 * 1024}
+      />
 
-      {videoFile && (
+      {uploading && (
+        <UploadProgressBar
+          progress={uploadProgress}
+          status={uploadStatus}
+          showPercentage={true}
+        />
+      )}
+
+      {videoFile && !uploading && (
         <div className="space-y-4 pt-4 border-t">
           <div className="space-y-2">
             <Label htmlFor="video-title">Title</Label>
@@ -217,17 +173,8 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
             className="w-full bg-tt-orange hover:bg-orange-600 text-white"
             disabled={uploading}
           >
-            {uploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Video
-              </>
-            )}
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Video
           </Button>
         </div>
       )}

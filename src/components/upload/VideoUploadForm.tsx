@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { processVideo } from "@/services/videoProcessing";
 import { supabase } from "@/integrations/supabase/client";
+import DragDropZone from "@/components/upload/DragDropZone";
 
 interface VideoUploadFormProps {
   uploading: boolean;
@@ -217,67 +218,13 @@ const VideoUploadForm = ({
       {/* Video Upload */}
       <div className="space-y-2">
         <Label htmlFor="video">Video Upload</Label>
-        <div className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${uploading ? 'border-blue-500 bg-blue-50' : videoFile ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-tt-blue'}`}>
-          {uploading ? (
-            <div className="space-y-4">
-              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <Upload className="h-6 w-6 text-blue-500 animate-spin" />
-              </div>
-              <div>
-                <p className="font-medium">Uploading your video</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Please wait while we process your video...
-                </p>
-              </div>
-            </div>
-          ) : !videoFile ? (
-            <div className="space-y-4">
-              <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <Upload className="h-6 w-6 text-gray-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">
-                  Drag and drop your video here, or click to browse
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Supports MP4, MOV, AVI up to 5GB
-                </p>
-              </div>
-              <Button type="button" variant="outline" className="relative" onClick={() => document.getElementById('videoInput')?.click()}>
-                Select Video
-                <input
-                  id="videoInput"
-                  type="file"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  accept="video/*"
-                  onChange={handleFileChange}
-                />
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <Check className="h-6 w-6 text-green-500" />
-              </div>
-              <div>
-                <p className="font-medium">
-                  {videoFile.name}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
-                </p>
-              </div>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"
-                onClick={() => setVideoFile(null)}
-              >
-                Remove
-              </Button>
-            </div>
-          )}
-        </div>
+        <DragDropZone
+          onFileSelect={(file) => setVideoFile(file)}
+          selectedFile={videoFile}
+          onClear={() => setVideoFile(null)}
+          disabled={uploading}
+          maxSize={5 * 1024 * 1024 * 1024}
+        />
       </div>
 
 
