@@ -1,0 +1,399 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.analysis_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  video_id uuid NOT NULL,
+  analysis_date timestamp with time zone NOT NULL DEFAULT now(),
+  reset_date timestamp with time zone NOT NULL,
+  subscription_plan_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT analysis_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT analysis_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT analysis_usage_video_id_fkey FOREIGN KEY (video_id) REFERENCES public.videos(id),
+  CONSTRAINT analysis_usage_subscription_plan_id_fkey FOREIGN KEY (subscription_plan_id) REFERENCES public.pricing(id)
+);
+CREATE TABLE public.articles (
+  id integer NOT NULL DEFAULT nextval('articles_id_seq'::regclass),
+  title text NOT NULL,
+  excerpt text NOT NULL,
+  content text NOT NULL,
+  image text NOT NULL,
+  read_time integer NOT NULL,
+  category_id integer,
+  author_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT articles_pkey PRIMARY KEY (id),
+  CONSTRAINT articles_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.profiles(id),
+  CONSTRAINT articles_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id)
+);
+CREATE TABLE public.categories (
+  id integer NOT NULL DEFAULT nextval('categories_id_seq'::regclass),
+  name character varying NOT NULL UNIQUE,
+  slug character varying NOT NULL UNIQUE,
+  CONSTRAINT categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chat_participants (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  chat_room_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  joined_at timestamp with time zone DEFAULT now(),
+  role text DEFAULT 'member'::text CHECK (role = ANY (ARRAY['member'::text, 'admin'::text])),
+  CONSTRAINT chat_participants_pkey PRIMARY KEY (id),
+  CONSTRAINT chat_participants_chat_room_id_fkey FOREIGN KEY (chat_room_id) REFERENCES public.chat_rooms(id),
+  CONSTRAINT chat_participants_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.chat_rooms (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name text,
+  type_id integer NOT NULL,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chat_rooms_pkey PRIMARY KEY (id),
+  CONSTRAINT chat_rooms_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.profiles(id),
+  CONSTRAINT chat_rooms_type_id_fkey FOREIGN KEY (type_id) REFERENCES public.chat_types(id)
+);
+CREATE TABLE public.chat_types (
+  id integer NOT NULL DEFAULT nextval('chat_types_id_seq'::regclass),
+  name text NOT NULL UNIQUE,
+  description text,
+  CONSTRAINT chat_types_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.coach_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coach_profile_id uuid NOT NULL,
+  title text NOT NULL,
+  description text,
+  year integer,
+  organization text,
+  achievement_type text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT coach_achievements_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_coach_achievements_coach_profile FOREIGN KEY (coach_profile_id) REFERENCES public.coach_profiles(id)
+);
+CREATE TABLE public.coach_education (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coach_profile_id uuid NOT NULL,
+  degree text NOT NULL,
+  institution text NOT NULL,
+  year_completed integer,
+  field_of_study text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT coach_education_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_coach_education_coach_profile FOREIGN KEY (coach_profile_id) REFERENCES public.coach_profiles(id)
+);
+CREATE TABLE public.coach_profiles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL UNIQUE,
+  years_coaching integer DEFAULT 0,
+  certifications ARRAY,
+  languages ARRAY,
+  coaching_philosophy text,
+  rate_per_hour numeric,
+  currency text DEFAULT 'USD'::text,
+  availability_schedule jsonb,
+  verified boolean DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT coach_profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_coach_profiles_user_id FOREIGN KEY (user_id) REFERENCES public.profiles(user_id)
+);
+CREATE TABLE public.coach_specialties (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coach_profile_id uuid NOT NULL,
+  specialty_type_id uuid NOT NULL,
+  proficiency USER-DEFINED NOT NULL DEFAULT 'intermediate'::coach_proficiency,
+  years_experience integer DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT coach_specialties_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_coach_specialties_coach_profile FOREIGN KEY (coach_profile_id) REFERENCES public.coach_profiles(id),
+  CONSTRAINT fk_coach_specialties_specialty_type FOREIGN KEY (specialty_type_id) REFERENCES public.specialty_types(id)
+);
+CREATE TABLE public.coach_statistics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coach_profile_id uuid NOT NULL UNIQUE,
+  total_sessions integer DEFAULT 0,
+  total_students integer DEFAULT 0,
+  average_rating numeric DEFAULT 0,
+  total_reviews integer DEFAULT 0,
+  response_time_hours integer DEFAULT 24,
+  success_rate numeric DEFAULT 0,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT coach_statistics_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_coach_statistics_coach_profile FOREIGN KEY (coach_profile_id) REFERENCES public.coach_profiles(id)
+);
+CREATE TABLE public.comments (
+  id integer NOT NULL DEFAULT nextval('comments_id_seq'::regclass),
+  content text NOT NULL,
+  article_id integer NOT NULL,
+  author_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT comments_pkey PRIMARY KEY (id),
+  CONSTRAINT comments_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id),
+  CONSTRAINT comments_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.connection_requests (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  sender_id uuid NOT NULL,
+  receiver_id uuid NOT NULL,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text, 'cancelled'::text])),
+  message text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT connection_requests_pkey PRIMARY KEY (id),
+  CONSTRAINT connection_requests_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES auth.users(id),
+  CONSTRAINT connection_requests_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.connections (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user2_id uuid NOT NULL,
+  user1_id uuid NOT NULL,
+  connection_date timestamp with time zone DEFAULT now(),
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'blocked'::text, 'inactive'::text])),
+  CONSTRAINT connections_pkey PRIMARY KEY (id),
+  CONSTRAINT connections_user1_id_fkey FOREIGN KEY (user1_id) REFERENCES public.profiles(id),
+  CONSTRAINT connections_user2_id_fkey FOREIGN KEY (user2_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.direct_chat_connections (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  chat_room_id uuid NOT NULL UNIQUE,
+  connection_id uuid NOT NULL UNIQUE,
+  CONSTRAINT direct_chat_connections_pkey PRIMARY KEY (id),
+  CONSTRAINT direct_chat_connections_chat_room_id_fkey FOREIGN KEY (chat_room_id) REFERENCES public.chat_rooms(id),
+  CONSTRAINT direct_chat_connections_connection_id_fkey FOREIGN KEY (connection_id) REFERENCES public.connections(id)
+);
+CREATE TABLE public.focus_areas (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  description text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT focus_areas_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.likes (
+  article_id integer NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT likes_pkey PRIMARY KEY (article_id, user_id),
+  CONSTRAINT likes_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id),
+  CONSTRAINT likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  chat_room_id uuid NOT NULL,
+  sender_id uuid NOT NULL,
+  content text NOT NULL,
+  message_type text DEFAULT 'text'::text CHECK (message_type = ANY (ARRAY['text'::text, 'image'::text, 'system'::text])),
+  read_by jsonb DEFAULT '[]'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT messages_pkey PRIMARY KEY (id),
+  CONSTRAINT messages_chat_room_id_fkey FOREIGN KEY (chat_room_id) REFERENCES public.chat_rooms(id),
+  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.motion_analysis_annotations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  frame_id uuid,
+  session_id uuid NOT NULL,
+  annotation_type text NOT NULL,
+  coordinates jsonb NOT NULL,
+  color text DEFAULT '#FF0000'::text,
+  label text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT motion_analysis_annotations_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.motion_analysis_frames (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  session_id uuid NOT NULL,
+  frame_number integer NOT NULL,
+  timestamp_ms integer NOT NULL,
+  annotations jsonb,
+  pose_data jsonb,
+  technique_notes text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT motion_analysis_frames_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.motion_analysis_results (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  session_id uuid NOT NULL,
+  analysis_type text NOT NULL,
+  score numeric,
+  feedback text,
+  areas_of_improvement jsonb,
+  strengths jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT motion_analysis_results_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.motion_analysis_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  video_id uuid,
+  video_url text,
+  video_file_path text,
+  title text NOT NULL,
+  description text,
+  sport_type text DEFAULT 'table-tennis'::text,
+  media_type text NOT NULL DEFAULT 'video'::text,
+  analysis_status text DEFAULT 'pending'::text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT motion_analysis_sessions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.performance_metrics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  month text NOT NULL,
+  rating integer NOT NULL DEFAULT 0,
+  wins integer NOT NULL DEFAULT 0,
+  losses integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT performance_metrics_pkey PRIMARY KEY (id),
+  CONSTRAINT performance_metrics_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.pricing (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  description text NOT NULL,
+  monthly_price numeric NOT NULL DEFAULT 0,
+  yearly_price numeric NOT NULL DEFAULT 0,
+  features ARRAY NOT NULL DEFAULT '{}'::text[],
+  recommended boolean NOT NULL DEFAULT false,
+  button_text text NOT NULL DEFAULT 'Get Started'::text,
+  button_variant text NOT NULL DEFAULT 'outline'::text,
+  display_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  analysis_limit integer DEFAULT 0,
+  CONSTRAINT pricing_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL UNIQUE,
+  username text NOT NULL UNIQUE,
+  display_name text,
+  avatar_url text,
+  bio text,
+  phone text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  location text,
+  playing_experience text,
+  preferred_play_style text,
+  member_since timestamp with time zone DEFAULT now(),
+  profile_image text,
+  sport_id uuid,
+  total_analysis_limit integer NOT NULL DEFAULT 0,
+  total_usage_count integer NOT NULL DEFAULT 0,
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT profiles_sport_id_fkey FOREIGN KEY (sport_id) REFERENCES public.sports(id)
+);
+CREATE TABLE public.specialty_types (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  description text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT specialty_types_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.sports (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT sports_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.survey_responses (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id text NOT NULL,
+  league_rating integer NOT NULL,
+  tournament_rating integer NOT NULL,
+  tournaments_yearly text NOT NULL,
+  league_frequency text NOT NULL,
+  purpose_of_play text NOT NULL,
+  sports_meaning text NOT NULL,
+  practice_time text NOT NULL,
+  coaching_frequency text NOT NULL,
+  favorite_clubs text NOT NULL,
+  total_points integer NOT NULL,
+  category text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT survey_responses_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_roles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  role USER-DEFINED NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  is_survay_completed boolean DEFAULT false,
+  CONSTRAINT user_roles_pkey PRIMARY KEY (id),
+  CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT user_roles_user_id_fkey1 FOREIGN KEY (user_id) REFERENCES public.profiles(user_id)
+);
+CREATE TABLE public.users_subscription (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  pricing_plan_id uuid NOT NULL,
+  subscription_type USER-DEFINED NOT NULL DEFAULT 'free'::subscription_type,
+  status USER-DEFINED NOT NULL DEFAULT 'pending'::subscription_status,
+  start_date timestamp with time zone NOT NULL DEFAULT now(),
+  end_date timestamp with time zone,
+  price_paid numeric NOT NULL DEFAULT 0,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  auto_renew boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  usages_count integer NOT NULL DEFAULT 0,
+  CONSTRAINT users_subscription_pkey PRIMARY KEY (id),
+  CONSTRAINT users_subscription_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT users_subscription_pricing_plan_id_fkey FOREIGN KEY (pricing_plan_id) REFERENCES public.pricing(id)
+);
+CREATE TABLE public.video_coaches (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  video_id uuid,
+  coach_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text])),
+  video_link text,
+  player_id uuid NOT NULL,
+  title text,
+  description text,
+  focus_areas text,
+  CONSTRAINT video_coaches_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_video_coaches_coach_id FOREIGN KEY (coach_id) REFERENCES public.profiles(user_id),
+  CONSTRAINT video_coaches_player_id_fkey FOREIGN KEY (player_id) REFERENCES auth.users(id),
+  CONSTRAINT video_coaches_player_id_fkey1 FOREIGN KEY (player_id) REFERENCES public.profiles(user_id)
+);
+CREATE TABLE public.video_feedback (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  video_id uuid,
+  coach_id uuid NOT NULL,
+  player_id uuid NOT NULL,
+  feedback_text text NOT NULL,
+  rating integer CHECK (rating >= 1 AND rating <= 5),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  video_coaches_id uuid,
+  CONSTRAINT video_feedback_pkey PRIMARY KEY (id),
+  CONSTRAINT video_feedback_coach_id_fkey FOREIGN KEY (coach_id) REFERENCES auth.users(id),
+  CONSTRAINT video_feedback_player_id_fkey FOREIGN KEY (player_id) REFERENCES auth.users(id),
+  CONSTRAINT video_feedback_video_coaches_id_fkey FOREIGN KEY (video_coaches_id) REFERENCES public.video_coaches(id)
+);
+CREATE TABLE public.videos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  file_path text NOT NULL,
+  file_name text NOT NULL,
+  file_size bigint,
+  title text,
+  description text,
+  focus_area text,
+  uploaded_at timestamp with time zone DEFAULT now(),
+  analyzed boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT videos_pkey PRIMARY KEY (id)
+);
