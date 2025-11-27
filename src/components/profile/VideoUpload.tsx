@@ -199,23 +199,24 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
 
     setUploading(true);
     setUploadStatus("uploading");
-    setUploadProgress(20);
+    setUploadProgress(0);
 
     try {
-      setUploadProgress(50);
-      setUploadStatus("processing");
-
       let videoRecord: any = null;
 
       if (hasFile && selectedFile) {
         const fileExt = selectedFile.name.split('.').pop();
         const filePath = `videos/${user.id}/${Date.now()}.${fileExt}`;
         
+        setUploadProgress(30);
+        
         const { error: uploadError } = await supabase.storage
           .from('videos')
-          .upload(filePath, selectedFile);
+          .upload(filePath, selectedFile, { upsert: false });
 
         if (uploadError) throw uploadError;
+        
+        setUploadProgress(50);
 
         const { data: video, error: videoError } = await supabase
           .from('videos')
@@ -235,6 +236,8 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         if (videoError) throw videoError;
         videoRecord = video;
       } else if (hasLink) {
+        setUploadProgress(50);
+        
         const { data: video, error: videoError } = await supabase
           .from('videos')
           .insert({
@@ -253,32 +256,43 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
         videoRecord = video;
       }
 
-      if (videoRecord && formData.coachIds.length > 0) {
-        const { error: coachError } = await supabase
-          .from('video_coaches')
-          .insert(
-            formData.coachIds.map(coachId => ({
-              video_id: videoRecord.id,
-              coach_id: coachId,
-              status: 'pending'
-            }))
+      // Parallel operations - don't wait sequentially
+      if (videoRecord) {
+        const promises = [];
+        
+        if (formData.coachIds.length > 0) {
+          promises.push(
+            supabase
+              .from('video_coaches')
+              .insert(
+                formData.coachIds.map(coachId => ({
+                  video_id: videoRecord.id,
+                  coach_id: coachId,
+                  status: 'pending'
+                }))
+              )
           );
+        }
 
-        if (coachError) throw coachError;
-      }
+        if (quotaInfo?.users_sub_id) {
+          promises.push(
+            supabase
+              .from('users_subscription')
+              .update({
+                usages_count: (quotaInfo?.usages_count || 0) + 1,
+              } as any)
+              .eq('id', quotaInfo?.users_sub_id)
+          );
+        }
 
-      setUploadProgress(80);
-
-      if (quotaInfo?.users_sub_id) {
-        const { error } = await supabase
-          .from('users_subscription')
-          .update({
-            usages_count: (quotaInfo?.usages_count || 0) + 1,
-          } as any)
-          .eq('id', quotaInfo?.users_sub_id);
-
-        if (error) {
-          console.warn('Failed to update subscription count:', error);
+        // Execute all parallel operations
+        if (promises.length > 0) {
+          const results = await Promise.all(promises);
+          results.forEach(result => {
+            if (result.error) {
+              console.warn('Post-upload error:', result.error);
+            }
+          });
         }
       }
 
@@ -302,12 +316,11 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
       setIsLinkValid(false);
       setLinkMetadata(null);
 
-      setTimeout(() => {
-        setUploading(false);
-        setUploadProgress(0);
-        setUploadStatus("idle");
-        onUploadSuccess?.();
-      }, 1500);
+      // Immediate completion without delay
+      setUploading(false);
+      setUploadProgress(0);
+      setUploadStatus("idle");
+      onUploadSuccess?.();
 
     } catch (error: any) {
       console.error('Upload error:', error);

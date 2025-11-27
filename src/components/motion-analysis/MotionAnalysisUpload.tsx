@@ -100,7 +100,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
 
     setUploading(true);
     setUploadStatus("uploading");
-    setUploadProgress(10);
+    setUploadProgress(0);
 
     try {
       let filePath = "";
@@ -109,19 +109,18 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
         const fileExt = videoFile.name.split('.').pop();
         filePath = `motion-analysis/${user.id}/${Date.now()}.${fileExt}`;
         
-        setUploadProgress(30);
+        setUploadProgress(25);
         
         const { error: uploadError } = await supabase.storage
           .from('videos')
-          .upload(filePath, videoFile);
+          .upload(filePath, videoFile, { upsert: false });
         
         if (uploadError) throw uploadError;
       } else if (hasLink) {
         filePath = videoLink;
       }
       
-      setUploadProgress(60);
-      setUploadStatus("processing");
+      setUploadProgress(50);
       
       const insertData: any = {
         user_id: user.id,
@@ -146,7 +145,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       
       if (sessionError) throw sessionError;
       
-      setUploadProgress(80);
+      setUploadProgress(75);
       
       const analysisTypes = ['stroke', 'footwork', 'body_position', 'timing', 'overall'];
       const resultsData = analysisTypes.map(type => ({
@@ -167,22 +166,22 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       setUploadProgress(100);
       setUploadStatus("complete");
       
-      await (supabase
+      // Update status asynchronously without blocking
+      supabase
         .from('motion_analysis_sessions' as any)
         .update({ analysis_status: 'completed' })
-        .eq('id', analysisSession.id) as any);
+        .eq('id', analysisSession.id);
       
       toast({
         title: "Upload Successful",
         description: "Your video has been uploaded and analysis is complete.",
       });
       
-      setTimeout(() => {
-        setUploading(false);
-        setUploadProgress(0);
-        setUploadStatus("idle");
-        onUploadComplete(analysisSession.id);
-      }, 1500);
+      // Immediate completion without artificial delays
+      setUploading(false);
+      setUploadProgress(0);
+      setUploadStatus("idle");
+      onUploadComplete(analysisSession.id);
       
     } catch (error: any) {
       console.error('Error uploading video:', error);
