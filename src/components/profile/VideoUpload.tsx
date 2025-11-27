@@ -205,7 +205,28 @@ const VideoUpload = ({ onUploadSuccess }: VideoUploadProps) => {
       setUploadProgress(50);
       setUploadStatus("processing");
 
-      if (formData.coachIds.length > 0) {
+      if (hasLink && formData.videoLink) {
+        const response = await fetch('/api/videos/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoLink: formData.videoLink,
+            userId: user.id,
+            title: formData.title,
+            description: formData.description,
+            focusArea: formData.focusArea,
+            coachIds: formData.coachIds,
+            platform: linkMetadata?.platform,
+            thumbnailUrl: linkMetadata?.thumbnailUrl,
+            embedUrl: linkMetadata?.embedUrl
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to save video URL');
+        }
+      } else if (formData.coachIds.length > 0) {
         const { error: coachError } = await supabase
           .from('video_coaches')
           .insert(

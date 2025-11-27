@@ -117,6 +117,25 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
         
         if (uploadError) throw uploadError;
       } else if (hasLink) {
+        const response = await fetch('/api/videos/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoLink,
+            userId: user.id,
+            title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
+            description: formData.description,
+            platform: linkMetadata?.platform,
+            thumbnailUrl: linkMetadata?.thumbnailUrl,
+            embedUrl: linkMetadata?.embedUrl
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to save video URL');
+        }
+        
         filePath = videoLink;
       }
       
@@ -129,7 +148,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
           user_id: user.id,
           title: formData.title || `Motion Analysis - ${new Date().toLocaleDateString()}`,
           description: formData.description,
-          video_file_path: filePath,
+          video_file_path: hasLink ? null : filePath,
           video_link: hasLink ? videoLink : null,
           video_platform: linkMetadata?.platform || null,
           sport_type: 'table-tennis',

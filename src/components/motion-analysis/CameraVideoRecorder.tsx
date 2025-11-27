@@ -98,12 +98,25 @@ const CameraVideoRecorder = ({ onBack, onComplete }: CameraVideoRecorderProps) =
     };
   }, []);
 
+  const pendingQualityChange = useRef<string | null>(null);
+  
   useEffect(() => {
-    if (!isPreviewing && hasPermission && !isRecording) {
+    if (isRecording || mediaRecorderRef.current?.state === 'recording') {
+      pendingQualityChange.current = videoQuality;
+      return;
+    }
+    
+    if (!isPreviewing && hasPermission) {
       stopCamera();
       startCamera();
     }
-  }, [videoQuality, isPreviewing, hasPermission, isRecording]);
+  }, [videoQuality]);
+  
+  useEffect(() => {
+    if (!isRecording && pendingQualityChange.current && pendingQualityChange.current !== videoQuality) {
+      pendingQualityChange.current = null;
+    }
+  }, [isRecording, videoQuality]);
 
   const startCamera = async () => {
     const settings = qualitySettings[videoQuality];
