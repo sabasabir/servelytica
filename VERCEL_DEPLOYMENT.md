@@ -30,28 +30,39 @@ Vercel will auto-detect Vite, but verify these settings:
 - **Install Command:** `npm install` (auto-detected)
 
 ### Step 4: Add Environment Variables
-**IMPORTANT:** Add these environment variables in Vercel:
+**⚠️ CRITICAL: Vercel does NOT automatically read .env files!**
 
-1. Click **"Environment Variables"** section
-2. Add each variable:
+You must add environment variables **individually** in the Vercel dashboard:
 
-```
-VITE_SUPABASE_URL=https://pxzlivocnykjjikkjago.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4emxpdm9jbnlramppa2tqYWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NTUwMDgsImV4cCI6MjA2MzAzMTAwOH0.l5yrgpfxJew3JxaihQB8Uu0a-sdI5pd2eR8cVGxrO1I
+1. In the deployment screen, scroll to **"Environment Variables"** section
+2. Click **"Add"** for each variable below
+3. **Add these 2 variables (VITE_ prefix is required):**
 
-SUPABASE_URL=https://pxzlivocnykjjikkjago.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4emxpdm9jbnlramppa2tqYWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NTUwMDgsImV4cCI6MjA2MzAzMTAwOH0.l5yrgpfxJew3JxaihQB8Uu0a-sdI5pd2eR8cVGxrO1I
+   **Variable 1:**
+   - Key: `VITE_SUPABASE_URL`
+   - Value: `https://pxzlivocnykjjikkjago.supabase.co`
+   - Environments: ✅ Production ✅ Preview ✅ Development
+   - Click **Save**
 
-DATABASE_URL=postgresql://postgres:EU5URRXWv1yPWop7@db.pxzlivocnykjjikkjago.supabase.co:5432/postgres
-```
+   **Variable 2:**
+   - Key: `VITE_SUPABASE_ANON_KEY`
+   - Value: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4emxpdm9jbnlramppa2tqYWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NTUwMDgsImV4cCI6MjA2MzAzMTAwOH0.l5yrgpfxJew3JxaihQB8Uu0a-sdI5pd2eR8cVGxrO1I`
+   - Environments: ✅ Production ✅ Preview ✅ Development
+   - Click **Save**
 
-3. Make sure to select **Production**, **Preview**, and **Development** for each variable
-4. Click **"Save"**
+4. **IMPORTANT:** After adding variables, you MUST redeploy (see Step 5)
+
+**📖 See `VERCEL_ENV_SETUP.md` for detailed instructions**
 
 ### Step 5: Deploy
 1. Click **"Deploy"** button
 2. Wait for build to complete (usually 2-3 minutes)
 3. Your app will be live at `https://your-project-name.vercel.app`
+
+**⚠️ If you added environment variables AFTER the first deployment:**
+- Go to **Deployments** tab
+- Click **3 dots** (⋯) on latest deployment → **Redeploy**
+- OR push a new commit to trigger redeploy
 
 ---
 
