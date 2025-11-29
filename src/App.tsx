@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import SportSelectionPage from "./pages/SportSelectionPage";
 import Index from "./pages/Index";
 import UploadPage from "./pages/UploadPage";
@@ -35,13 +36,14 @@ import LiveStreamingPage from "./pages/LiveStreamingPage";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
             {/* <Route path="/" element={<SportSelectionPage />} /> */}
             <Route path="/" element={<Index />} />
             {/* <Route path="/table-tennis" element={<Index />} />
@@ -78,11 +80,12 @@ const App = () => (
             <Route path="/matchmaking" element={<MatchmakingPage />} />
             <Route path="/live-stream" element={<LiveStreamingPage />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

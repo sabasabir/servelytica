@@ -105,12 +105,27 @@ const LibraryUploader = ({ onBack, onComplete }: LibraryUploaderProps) => {
 
     } catch (error: any) {
       console.error('Error uploading video:', error);
+      console.error('Full error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+        error: error
+      });
       setUploadStatus("error");
-      const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
+      
+      let errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
+      
+      // Check for RLS policy violation
+      if (errorMessage.includes('row-level security') || errorMessage.includes('RLS') || errorMessage.includes('policy')) {
+        errorMessage = `RLS Error: ${errorMessage}. RLS has been disabled - please hard refresh (Ctrl+Shift+R) and try again.`;
+      }
+      
       toast({
         title: "Upload Failed",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
+        duration: 10000
       });
       setTimeout(() => {
         setUploading(false);

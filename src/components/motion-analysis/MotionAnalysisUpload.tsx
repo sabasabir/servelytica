@@ -107,7 +107,7 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       
       if (hasFile && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
-        filePath = `motion-analysis/${user.id}/${Date.now()}.${fileExt}`;
+        filePath = `videos/${user.id}/${Date.now()}.${fileExt}`;
         
         setUploadProgress(25);
         
@@ -185,12 +185,44 @@ const MotionAnalysisUpload = ({ onUploadComplete }: MotionAnalysisUploadProps) =
       
     } catch (error: any) {
       console.error('Error uploading video:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        error_description: error?.error_description,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+        fullError: error
+      });
       setUploadStatus("error");
-      const errorMessage = error?.message || error?.error_description || "Failed to upload video. Please try again.";
+      
+      // Extract detailed error message
+      let errorMessage = "Failed to upload video. Please try again.";
+      
+      if (error?.message) {
+        errorMessage = error.message;
+        
+        // Check for RLS policy violation
+        if (error.message.includes('row-level security') || error.message.includes('RLS') || error.message.includes('policy')) {
+          errorMessage = `Security Policy Error: ${error.message}. Please ensure RLS is disabled on motion_analysis tables in Supabase.`;
+        }
+        
+        // Check for storage bucket errors
+        if (error.message.includes('bucket') || error.message.includes('storage') || error.message.includes('permission')) {
+          errorMessage = `Storage Error: ${error.message}. Please check storage bucket permissions.`;
+        }
+      } else if (error?.error_description) {
+        errorMessage = error.error_description;
+      } else if (error?.details) {
+        errorMessage = error.details;
+      } else if (error?.hint) {
+        errorMessage = error.hint;
+      }
+      
       toast({
         title: "Upload Failed",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
+        duration: 5000
       });
       setTimeout(() => {
         setUploading(false);

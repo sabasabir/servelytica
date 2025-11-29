@@ -7,12 +7,31 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || impor
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY || '', {
-    realtime: {
-        params: {
-            eventsPerSecond: 10
-        }
-    }
-});
+// Create a safe Supabase client
+// Use the actual key if provided, otherwise use a dummy key (but operations will fail gracefully)
+const supabaseKey = SUPABASE_PUBLISHABLE_KEY || 'dummy-key-for-initialization';
 
-export const isSupabaseConfigured = !!(SUPABASE_PUBLISHABLE_KEY && SUPABASE_URL && SUPABASE_URL !== 'https://pxzlivocnykjjikkjago.supabase.co');
+export const supabase = createClient<Database>(
+  SUPABASE_URL, 
+  supabaseKey, 
+  {
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
+    },
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+);
+
+// Check if Supabase is properly configured (has both URL and key, and key is not empty/dummy)
+export const isSupabaseConfigured = !!(
+  SUPABASE_PUBLISHABLE_KEY && 
+  SUPABASE_URL && 
+  SUPABASE_PUBLISHABLE_KEY !== 'dummy-key-for-initialization' &&
+  SUPABASE_PUBLISHABLE_KEY.length > 20 // Valid keys are much longer
+);
