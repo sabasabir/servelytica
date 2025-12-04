@@ -83,11 +83,29 @@ const UploadPage = () => {
       // Navigate to the upload complete page
       navigate("/upload-complete");
 
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code
+      });
+      
+      let errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      
+      // Provide helpful error messages
+      if (errorMessage.includes('row-level security') || errorMessage.includes('RLS') || errorMessage.includes('policy')) {
+        errorMessage = 'Security Policy Error: RLS has been disabled. Please hard refresh (Ctrl+Shift+R) and try again.';
+      } else if (errorMessage.includes('bucket') || errorMessage.includes('storage')) {
+        errorMessage = 'Storage Error: Please check storage bucket permissions.';
+      }
+      
       toast({
         title: "Upload failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive"
+        description: errorMessage,
+        variant: "destructive",
+        duration: 8000
       });
     } finally {
       setUploading(false);

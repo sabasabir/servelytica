@@ -1,11 +1,9 @@
 
-// Note: This is a placeholder implementation
-// In a real application, this would handle file uploads to Supabase storage
-
+// Upload service - uploads directly to Supabase storage
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Uploads a file to backend storage via base64 encoding and creates database record
+ * Uploads a file directly to Supabase storage and creates database record
  * @param file The file to upload
  * @param userId The user ID
  * @param formData Additional form data (title, description, focusArea, coachIds)
@@ -22,64 +20,92 @@ export const uploadFileToStorage = async (
   }
 ) => {
   try {
-    // Convert file to base64
-    const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    let binary = '';
-    for (let i = 0; i < uint8Array.length; i++) {
-      binary += String.fromCharCode(uint8Array[i]);
-    }
-    const base64 = btoa(binary);
+    console.log('Starting upload for user:', userId);
     
-    const response = await fetch('/api/videos/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        file: base64,
-        fileName: file.name,
-        fileSize: file.size,
-        userId: userId,
-        title: formData?.title || null,
+    // Generate file path
+    const fileExt = file.name.split('.').pop() || 'mp4';
+    const filePath = `videos/${userId}/${Date.now()}.${fileExt}`;
+    
+    console.log('Uploading to path:', filePath);
+    
+    // Upload file to Supabase storage
+    const { error: uploadError, data: uploadData } = await supabase.storage
+      .from('videos')
+      .upload(filePath, file, { 
+        upsert: false,
+        cacheControl: '3600',
+        contentType: file.type || 'video/mp4'
+      });
+    
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      throw uploadError;
+    }
+    
+    console.log('File uploaded successfully, creating database record...');
+    
+    // Create video record in database
+    const { data: video, error: videoError } = await supabase
+      .from('videos')
+      .insert({
+        user_id: userId,
+        file_path: filePath,
+        file_name: file.name,
+        file_size: file.size,
+        title: formData?.title || file.name.replace(/\.[^/.]+$/, ""),
         description: formData?.description || null,
-        focusArea: formData?.focusArea || null,
-        coachIds: formData?.coachIds || []
+        focus_area: formData?.focusArea || null,
+        analyzed: false
       })
-    });
+      .select()
+      .single();
     
-    if (!response.ok) {
-      try {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Upload failed with status ${response.status}`);
-      } catch (parseError) {
-        throw new Error(`Upload failed with status ${response.status}: ${response.statusText}`);
+    if (videoError) {
+      console.error('Database insert error:', videoError);
+      throw videoError;
+    }
+    
+    console.log('Video record created:', video?.id);
+    
+    // Assign coaches if provided
+    if (formData?.coachIds && formData.coachIds.length > 0 && video?.id) {
+      console.log('Assigning coaches:', formData.coachIds);
+      const coachAssignments = formData.coachIds.map(coachId => ({
+        video_id: video.id,
+        coach_id: coachId,
+        status: 'pending'
+      }));
+      
+      const { error: coachError } = await supabase
+        .from('video_coaches')
+        .insert(coachAssignments);
+      
+      if (coachError) {
+        console.error('Coach assignment error (non-fatal):', coachError);
+        // Don't fail the upload if coach assignment fails
       }
-    }
-    
-    const responseText = await response.text();
-    if (!responseText) {
-      throw new Error('Server returned empty response');
-    }
-    
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('Failed to parse response:', responseText);
-      throw new Error(`Invalid response from server: ${responseText.substring(0, 100)}`);
     }
     
     return {
       success: true,
-      filePath: data.filePath || data.path,
-      video: data.video
+      filePath: filePath,
+      video: video
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error uploading file:', error);
+    
+    let errorMessage = error?.message || 'Unknown error';
+    
+    // Provide helpful error messages
+    if (errorMessage.includes('row-level security') || errorMessage.includes('RLS') || errorMessage.includes('policy')) {
+      errorMessage = 'Security Policy Error: Please ensure RLS is disabled on videos and video_coaches tables.';
+    } else if (errorMessage.includes('bucket') || errorMessage.includes('storage')) {
+      errorMessage = 'Storage Error: Please check storage bucket permissions.';
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: errorMessage
     };
   }
 };
